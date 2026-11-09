@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 09, 2026 at 03:21 AM
+-- Generation Time: Nov 09, 2026 at 04:19 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.3.33
 
@@ -109,7 +109,6 @@ INSERT INTO `log_aktivitas` (`id`, `pengguna_id`, `aksi`, `tipe_objek`, `id_obje
 --
 -- Table structure for table `pembayaran`
 --
--- tesssssssssssssssssssss
 
 CREATE TABLE `pembayaran` (
   `id` bigint UNSIGNED NOT NULL,
@@ -151,7 +150,9 @@ CREATE TABLE `pengguna` (
 --
 
 INSERT INTO `pengguna` (`id`, `nama`, `email`, `password`, `peran`, `aktif`, `telepon`, `remember_token`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'Admin OMYU', 'admin@omyu.test', '$2y$12$qcCOwhbgdfbGlJFISOwV6urx./Ec4PZW/bgE4uznpEAiNaFzYl8NG', 'admin', 1, NULL, NULL, '2026-11-01 07:54:03', '2026-11-09 03:18:25', NULL);
+(1, 'Admin OMYU', 'admin@omyu.test', '$2y$12$4z5vlWXSeBm9gDIqsL71N.zCH9rXsAG0zHj0Mne/vPXL8ZBuSAb9e', 'admin', 1, NULL, NULL, '2026-11-01 07:54:03', '2026-11-09 03:23:35', NULL),
+(2, 'Budi', 'budi@omyu.test', '$2y$12$YM87AsU/W4VyrM/ljLEgxeaxu62Q8oWs7bwTvt3tUaSp8LBsvZ9XS', 'karyawan', 1, '081234567890', '0vu6y4jAHYC5EAp7W7qz73qmAC0Ob1oHbm1bOwUvV5sAeXwFjn47nWohAexo', '2026-11-09 03:23:35', '2026-11-09 03:23:35', NULL),
+(3, 'Siti', 'siti@omyu.test', '$2y$12$Eg63F494Cnwtc/q1FnDqCOiKeSIA/cEyG2MydxiFjd20KFA4JMyK6', 'karyawan', 1, NULL, NULL, '2026-11-09 03:23:35', '2026-11-09 03:23:35', NULL);
 
 -- --------------------------------------------------------
 
@@ -345,7 +346,7 @@ ALTER TABLE `pembayaran`
 -- AUTO_INCREMENT for table `pengguna`
 --
 ALTER TABLE `pengguna`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `pesanan`
