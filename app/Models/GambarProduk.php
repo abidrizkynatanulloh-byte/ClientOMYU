@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\PakaiBahasaIndonesia;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class GambarProduk extends Model
 {
-    use PakaiBahasaIndonesia;
+    use SoftDeletes;
 
     protected $table = 'gambar_produk';
 

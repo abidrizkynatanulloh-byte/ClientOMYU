@@ -3,5 +3,5 @@
 
 <form method="POST" action="{{ route('keluar') }}">
     @csrf
-    <button type="submit">Keluar</button>
+    <button type="submit">Keluar dari halaman ini</button>
 </form>

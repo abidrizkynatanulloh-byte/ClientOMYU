@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\PakaiBahasaIndonesia;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class ItemPesanan extends Model
-{
-    use PakaiBahasaIndonesia;
-
+{  
+    use SoftDeletes;
     protected $table = 'item_pesanan';
 
     protected $fillable = ['pesanan_id', 'produk_id', 'nama_produk', 'harga', 'jumlah', 'subtotal'];

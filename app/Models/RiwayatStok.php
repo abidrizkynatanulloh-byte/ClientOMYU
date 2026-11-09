@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\PakaiBahasaIndonesia;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RiwayatStok extends Model
 {
-    use PakaiBahasaIndonesia;
+    use SoftDeletes;
+
+    const UPDATED_AT = null;
 
     protected $table = 'riwayat_stok';
 
@@ -15,11 +17,6 @@ class RiwayatStok extends Model
         'produk_id', 'pengguna_id', 'pesanan_id', 'jenis',
         'jumlah', 'stok_setelah', 'catatan',
     ];
-
-    public function getUpdatedAtColumn()
-    {
-        return null;
-    }
 
     public function produk()
     {

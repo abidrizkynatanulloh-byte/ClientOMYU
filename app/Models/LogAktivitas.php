@@ -2,21 +2,17 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\PakaiBahasaIndonesia;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class LogAktivitas extends Model
 {
-    use PakaiBahasaIndonesia;
+    use SoftDeletes;
 
+    const UPDATED_AT = null;
     protected $table = 'log_aktivitas';
 
     protected $fillable = ['pengguna_id', 'aksi', 'tipe_objek', 'id_objek', 'deskripsi'];
-
-    public function getUpdatedAtColumn()
-    {
-        return null;
-    }
 
     public function pengguna()
     {

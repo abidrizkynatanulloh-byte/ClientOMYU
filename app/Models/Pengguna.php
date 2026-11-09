@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\PakaiBahasaIndonesia;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class Pengguna extends Authenticatable
 {
-    use Notifiable, PakaiBahasaIndonesia;
+    use Notifiable, SoftDeletes;
 
     protected $table = 'pengguna';
 
