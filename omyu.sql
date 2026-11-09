@@ -109,6 +109,7 @@ INSERT INTO `log_aktivitas` (`id`, `pengguna_id`, `aksi`, `tipe_objek`, `id_obje
 --
 -- Table structure for table `pembayaran`
 --
+-- tesssssssssssssssssssss
 
 CREATE TABLE `pembayaran` (
   `id` bigint UNSIGNED NOT NULL,
