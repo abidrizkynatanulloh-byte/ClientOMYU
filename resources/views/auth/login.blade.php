@@ -9,5 +9,5 @@
     <div><input type="email" name="email" value="{{ old('email') }}" placeholder="Email" required></div>
     <div><input type="password" name="password" placeholder="Password" required></div>
     <div><label><input type="checkbox" name="ingat"> Ingat saya</label></div>
-    <button type="submit">Masuk</button>
+    <button type="submit"> MASUK</button>
 </form>
