@@ -1,196 +1,193 @@
-# ClientOMYU
+```
+ ██████╗ ███╗   ███╗██╗   ██╗██╗   ██╗
+██╔═══██╗████╗ ████║╚██╗ ██╔╝██║   ██║
+██║   ██║██╔████╔██║ ╚████╔╝ ██║   ██║
+██║   ██║██║╚██╔╝██║  ╚██╔╝  ██║   ██║
+╚██████╔╝██║ ╚═╝ ██║   ██║   ╚██████╔╝
+ ╚═════╝ ╚═╝     ╚═╝   ╚═╝    ╚═════╝ 
+```
+# 💼 ClientOMYU
+(sesuaikan) Satu kalimat singkat tentang apa yang dilakukan aplikasi ini.
 
-Repositori proyek **ClientOMYU**. Dokumen ini adalah panduan supaya semua anggota tim bisa menjalankan proyek dan berkontribusi tanpa bingung.
-
-> Catatan: bagian bertanda `(sesuaikan)` perlu diisi/diubah sesuai kebutuhan proyek.
-
----
-
-## Daftar Isi
-
-1. [Gambaran Proyek](#gambaran-proyek)
-2. [Kebutuhan Awal](#kebutuhan-awal)
-3. [Cara Menjalankan Proyek di Komputer](#cara-menjalankan-proyek-di-komputer)
-4. [Alur Kerja Tim (Git)](#alur-kerja-tim-git)
-5. [Aturan Penulisan Commit](#aturan-penulisan-commit)
-6. [Masalah Umum dan Solusinya](#masalah-umum-dan-solusinya)
-7. [Anggota Tim](#anggota-tim)
+`PHP` `Laravel` `MySQL` `Status: Development`
 
 ---
 
-## Gambaran Proyek
+## 📋 Tentang Proyek
 
-(sesuaikan) Tulis 2-3 kalimat tentang proyek ini: tujuannya, fitur utama, dan teknologi yang dipakai.
+(sesuaikan) ClientOMYU adalah aplikasi web yang ... Jelaskan tujuan proyek, siapa penggunanya, dan masalah apa yang diselesaikan.
 
-Contoh:
-- Bahasa/Framework: PHP / HTML / CSS / JavaScript (sesuaikan)
-- Database: MySQL (sesuaikan)
-- Server lokal: Laragon
+## ✨ Fitur
 
----
+| Fitur | Deskripsi |
+|---|---|
+| 🔐 Login & Role | (sesuaikan) Autentikasi dan pembagian hak akses |
+| 📦 Fitur 1 | (sesuaikan) Deskripsi singkat |
+| 📝 Fitur 2 | (sesuaikan) Deskripsi singkat |
+| 📊 Fitur 3 | (sesuaikan) Deskripsi singkat |
 
-## Kebutuhan Awal
+## 🛠️ Tech Stack
 
-Pastikan sudah terpasang di komputer:
-
-| Aplikasi | Fungsi |
-|----------|--------|
-| [Git](https://git-scm.com/downloads) | Mengelola versi kode |
-| [Laragon](https://laragon.org/download/) | Server lokal (Apache/Nginx, PHP, MySQL) |
-| [VS Code](https://code.visualstudio.com/) | Editor kode |
-| Akun [GitHub](https://github.com/) | Untuk berkontribusi |
-
----
-
-## Cara Menjalankan Proyek di Komputer
-
-### 1. Terima undangan collaborator
-
-Pemilik repo akan mengundang kamu. Buka email atau notifikasi GitHub, lalu klik **Accept invitation**. Tanpa ini kamu tidak bisa `push`.
-
-### 2. Atur identitas Git (sekali saja)
-
-Gunakan **email yang sama dengan akun GitHub-mu** supaya namamu muncul di daftar Contributors.
-
-```bash
-git config --global user.name "NamaKamu"
-git config --global user.email "emailgithubmu@contoh.com"
+```
+Frontend  → Blade · Tailwind/Bootstrap · JavaScript
+Backend   → PHP (Laravel)
+Database  → MySQL
 ```
 
-### 3. Clone repositori
+(sesuaikan kalau stack-nya berbeda)
 
-Buka terminal, pindah ke folder `www` milik Laragon, lalu clone:
+## 🚀 Cara Install (Pertama Kali)
+
+### Prasyarat
+- Laragon (atau XAMPP) sudah terinstall
+- PHP >= 8.1
+- Composer
+- Git
+- Sudah menerima undangan **collaborator** dari pemilik repo (cek email / notifikasi GitHub)
+
+### Langkah-langkah
 
 ```bash
+# 0. Atur identitas Git (sekali saja di laptop masing-masing)
+#    Pakai email yang SAMA dengan akun GitHub supaya muncul di Contributors
+git config --global user.name "nama_kamu"
+git config --global user.email "email_github_kamu@gmail.com"
+
+# 1. Clone repo (jalankan dari folder induk, misalnya C:\laragon\www)
 cd C:\laragon\www
 git clone https://github.com/abidrizkynatanulloh-byte/ClientOMYU.git
 cd ClientOMYU
+
+# 2. Install dependencies Laravel
+composer install
+
+# 3. Buat file konfigurasi
+cp .env.example .env
+php artisan key:generate
 ```
 
-> Jangan menjalankan `git clone` di dalam folder yang sudah bernama `ClientOMYU`, karena akan error `destination path already exists`.
+> ⚠️ Jangan `git clone` di dalam folder yang sudah bernama `ClientOMYU`, nanti error `destination path already exists`.
 
-### 4. Siapkan database (jika ada)
-
-(sesuaikan)
-1. Nyalakan Laragon, klik **Start All**.
-2. Buka phpMyAdmin / HeidiSQL, buat database baru, misalnya `clientomyu`.
-3. Import file `.sql` dari proyek (jika tersedia).
-4. Atur koneksi database di file konfigurasi (misalnya `config.php` atau `.env`).
-
-### 5. Jalankan proyek
-
-Buka di browser:
+Buka file `.env`, sesuaikan bagian database:
 
 ```
-http://clientomyu.test
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=clientomyu
+DB_USERNAME=root
+DB_PASSWORD=
 ```
-
-atau
-
-```
-http://localhost/ClientOMYU
-```
-
-(Laragon biasanya membuat alamat `.test` otomatis. Kalau tidak jalan, klik kanan ikon Laragon, lalu **Menu, Apache, Reload**.)
-
----
-
-## Alur Kerja Tim (Git)
-
-Aturan utama: **jangan langsung mengerjakan di `main`**. Buat branch sendiri untuk setiap tugas.
-
-### Langkah setiap kali mulai mengerjakan tugas
-
-**1. Ambil update terbaru dulu**
 
 ```bash
+# 4. Buat database "clientomyu" di phpMyAdmin (http://localhost/phpmyadmin)
+
+# 5. Jalankan migration (buat semua tabel otomatis)
+php artisan migrate
+
+# (opsional) isi data contoh
+php artisan migrate --seed
+
+# 6. Jalankan aplikasi
+php artisan serve
+```
+
+Buka browser → `http://localhost:8000` 🎉
+
+(Kalau pakai Laragon dengan auto virtual host, bisa juga lewat `http://clientomyu.test`)
+
+## 🔄 Workflow Sebelum Ngoding
+
+Wajib dilakukan setiap kali mau mulai kerja!
+
+```bash
+# 1. Pindah ke main dan ambil update terbaru dari teman
 git checkout main
 git pull origin main
-```
 
-**2. Buat branch baru**
-
-```bash
+# 2. Buat branch baru untuk tugasmu
 git checkout -b nama-fitur
 ```
 
-Contoh nama branch: `fitur-login`, `perbaikan-navbar`, `tambah-readme`.
+> Kalau ada migration baru dari teman setelah `git pull`, jalankan `php artisan migrate` lagi biar tabel barunya ikut dibuat.
+>
+> Kalau ada package baru di `composer.json`, jalankan `composer install` lagi.
 
-**3. Kerjakan dan simpan perubahan**
+## 📤 Upload Perubahan
 
 ```bash
+# 1. Cek file apa saja yang berubah
 git status
+
+# 2. Tambahkan file yang berubah
 git add .
-git commit -m "feat: tambah halaman login"
+
+# 3. Tulis pesan commit yang jelas
+git commit -m "feat: tambah fitur login"
+
+# 4. Push ke branch kamu
+git push -u origin nama-fitur
 ```
 
-**4. Kirim ke GitHub**
+Lalu di GitHub:
+1. Klik tombol **Compare & pull request**
+2. Tulis ringkasan perubahan, klik **Create pull request**
+3. Minta teman mengecek, lalu **Merge**
+4. Kembali ke terminal: `git checkout main` lalu `git pull origin main`
 
-```bash
-git push origin nama-fitur
-```
+> Nama kamu muncul di daftar **Contributors** setelah commit-mu masuk ke branch `main` (lewat merge Pull Request).
 
-**5. Buat Pull Request (PR)**
-
-1. Buka repo di GitHub.
-2. Klik tombol **Compare & pull request**.
-3. Tulis ringkasan perubahan, lalu klik **Create pull request**.
-4. Minta teman satu tim mengecek, lalu **Merge** setelah disetujui.
-
-**6. Setelah di-merge, sinkronkan lagi**
-
-```bash
-git checkout main
-git pull origin main
-```
-
-> Contributor akan tercatat di halaman repo setelah commit masuk ke branch `main` (lewat merge PR).
-
-### Ringkasan alur
-
-```
-pull main -> buat branch -> kerjakan -> commit -> push -> Pull Request -> merge -> pull main
-```
-
----
-
-## Aturan Penulisan Commit
-
-Pakai pesan yang singkat dan jelas, diawali jenis perubahan:
+### Format Pesan Commit
 
 | Awalan | Arti | Contoh |
-|--------|------|--------|
-| `feat:` | Menambah fitur | `feat: tambah form pendaftaran` |
-| `fix:` | Memperbaiki bug | `fix: perbaiki tampilan di mobile` |
+|---|---|---|
+| `feat:` | Tambah fitur | `feat: tambah halaman dashboard` |
+| `fix:` | Perbaiki bug | `fix: perbaiki validasi form` |
 | `docs:` | Dokumentasi | `docs: update README` |
-| `style:` | Perubahan tampilan/format | `style: rapikan CSS navbar` |
-| `refactor:` | Merapikan kode | `refactor: pisahkan fungsi koneksi` |
+| `style:` | Tampilan / format | `style: rapikan CSS navbar` |
+| `refactor:` | Rapikan kode | `refactor: pisahkan fungsi helper` |
 
----
+## 📁 Struktur Folder
 
-## Masalah Umum dan Solusinya
+(sesuaikan dengan struktur proyek yang sebenarnya)
 
-| Masalah | Penyebab | Solusi |
-|---------|----------|--------|
-| `fatal: not a git repository` | Folder belum jadi repo Git | Masuk ke folder hasil `git clone`, atau jalankan `git init` lalu `git remote add origin <url>` |
-| `destination path already exists` | Clone ke folder yang sudah ada | Pindah dulu ke folder induk (`cd C:\laragon\www`) lalu clone |
-| `403 Permission denied` saat push | Belum jadi collaborator | Terima undangan, atau gunakan Fork + Pull Request |
-| `nothing to commit` | Tidak ada file yang berubah | Edit dan simpan (Ctrl+S) dulu, cek dengan `git status` |
-| `Your branch is behind` / push ditolak | Ada perubahan baru di GitHub | Jalankan `git pull origin main` dulu, lalu push lagi |
-| Merge conflict | Dua orang mengubah baris yang sama | Buka file yang konflik, pilih versi yang benar, hapus tanda `<<<<<<<`, `=======`, `>>>>>>>`, lalu `git add` dan `git commit` |
-| Nama tidak muncul di Contributors | Email commit tidak cocok dengan akun GitHub | Tambahkan email di GitHub (Settings, Emails) dan samakan dengan `git config user.email` |
+```
+$ tree
+.
+├── app
+│   ├── Http
+│   │   └── Controllers
+│   └── Models
+├── database
+│   ├── migrations
+│   └── seeders
+├── resources
+│   └── views
+├── routes
+│   └── web.php
+├── .env.example
+├── composer.json
+└── README.md
+```
 
----
-
-## Anggota Tim
+## 🗂️ Struktur Database
 
 (sesuaikan)
 
-| Nama | GitHub | Tugas |
-|------|--------|-------|
-| Abid Rizky Natanulloh | [@abidrizkynatanulloh-byte](https://github.com/abidrizkynatanulloh-byte) | Pemilik repo |
-| ... | ... | ... |
+| Tabel | Isi |
+|---|---|
+| `users` | Data pengguna |
+| `...` | ... |
 
----
+## 🆘 Masalah Umum
 
-Kalau ada yang kurang jelas, tanyakan di grup tim sebelum mengubah `main`. Selamat berkontribusi!
+| Masalah | Penyebab | Solusi |
+|---|---|---|
+| `fatal: not a git repository` | Folder belum jadi repo Git | Masuk ke folder hasil `git clone` |
+| `destination path already exists` | Clone di dalam folder yang sama | Pindah ke folder induk dulu, lalu clone |
+| `403 Permission denied` saat push | Belum jadi collaborator | Terima undangan dari pemilik repo |
+| `nothing to commit` | Belum ada file yang berubah | Edit & simpan (Ctrl+S), cek `git status` |
+| Push ditolak / `behind` | Ada update baru di GitHub | `git pull origin main` dulu |
+| Merge conflict | Dua orang edit baris yang sama | Buka file konflik, pilih versi yang benar, hapus tanda `<<<<<<<`, lalu `git add` & `git commit` |
+| Nama tidak muncul di Contributors | Email commit tidak cocok dengan GitHub | Samakan `git config user.email` dengan email di GitHub (Settings → Emails) |
+| Error `.env` / `APP_KEY` | Belum generate key | `php artisan key:generate` |
