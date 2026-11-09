@@ -1,58 +1,196 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ClientOMYU
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Repositori proyek **ClientOMYU**. Dokumen ini adalah panduan supaya semua anggota tim bisa menjalankan proyek dan berkontribusi tanpa bingung.
 
-## About Laravel
+> Catatan: bagian bertanda `(sesuaikan)` perlu diisi/diubah sesuai kebutuhan proyek.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Daftar Isi
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. [Gambaran Proyek](#gambaran-proyek)
+2. [Kebutuhan Awal](#kebutuhan-awal)
+3. [Cara Menjalankan Proyek di Komputer](#cara-menjalankan-proyek-di-komputer)
+4. [Alur Kerja Tim (Git)](#alur-kerja-tim-git)
+5. [Aturan Penulisan Commit](#aturan-penulisan-commit)
+6. [Masalah Umum dan Solusinya](#masalah-umum-dan-solusinya)
+7. [Anggota Tim](#anggota-tim)
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Gambaran Proyek
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+(sesuaikan) Tulis 2-3 kalimat tentang proyek ini: tujuannya, fitur utama, dan teknologi yang dipakai.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Contoh:
+- Bahasa/Framework: PHP / HTML / CSS / JavaScript (sesuaikan)
+- Database: MySQL (sesuaikan)
+- Server lokal: Laragon
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Kebutuhan Awal
+
+Pastikan sudah terpasang di komputer:
+
+| Aplikasi | Fungsi |
+|----------|--------|
+| [Git](https://git-scm.com/downloads) | Mengelola versi kode |
+| [Laragon](https://laragon.org/download/) | Server lokal (Apache/Nginx, PHP, MySQL) |
+| [VS Code](https://code.visualstudio.com/) | Editor kode |
+| Akun [GitHub](https://github.com/) | Untuk berkontribusi |
+
+---
+
+## Cara Menjalankan Proyek di Komputer
+
+### 1. Terima undangan collaborator
+
+Pemilik repo akan mengundang kamu. Buka email atau notifikasi GitHub, lalu klik **Accept invitation**. Tanpa ini kamu tidak bisa `push`.
+
+### 2. Atur identitas Git (sekali saja)
+
+Gunakan **email yang sama dengan akun GitHub-mu** supaya namamu muncul di daftar Contributors.
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git config --global user.name "NamaKamu"
+git config --global user.email "emailgithubmu@contoh.com"
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 3. Clone repositori
 
-## Contributing
+Buka terminal, pindah ke folder `www` milik Laragon, lalu clone:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+cd C:\laragon\www
+git clone https://github.com/abidrizkynatanulloh-byte/ClientOMYU.git
+cd ClientOMYU
+```
 
-## Code of Conduct
+> Jangan menjalankan `git clone` di dalam folder yang sudah bernama `ClientOMYU`, karena akan error `destination path already exists`.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 4. Siapkan database (jika ada)
 
-## Security Vulnerabilities
+(sesuaikan)
+1. Nyalakan Laragon, klik **Start All**.
+2. Buka phpMyAdmin / HeidiSQL, buat database baru, misalnya `clientomyu`.
+3. Import file `.sql` dari proyek (jika tersedia).
+4. Atur koneksi database di file konfigurasi (misalnya `config.php` atau `.env`).
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 5. Jalankan proyek
 
-## License
+Buka di browser:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```
+http://clientomyu.test
+```
+
+atau
+
+```
+http://localhost/ClientOMYU
+```
+
+(Laragon biasanya membuat alamat `.test` otomatis. Kalau tidak jalan, klik kanan ikon Laragon, lalu **Menu, Apache, Reload**.)
+
+---
+
+## Alur Kerja Tim (Git)
+
+Aturan utama: **jangan langsung mengerjakan di `main`**. Buat branch sendiri untuk setiap tugas.
+
+### Langkah setiap kali mulai mengerjakan tugas
+
+**1. Ambil update terbaru dulu**
+
+```bash
+git checkout main
+git pull origin main
+```
+
+**2. Buat branch baru**
+
+```bash
+git checkout -b nama-fitur
+```
+
+Contoh nama branch: `fitur-login`, `perbaikan-navbar`, `tambah-readme`.
+
+**3. Kerjakan dan simpan perubahan**
+
+```bash
+git status
+git add .
+git commit -m "feat: tambah halaman login"
+```
+
+**4. Kirim ke GitHub**
+
+```bash
+git push origin nama-fitur
+```
+
+**5. Buat Pull Request (PR)**
+
+1. Buka repo di GitHub.
+2. Klik tombol **Compare & pull request**.
+3. Tulis ringkasan perubahan, lalu klik **Create pull request**.
+4. Minta teman satu tim mengecek, lalu **Merge** setelah disetujui.
+
+**6. Setelah di-merge, sinkronkan lagi**
+
+```bash
+git checkout main
+git pull origin main
+```
+
+> Contributor akan tercatat di halaman repo setelah commit masuk ke branch `main` (lewat merge PR).
+
+### Ringkasan alur
+
+```
+pull main -> buat branch -> kerjakan -> commit -> push -> Pull Request -> merge -> pull main
+```
+
+---
+
+## Aturan Penulisan Commit
+
+Pakai pesan yang singkat dan jelas, diawali jenis perubahan:
+
+| Awalan | Arti | Contoh |
+|--------|------|--------|
+| `feat:` | Menambah fitur | `feat: tambah form pendaftaran` |
+| `fix:` | Memperbaiki bug | `fix: perbaiki tampilan di mobile` |
+| `docs:` | Dokumentasi | `docs: update README` |
+| `style:` | Perubahan tampilan/format | `style: rapikan CSS navbar` |
+| `refactor:` | Merapikan kode | `refactor: pisahkan fungsi koneksi` |
+
+---
+
+## Masalah Umum dan Solusinya
+
+| Masalah | Penyebab | Solusi |
+|---------|----------|--------|
+| `fatal: not a git repository` | Folder belum jadi repo Git | Masuk ke folder hasil `git clone`, atau jalankan `git init` lalu `git remote add origin <url>` |
+| `destination path already exists` | Clone ke folder yang sudah ada | Pindah dulu ke folder induk (`cd C:\laragon\www`) lalu clone |
+| `403 Permission denied` saat push | Belum jadi collaborator | Terima undangan, atau gunakan Fork + Pull Request |
+| `nothing to commit` | Tidak ada file yang berubah | Edit dan simpan (Ctrl+S) dulu, cek dengan `git status` |
+| `Your branch is behind` / push ditolak | Ada perubahan baru di GitHub | Jalankan `git pull origin main` dulu, lalu push lagi |
+| Merge conflict | Dua orang mengubah baris yang sama | Buka file yang konflik, pilih versi yang benar, hapus tanda `<<<<<<<`, `=======`, `>>>>>>>`, lalu `git add` dan `git commit` |
+| Nama tidak muncul di Contributors | Email commit tidak cocok dengan akun GitHub | Tambahkan email di GitHub (Settings, Emails) dan samakan dengan `git config user.email` |
+
+---
+
+## Anggota Tim
+
+(sesuaikan)
+
+| Nama | GitHub | Tugas |
+|------|--------|-------|
+| Abid Rizky Natanulloh | [@abidrizkynatanulloh-byte](https://github.com/abidrizkynatanulloh-byte) | Pemilik repo |
+| ... | ... | ... |
+
+---
+
+Kalau ada yang kurang jelas, tanyakan di grup tim sebelum mengubah `main`. Selamat berkontribusi!
