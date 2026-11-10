@@ -1,17 +1,30 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Owner\DashboardController;
+use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 use App\Http\Controllers\Owner\PenjualanController;
 use App\Http\Controllers\Owner\ResepHppController;
+<<<<<<< HEAD
 use App\Http\Controllers\Owner\BahanController;
 use App\Http\Controllers\Owner\KeuanganController;
 use App\Http\Controllers\Owner\KaryawanController;
+=======
+use App\Http\Controllers\Staf\AktivitasController as StafAktivitasController;
+use App\Http\Controllers\Staf\DashboardController as StafDashboardController;
+use App\Http\Controllers\Staf\KasirController as StafKasirController;
+use App\Http\Controllers\Staf\PesananController as StafPesananController;
+use App\Http\Controllers\Staf\ProfilController as StafProfilController;
+use App\Http\Controllers\Staf\StokController as StafStokController;
+use App\Models\Produk;
+>>>>>>> c3e721f (backend staff)
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => 'Halaman katalog (akan dibuat di Tahap 4)');
+Route::get('/', function () {
+    $daftarProduk = Produk::where('aktif', 1)->take(8)->get();
+    return view('beranda', compact('daftarProduk'));
+});
 
-// login staf
+// Otentikasi Staf & Admin
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'tampilkanLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'masuk'])
@@ -23,20 +36,51 @@ Route::post('/keluar', [AuthController::class, 'keluar'])
     ->middleware('auth')
     ->name('keluar');
 
-// panel: karyawan dan admin
+// Panel Operasional: Staf Karyawan & Admin
 Route::middleware(['auth', 'peran:admin,karyawan'])
     ->prefix('panel')->name('panel.')
     ->group(function () {
-        Route::view('/', 'panel.beranda')->name('beranda');
 
-                // khusus admin (owner)
+        // K-02: Dashboard Operasional Staf
+        Route::get('/', [StafDashboardController::class, 'index'])->name('beranda');
+
+        // K-03, K-04, K-05, K-06, K-12: Manajemen Pesanan Masuk & Verifikasi
+        Route::prefix('pesanan')->name('staf.pesanan.')->group(function () {
+            Route::get('/', [StafPesananController::class, 'index'])->name('index');
+            Route::get('/{id}', [StafPesananController::class, 'detail'])->name('detail');
+            Route::post('/{id}/verifikasi-bayar', [StafPesananController::class, 'verifikasiPembayaran'])->name('verifikasi-bayar');
+            Route::post('/{id}/status', [StafPesananController::class, 'updateStatus'])->name('update-status');
+            Route::post('/{id}/batal', [StafPesananController::class, 'batalkan'])->name('batal');
+        });
+
+        // K-07: Penjualan Langsung di Kasir (POS)
+        Route::prefix('kasir')->name('staf.kasir.')->group(function () {
+            Route::get('/', [StafKasirController::class, 'index'])->name('index');
+            Route::post('/transaksi', [StafKasirController::class, 'simpanTransaksi'])->name('simpan');
+            Route::get('/struk/{id}', [StafKasirController::class, 'struk'])->name('struk');
+        });
+
+        // K-09, K-10, K-11: Manajemen Stok & Kerusakan Produk
+        Route::prefix('stok')->name('staf.stok.')->group(function () {
+            Route::get('/', [StafStokController::class, 'index'])->name('index');
+            Route::post('/{id}/penyesuaian', [StafStokController::class, 'penyesuaian'])->name('penyesuaian');
+        });
+
+        // K-14: Riwayat Aktivitas Audit Log
+        Route::get('/aktivitas', [StafAktivitasController::class, 'index'])->name('staf.aktivitas.index');
+
+        // K-01: Profil & Ubah Password
+        Route::get('/profil', [StafProfilController::class, 'index'])->name('staf.profil.index');
+        Route::post('/profil/password', [StafProfilController::class, 'updatePassword'])->name('staf.profil.password');
+
+        // Khusus Admin (Owner)
         Route::middleware('peran:admin')
             ->prefix('admin')->name('admin.')
             ->group(function () {
-                Route::get('/', [DashboardController::class, 'index'])->name('beranda');
+                Route::get('/', [OwnerDashboardController::class, 'index'])->name('beranda');
                 Route::get('/penjualan', [PenjualanController::class, 'index'])->name('penjualan.index');
                 Route::get('/penjualan/{id}', [PenjualanController::class, 'detail'])->name('penjualan.detail');
-                                // O-03: Modul Produk, Resep & HPP per Cup
+                // O-03: Modul Produk, Resep & HPP per Cup
                 Route::get('/resep', [ResepHppController::class, 'index'])->name('resep.index');
                 Route::get('/resep/{varianId}', [ResepHppController::class, 'detail'])->name('resep.detail');
                 Route::get('/bahan', [BahanController::class, 'index'])->name('bahan.index');
