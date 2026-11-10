@@ -12,12 +12,13 @@ class Pengguna extends Authenticatable
 
     protected $table = 'pengguna';
 
-    protected $fillable = ['nama', 'email', 'password', 'peran', 'aktif', 'telepon'];
+    protected $fillable = ['nama', 'email', 'password', 'peran', 'aktif','bisa_lihat_hpp',  'telepon'];
 
     protected $hidden = ['password', 'remember_token'];
 
     protected $casts = [
         'aktif'    => 'boolean',
+        'bisa_lihat_hpp'=> 'boolean',
         'password' => 'hashed',
     ];
 

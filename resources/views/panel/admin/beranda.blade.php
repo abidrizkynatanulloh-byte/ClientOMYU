@@ -31,6 +31,15 @@
                 <a href="{{ route('panel.admin.resep.index') }}" style="padding: 8px 14px; background: #fff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold;">
             🍹 Resep & HPP (O-03)
         </a>
+                <a href="{{ route('panel.admin.bahan.index') }}" style="padding: 8px 14px; background: #fff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold;">
+            📦 Persediaan Bahan (O-04)
+        </a>
+                <a href="{{ route('panel.admin.keuangan.laba_rugi') }}" style="padding: 8px 14px; background: #fff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold;">
+            💰 Keuangan & Laba Rugi (O-05)
+        </a>
+                <a href="{{ route('panel.admin.karyawan.index') }}" style="padding: 8px 14px; background: #fff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold;">
+            👥 Karyawan (O-09)
+        </a>
         <form method="POST" action="{{ route('keluar') }}">
             @csrf
             <button type="submit" style="padding: 8px 16px; cursor: pointer;">Keluar</button>

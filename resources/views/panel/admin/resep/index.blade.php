@@ -21,6 +21,10 @@
         <a href="{{ route('panel.admin.beranda') }}">📊 Dashboard</a>
         <a href="{{ route('panel.admin.penjualan.index') }}">🛒 Penjualan</a>
         <a href="{{ route('panel.admin.resep.index') }}" class="active">🍹 Resep & HPP (O-03)</a>
+        <a href="{{ route('panel.admin.bahan.index') }}">📦 Persediaan Bahan (O-04)</a>
+        <a href="{{ route('panel.admin.keuangan.laba_rugi') }}" >
+            💰 Keuangan & Laba Rugi (O-05)
+        </a>
     </div>
 
     <h1>Tabel HPP, Margin & Kapasitas Cup per Menu</h1>

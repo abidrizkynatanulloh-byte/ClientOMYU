@@ -28,6 +28,10 @@
         <a href="{{ route('panel.admin.beranda') }}">📊 Dashboard</a>
         <a href="{{ route('panel.admin.penjualan.index') }}"class="active">🛒 Penjualan</a>
         <a href="{{ route('panel.admin.resep.index') }}" >🍹 Resep & HPP (O-03)</a>
+        <a href="{{ route('panel.admin.bahan.index') }}">📦 Persediaan Bahan (O-04)</a>
+        <a href="{{ route('panel.admin.keuangan.laba_rugi') }}">
+            💰 Keuangan & Laba Rugi (O-05)
+        </a>
     </div>
 
     <h1>Rekap Penjualan & Pesanan (O-02)</h1>
