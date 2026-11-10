@@ -28,11 +28,15 @@ class AuthController extends Controller
                 ->onlyInput('email');
         }
 
-        $request->session()->regenerate();
+                $request->session()->regenerate();
+
+        // Cek peran pengguna: jika admin arahkan ke panel admin, jika karyawan ke panel biasa
+        if (Auth::user()->peran === 'admin') {
+            return redirect()->intended('/panel/admin');
+        }
 
         return redirect()->intended('/panel');
     }
-
     public function keluar(Request $request)
     {
         Auth::logout();

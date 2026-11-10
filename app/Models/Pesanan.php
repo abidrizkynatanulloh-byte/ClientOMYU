@@ -12,10 +12,10 @@ class Pesanan extends Model
     protected $table = 'pesanan';
 
     protected $fillable = [
-        'kode_pesanan', 'token_akses', 'nama_pembeli', 'telepon_pembeli',
+        'kode_pesanan', 'token_akses', 'jenis', 'nama_pembeli', 'telepon_pembeli',
         'email_pembeli', 'alamat_pengiriman', 'catatan', 'subtotal', 'ongkir',
-        'total', 'status_pembayaran', 'status_pesanan', 'kedaluwarsa_pada',
-        'dibayar_pada', 'ditangani_oleh', 'nomor_resi',
+        'total', 'metode_bayar', 'kode_unik', 'status_pembayaran', 'status_pesanan',
+        'kedaluwarsa_pada', 'dibayar_pada', 'ditangani_oleh', 'nomor_resi',
     ];
 
     protected $casts = [

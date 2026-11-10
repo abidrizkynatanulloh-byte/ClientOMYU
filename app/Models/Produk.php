@@ -56,4 +56,10 @@ class Produk extends Model
     {
         return $query->where('aktif', true);
     }
+
+        public function varian()
+    {
+        return $this->hasMany(VarianProduk::class, 'produk_id');
+    }
+    
 }

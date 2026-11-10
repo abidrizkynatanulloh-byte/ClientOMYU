@@ -16,7 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
     'peran' => \App\Http\Middleware\PastikanPeran::class,
 ]);
 
-$middleware->redirectUsersTo('/panel');
+$middleware->redirectUsersTo(fn (Request $request) => 
+    $request->user()?->peran === 'admin' ? '/panel/admin' : '/panel'
+);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -10,7 +10,10 @@ class ItemPesanan extends Model
     use SoftDeletes;
     protected $table = 'item_pesanan';
 
-    protected $fillable = ['pesanan_id', 'produk_id', 'nama_produk', 'harga', 'jumlah', 'subtotal'];
+    protected $fillable = [
+        'pesanan_id', 'produk_id', 'varian_id', 'nama_produk', 'nama_varian',
+        'harga', 'jumlah', 'subtotal', 'resep_id', 'hpp_bahan', 'hpp_kemasan'
+    ];
 
     protected $casts = [
         'harga'    => 'integer',
