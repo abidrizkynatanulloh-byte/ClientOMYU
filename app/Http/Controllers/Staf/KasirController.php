@@ -13,6 +13,7 @@ use App\Models\RiwayatStok;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Models\Resep;
 
 class KasirController extends Controller
 {
@@ -131,25 +132,62 @@ class KasirController extends Controller
             $pesananId = $pesanan->id;
 
             // 2. Simpan Item Pesanan, Potong Stok, & Buat Riwayat Stok
+                        // 2. Simpan Item Pesanan, Hitung HPP Otomatis, & Potong Stok Bahan Baku (Bab 2 & 10)
             foreach ($itemsData as $data) {
                 $produk = $data['produk'];
                 $qty = $data['jumlah'];
 
+                // Cari resep aktif dari varian produk ini
+                $varian = $produk->varian()->first();
+                $resep = $varian 
+                    ? Resep::with('bahanList')->where('varian_id', $varian->id)->where('aktif', 1)->first() 
+                    : null;
+
+                $hppBahanPerCup = 0;
+                $hppKemasanPerCup = 0;
+
+                // Jika produk punya resep, hitung HPP dan kurangi stok bahan baku (melon, gula, cup, dll)
+                if ($resep && $resep->bahanList->isNotEmpty()) {
+                    foreach ($resep->bahanList as $bahan) {
+                        $takaran = (float) $bahan->pivot->takaran;
+                        $biayaSatuan = (float) $bahan->biaya_rata_rata;
+                        $biayaTotal = $takaran * $biayaSatuan;
+
+                        if ($bahan->jenis === 'kemasan') {
+                            $hppKemasanPerCup += $biayaTotal;
+                        } else {
+                            $hppBahanPerCup += $biayaTotal;
+                        }
+
+                        // Kurangi stok riil bahan di kulkas (dalam gram/ml/pcs)
+                        $kebutuhan = $takaran * $qty;
+                        $stokBahanSebelum = (float) $bahan->stok;
+                        $stokBahanSesudah = max(0, $stokBahanSebelum - $kebutuhan);
+                        $bahan->update(['stok' => $stokBahanSesudah]);
+                    }
+                }
+
+                // Simpan item pesanan lengkap dengan nilai HPP bahan & kemasan
                 ItemPesanan::create([
                     'pesanan_id'  => $pesanan->id,
                     'produk_id'   => $produk->id,
+                    'varian_id'   => $varian?->id,
                     'nama_produk' => $produk->nama,
+                    'nama_varian' => $varian?->nama ?? 'Reguler',
                     'harga'       => $data['harga'],
                     'jumlah'      => $qty,
                     'subtotal'    => $data['subtotal'],
+                    'resep_id'    => $resep?->id,
+                    'hpp_bahan'   => round($hppBahanPerCup, 2),
+                    'hpp_kemasan' => round($hppKemasanPerCup, 2),
                 ]);
 
-                // Kurangi stok di produk
+                // Kurangi stok cup produk jadi di kasir
                 $stokSebelum = $produk->stok;
                 $stokSesudah = max(0, $stokSebelum - $qty);
                 $produk->update(['stok' => $stokSesudah]);
 
-                // Catat riwayat stok
+                // Catat riwayat pergerakan stok
                 RiwayatStok::create([
                     'produk_id'    => $produk->id,
                     'pengguna_id'  => auth()->id(),

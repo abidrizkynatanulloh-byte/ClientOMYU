@@ -4,11 +4,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 use App\Http\Controllers\Owner\PenjualanController;
 use App\Http\Controllers\Owner\ResepHppController;
-<<<<<<< HEAD
 use App\Http\Controllers\Owner\BahanController;
 use App\Http\Controllers\Owner\KeuanganController;
 use App\Http\Controllers\Owner\KaryawanController;
-=======
 use App\Http\Controllers\Staf\AktivitasController as StafAktivitasController;
 use App\Http\Controllers\Staf\DashboardController as StafDashboardController;
 use App\Http\Controllers\Staf\KasirController as StafKasirController;
@@ -16,7 +14,6 @@ use App\Http\Controllers\Staf\PesananController as StafPesananController;
 use App\Http\Controllers\Staf\ProfilController as StafProfilController;
 use App\Http\Controllers\Staf\StokController as StafStokController;
 use App\Models\Produk;
->>>>>>> c3e721f (backend staff)
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
