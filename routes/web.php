@@ -11,6 +11,7 @@ use App\Http\Controllers\Staf\AktivitasController as StafAktivitasController;
 use App\Http\Controllers\Staf\DashboardController as StafDashboardController;
 use App\Http\Controllers\Staf\KasirController as StafKasirController;
 use App\Http\Controllers\Staf\PesananController as StafPesananController;
+use App\Http\Controllers\Staf\ProduksiController as StafProduksiController;
 use App\Http\Controllers\Staf\ProfilController as StafProfilController;
 use App\Http\Controllers\Staf\StokController as StafStokController;
 use App\Models\Produk;
@@ -50,6 +51,14 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
             Route::post('/{id}/batal', [StafPesananController::class, 'batalkan'])->name('batal');
         });
 
+        // K-06: Antrean Racik Jus & KDS Mode (Kitchen Display System)
+        Route::prefix('produksi')->name('staf.produksi.')->group(function () {
+            Route::get('/', [StafProduksiController::class, 'index'])->name('index');
+            Route::post('/{id}/mulai-racik', [StafProduksiController::class, 'mulaiRacik'])->name('mulai-racik');
+            Route::post('/{id}/selesai-racik', [StafProduksiController::class, 'selesaiRacik'])->name('selesai-racik');
+            Route::post('/catat-gagal', [StafProduksiController::class, 'catatGagal'])->name('catat-gagal');
+        });
+
         // K-07: Penjualan Langsung di Kasir (POS)
         Route::prefix('kasir')->name('staf.kasir.')->group(function () {
             Route::get('/', [StafKasirController::class, 'index'])->name('index');
@@ -57,9 +66,13 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
             Route::get('/struk/{id}', [StafKasirController::class, 'struk'])->name('struk');
         });
 
-        // K-09, K-10, K-11: Manajemen Stok & Kerusakan Produk
+        // K-09, K-10, K-11: Manajemen Stok Bahan Baku Segar & Kerusakan
         Route::prefix('stok')->name('staf.stok.')->group(function () {
             Route::get('/', [StafStokController::class, 'index'])->name('index');
+            Route::post('/pasokan', [StafStokController::class, 'pasokanMasuk'])->name('pasokan');
+            Route::post('/pembuangan', [StafStokController::class, 'catatPembuangan'])->name('pembuangan');
+            Route::post('/{id}/toggle-aktif', [StafStokController::class, 'toggleAktif'])->name('toggle-aktif');
+            Route::post('/{id}/audit', [StafStokController::class, 'auditBahan'])->name('audit');
             Route::post('/{id}/penyesuaian', [StafStokController::class, 'penyesuaian'])->name('penyesuaian');
         });
 
