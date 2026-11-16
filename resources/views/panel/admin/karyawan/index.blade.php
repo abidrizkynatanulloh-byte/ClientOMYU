@@ -1,117 +1,228 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Manajemen Karyawan - OMYU</title>
-    <style>
-        body { font-family: sans-serif; padding: 24px; background: #f8fafc; color: #1e293b; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
-        .card { background: #fff; padding: 16px; border-radius: 10px; border: 1px solid #e2e8f0; }
-        .card h3 { margin: 0 0 6px; font-size: 13px; color: #64748b; }
-        .card .angka { font-size: 20px; font-weight: bold; margin: 0; }
-        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; margin-top: 16px; border: 1px solid #e2e8f0; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-        th { background: #f1f5f9; }
-        .nav a { margin-right: 10px; text-decoration: none; padding: 6px 12px; background: #e2e8f0; color: #334155; border-radius: 6px; font-size: 13px; font-weight: bold; }
-        .nav a.active { background: #0f172a; color: white; }
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; }
-        .badge-aktif { background: #dcfce7; color: #15803d; }
-        .badge-nonaktif { background: #fee2e2; color: #b91c1c; }
-        .pesan-sukses { background: #dcfce7; color: #15803d; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-weight: bold; }
-        .pesan-galat { background: #fee2e2; color: #b91c1c; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-weight: bold; }
-        .btn-tambah { background: #16a34a; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; }
-    </style>
-</head>
-<body>
+@extends('layouts.admin')
 
-    <div class="nav" style="margin-bottom: 20px;">
-        <a href="{{ route('panel.admin.beranda') }}">📊 Dashboard</a>
-        <a href="{{ route('panel.admin.penjualan.index') }}">🛒 Penjualan</a>
-        <a href="{{ route('panel.admin.resep.index') }}">🍹 Resep & HPP</a>
-        <a href="{{ route('panel.admin.bahan.index') }}">📦 Persediaan</a>
-        <a href="{{ route('panel.admin.keuangan.laba_rugi') }}">💰 Laba Rugi</a>
-        <a href="{{ route('panel.admin.karyawan.index') }}" class="active">👥 Karyawan (O-09)</a>
+@section('title', 'Manajemen Karyawan & Staf')
+@section('page_title', 'Manajemen Karyawan')
+@section('badge', 'O-09')
+@section('page_subtitle', 'Kelola hak akses pengguna, peran kasir/admin, status akun, dan izin melihat margin HPP.')
+
+@section('header_actions')
+    <a href="{{ route('panel.admin.karyawan.create') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs sm:text-sm shadow-xs transition-all hover:shadow-md">
+        <i class="fa-solid fa-user-plus"></i>
+        <span>Tambah Staf Baru</span>
+    </a>
+@endsection
+
+@section('content')
+<div class="space-y-6">
+
+    <!-- Ringkasan Staf KPI Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Total Staf Terdaftar</span>
+                <h3 class="text-2xl font-extrabold text-slate-900 tracking-tight mt-0.5">
+                    {{ $totalStaf }} <span class="text-sm font-semibold text-slate-500">Orang</span>
+                </h3>
+                <span class="text-[11px] text-slate-400">Semua akun di sistem OMYU</span>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Administrator / Owner</span>
+                <h3 class="text-2xl font-extrabold text-indigo-700 tracking-tight mt-0.5">
+                    {{ $totalAdmin }} <span class="text-sm font-semibold text-slate-500">Akun</span>
+                </h3>
+                <span class="text-[11px] text-slate-400">Hak akses penuh ke seluruh modul</span>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+                <i class="fa-solid fa-user-check"></i>
+            </div>
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Kasir / Karyawan Aktif</span>
+                <h3 class="text-2xl font-extrabold text-emerald-700 tracking-tight mt-0.5">
+                    {{ $totalKaryawanAktif }} <span class="text-sm font-semibold text-slate-500">Orang</span>
+                </h3>
+                <span class="text-[11px] text-slate-400">Siap melayani kasir outlet</span>
+            </div>
+        </div>
+
     </div>
 
-    @if(session('sukses'))
-        <div class="pesan-sukses">{{ session('sukses') }}</div>
-    @endif
-    @if(session('galat'))
-        <div class="pesan-galat">{{ session('galat') }}</div>
-    @endif
+    <!-- Filter Bar Card -->
+    <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+        <form method="GET" action="{{ route('panel.admin.karyawan.index') }}" class="space-y-4">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                
+                <!-- Search -->
+                <div class="sm:col-span-6">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Cari Karyawan</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" name="cari" value="{{ request('cari') }}" 
+                               placeholder="Nama, email, atau no telepon..."
+                               class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400 transition-all">
+                    </div>
+                </div>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h1>Daftar Akun Karyawan & Staf (O-09)</h1>
-        <a href="{{ route('panel.admin.karyawan.create') }}" class="btn-tambah">+ Tambah Karyawan Baru</a>
+                <!-- Peran Filter -->
+                <div class="sm:col-span-3">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Peran Akses</label>
+                    <select name="peran" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        <option value="">Semua Peran</option>
+                        <option value="admin" {{ request('peran') == 'admin' ? 'selected' : '' }}>Admin / Owner</option>
+                        <option value="karyawan" {{ request('peran') == 'karyawan' ? 'selected' : '' }}>Karyawan / Kasir</option>
+                    </select>
+                </div>
+
+                <!-- Status Filter -->
+                <div class="sm:col-span-3">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Status Akun</label>
+                    <select name="status" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        <option value="">Semua Status</option>
+                        <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Aktif</option>
+                        <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Nonaktif</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                <span class="text-xs text-slate-400">
+                    Menampilkan <strong>{{ $daftarKaryawan->total() }}</strong> pengguna
+                </span>
+                <div class="flex items-center gap-2">
+                    @if(request()->hasAny(['cari', 'peran', 'status']))
+                        <a href="{{ route('panel.admin.karyawan.index') }}" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-colors">
+                            Reset
+                        </a>
+                    @endif
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-filter text-xs"></i>
+                        <span>Terapkan Filter</span>
+                    </button>
+                </div>
+            </div>
+
+        </form>
     </div>
 
-    <div class="grid">
-        <div class="card">
-            <h3>Total Staf Terdaftar</h3>
-            <p class="angka">{{ $totalStaf }} Orang</p>
+    <!-- Data Table Card -->
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs sm:text-sm">
+                <thead>
+                    <tr class="bg-slate-50/80 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200/80">
+                        <th class="py-3.5 px-6 font-bold">Pengguna</th>
+                        <th class="py-3.5 px-4 font-bold">Email</th>
+                        <th class="py-3.5 px-4 font-bold">Nomor Telepon</th>
+                        <th class="py-3.5 px-4 font-bold">Peran Akses</th>
+                        <th class="py-3.5 px-4 font-bold text-center">Izin Lihat HPP</th>
+                        <th class="py-3.5 px-4 font-bold text-center">Status Akun</th>
+                        <th class="py-3.5 px-6 font-bold text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach($daftarKaryawan as $k)
+                        <tr class="hover:bg-brand-50/30 transition-colors">
+                            <td class="py-4 px-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-xl {{ $k->peran === 'admin' ? 'bg-indigo-100 text-indigo-700' : 'bg-brand-100 text-brand-800' }} flex items-center justify-center font-black text-sm shrink-0">
+                                        {{ strtoupper(substr($k->nama, 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <span class="font-extrabold text-slate-900 block">{{ $k->nama }}</span>
+                                        @if(auth()->id() === $k->id)
+                                            <span class="inline-flex items-center text-[10px] text-brand-800 font-bold bg-brand-50 px-1.5 py-0.2 rounded">Anda Saat Ini</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-600 font-medium">
+                                {{ $k->email }}
+                            </td>
+                            <td class="py-4 px-4 text-slate-600">
+                                {{ $k->telepon ?? '-' }}
+                            </td>
+                            <td class="py-4 px-4">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase {{ $k->peran === 'admin' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-slate-100 text-slate-700 border border-slate-200' }}">
+                                    <i class="fa-solid {{ $k->peran === 'admin' ? 'fa-user-shield' : 'fa-cash-register' }} text-[10px]"></i>
+                                    {{ $k->peran }}
+                                </span>
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                @if($k->peran === 'admin')
+                                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                                        Otomatis (Admin)
+                                    </span>
+                                @else
+                                    @if($k->bisa_lihat_hpp)
+                                        <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                            <i class="fa-solid fa-check text-[10px]"></i> Diizinkan
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                                            <i class="fa-solid fa-xmark text-[10px]"></i> Dilarang
+                                        </span>
+                                    @endif
+                                @endif
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                @if($k->aktif)
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <i class="fa-solid fa-circle-check text-[10px]"></i> Aktif
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                        <i class="fa-solid fa-ban text-[10px]"></i> Nonaktif
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <div class="inline-flex items-center gap-2">
+                                    <a href="{{ route('panel.admin.karyawan.edit', $k->id) }}" 
+                                       title="Edit Akun"
+                                       class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-brand-400 hover:text-brand-950 text-slate-600 flex items-center justify-center transition-colors">
+                                        <i class="fa-regular fa-pen-to-square text-xs"></i>
+                                    </a>
+
+                                    @if(auth()->id() !== $k->id)
+                                        <form method="POST" action="{{ route('panel.admin.karyawan.toggle_status', $k->id) }}" 
+                                              onsubmit="return confirm('Apakah Anda yakin ingin {{ $k->aktif ? 'menonaktifkan' : 'mengaktifkan' }} akun {{ $k->nama }}?')">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" 
+                                                    title="{{ $k->aktif ? 'Nonaktifkan Akun' : 'Aktifkan Akun' }}"
+                                                    class="w-8 h-8 rounded-xl {{ $k->aktif ? 'bg-slate-100 hover:bg-rose-500 hover:text-white text-rose-600' : 'bg-emerald-100 hover:bg-emerald-600 hover:text-white text-emerald-700' }} flex items-center justify-center transition-colors">
+                                                <i class="fa-solid {{ $k->aktif ? 'fa-user-slash' : 'fa-user-check' }} text-xs"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
-        <div class="card">
-            <h3>Admin / Owner</h3>
-            <p class="angka">{{ $totalAdmin }} Akun</p>
-        </div>
-        <div class="card">
-            <h3>Kasir / Karyawan Aktif</h3>
-            <p class="angka" style="color: #16a34a;">{{ $totalKaryawanAktif }} Orang</p>
-        </div>
+
+        @if($daftarKaryawan->hasPages())
+            <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50">
+                {{ $daftarKaryawan->links() }}
+            </div>
+        @endif
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Nama</th>
-                <th>Email</th>
-                <th>No Telepon</th>
-                <th>Peran</th>
-                <th>Izin Lihat HPP</th>
-                <th>Status Akun</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($daftarKaryawan as $k)
-                <tr>
-                    <td><strong>{{ $k->nama }}</strong></td>
-                    <td>{{ $k->email }}</td>
-                    <td>{{ $k->telepon ?? '-' }}</td>
-                    <td>
-                        <span style="font-weight: bold; text-transform: uppercase; color: {{ $k->peran == 'admin' ? '#0369a1' : '#475569' }};">
-                            {{ $k->peran }}
-                        </span>
-                    </td>
-                    <td>
-                        @if($k->peran === 'admin')
-                            <small style="color: #15803d;">Ya (Otomatis)</small>
-                        @else
-                            {{ $k->bisa_lihat_hpp ? '✅ Diizinkan' : '❌ Dilarang' }}
-                        @endif
-                    </td>
-                    <td>
-                        <span class="badge {{ $k->aktif ? 'badge-aktif' : 'badge-nonaktif' }}">
-                            {{ $k->aktif ? 'AKTIF' : 'NONAKTIF' }}
-                        </span>
-                    </td>
-                    <td style="display: flex; gap: 8px;">
-                        <a href="{{ route('panel.admin.karyawan.edit', $k->id) }}">Edit</a>
-                        
-                        @if(auth()->id() !== $k->id)
-                            <form method="POST" action="{{ route('panel.admin.karyawan.toggle_status', $k->id) }}">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" style="background: none; border: none; color: {{ $k->aktif ? '#dc2626' : '#16a34a' }}; cursor: pointer; text-decoration: underline; padding: 0;">
-                                    {{ $k->aktif ? 'Nonaktifkan' : 'Aktifkan' }}
-                                </button>
-                            </form>
-                        @endif
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-
-</body>
-</html>
+</div>
+@endsection
