@@ -3,316 +3,445 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OMYU Juice - Fresh Juice, Smarter Business</title>
+    <title>OMYU Juice - Sensasi Segar Rendah Gula, Manis Alami</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #fdfcf9; color: #1e293b; overflow-x: hidden; }
-
-        /* Navbar */
-        .navbar { background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 14px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 40; }
-        .brand { font-size: 20px; font-weight: 800; color: #6aa332; text-decoration: none; display: flex; align-items: center; gap: 8px; }
-        .brand span { color: #0f172a; font-size: 14px; font-weight: 500; }
-        .nav-actions { display: flex; align-items: center; gap: 12px; }
-
-        /* Buttons */
-        .btn { padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border: none; cursor: pointer; transition: 0.15s; }
-        .btn-primary { background: #6aa332; color: #ffffff; box-shadow: 0 2px 6px rgba(106, 163, 50, 0.25); }
-        .btn-primary:hover { background: #5c8f2b; }
-        .btn-dark { background: #0f172a; color: #ffffff; }
-        .btn-dark:hover { background: #1e293b; }
-        .btn-outline { background: transparent; border: 1px solid #cbd5e1; color: #334155; }
-        .btn-outline:hover { background: #f1f5f9; }
-
-        /* Hero Banner */
-        .hero { padding: 50px 30px 40px; text-align: center; max-width: 800px; margin: 0 auto; }
-        .tagline { display: inline-block; background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .hero h1 { font-size: 38px; font-weight: 900; color: #0f172a; line-height: 1.2; margin-bottom: 14px; }
-        .hero h1 span { color: #6aa332; }
-        .hero p { font-size: 16px; color: #64748b; line-height: 1.6; margin-bottom: 24px; }
-
-        /* Menu Showcase */
-        .catalog { max-width: 1050px; margin: 0 auto; padding: 0 24px 60px; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .section-header h2 { font-size: 20px; font-weight: 800; color: #0f172a; }
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
-        .menu-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between; }
-        .menu-card h3 { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
-        .menu-card p { font-size: 12px; color: #64748b; margin-bottom: 12px; flex-grow: 1; }
-        .menu-card .price { font-size: 16px; font-weight: 800; color: #6aa332; }
-
-        /* Floating Slide Panel Toggle Button */
-        .floating-btn { position: fixed; right: 24px; bottom: 24px; background: #0f172a; color: #ffffff; padding: 14px 22px; border-radius: 30px; font-weight: 700; font-size: 14px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3); border: 2px solid #6aa332; cursor: pointer; display: flex; align-items: center; gap: 10px; z-index: 50; transition: 0.2s transform; }
-        .floating-btn:hover { transform: translateY(-3px); }
-        .pulse-dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25); animation: pulse 1.8s infinite; }
-
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background: #f8fafc; color: #1e293b; }
+        
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            min-height: 100vh;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.05);
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Slide Panel Overlay & Drawer */
-        .slide-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); z-index: 60; opacity: 0; visibility: hidden; transition: 0.3s; }
-        .slide-overlay.active { opacity: 1; visibility: visible; }
+        /* Top Header Navbar */
+        .top-navbar {
+            background: #ffffff;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .top-navbar .logo-img { height: 38px; object-fit: contain; }
+        .nav-menu { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 700; }
+        .nav-menu a { text-decoration: none; color: #64748b; padding: 7px 16px; border-radius: 20px; transition: 0.2s; }
+        .nav-menu a:hover { color: #166534; }
+        .nav-menu a.active { background: #c6e79d; color: #143507; }
+        .nav-icons { display: flex; align-items: center; gap: 16px; }
+        .nav-icons a { color: #1e293b; text-decoration: none; font-size: 19px; position: relative; }
+        .cart-badge { position: absolute; top: -6px; right: -8px; background: #22c55e; color: white; font-size: 10px; font-weight: 800; border-radius: 50%; width: 17px; height: 17px; display: flex; align-items: center; justify-content: center; }
 
-        .slide-panel { position: fixed; top: 0; right: -420px; width: 400px; max-width: 90vw; height: 100vh; background: #ffffff; z-index: 70; box-shadow: -10px 0 30px rgba(0,0,0,0.15); display: flex; flex-direction: column; transition: 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
-        .slide-panel.active { right: 0; }
+        /* Hero Section */
+        .hero-section {
+            padding: 40px 28px 30px;
+            background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            align-items: center;
+        }
+        @media (min-width: 768px) {
+            .hero-section {
+                grid-template-columns: 1.2fr 0.8fr;
+                padding: 60px 48px;
+            }
+        }
+        .tag-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #bbf7d0;
+            color: #14532d;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 5px 14px;
+            border-radius: 20px;
+            margin-bottom: 14px;
+            letter-spacing: 0.5px;
+        }
+        .hero-title {
+            font-size: 28px;
+            font-weight: 900;
+            line-height: 1.25;
+            color: #0f172a;
+            margin-bottom: 12px;
+        }
+        @media (min-width: 768px) {
+            .hero-title { font-size: 44px; }
+        }
+        .hero-title span { color: #4d8822; }
+        .hero-desc {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 22px;
+            max-width: 520px;
+        }
+        @media (min-width: 768px) {
+            .hero-desc { font-size: 16px; }
+        }
+        .hero-visual-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .hero-juice-circle {
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            background: #4ade80;
+            overflow: hidden;
+            border: 6px solid #ffffff;
+            box-shadow: 0 8px 24px rgba(74, 222, 128, 0.4);
+        }
+        @media (min-width: 768px) {
+            .hero-juice-circle { width: 280px; height: 280px; border-width: 8px; }
+        }
+        .hero-juice-circle img { width: 100%; height: 100%; object-fit: cover; }
 
-        .panel-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
-        .panel-header h2 { font-size: 17px; font-weight: 800; color: #0f172a; margin: 0; }
-        .btn-close { width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; border: none; font-size: 16px; font-weight: bold; color: #475569; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .btn-close:hover { background: #cbd5e1; }
+        .btn-order-now {
+            display: inline-block;
+            background: #4d8822;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 13px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            box-shadow: 0 4px 14px rgba(77, 136, 34, 0.35);
+            transition: 0.2s;
+        }
+        .btn-order-now:hover { background: #3d6e19; transform: translateY(-2px); }
 
-        .panel-body { padding: 24px; overflow-y: auto; flex: 1; }
+        /* Feature Bar (3 Pills) */
+        .feature-bar {
+            background: #bde597;
+            border-radius: 16px;
+            margin: 0 28px 28px;
+            padding: 18px 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            text-align: center;
+            border: 1px solid #a3d973;
+        }
+        @media (min-width: 768px) {
+            .feature-bar { margin: 0 48px 36px; padding: 22px 32px; }
+        }
+        .feature-item { padding: 0 8px; border-right: 1px solid rgba(0,0,0,0.08); }
+        .feature-item:last-child { border-right: none; }
+        .feature-item .icon { font-size: 26px; margin-bottom: 4px; }
+        .feature-item .title { font-size: 13px; font-weight: 800; color: #143507; margin-bottom: 2px; }
+        .feature-item .sub { font-size: 11px; color: #2d5a16; font-weight: 500; line-height: 1.3; }
 
-        /* Panel Content Styles */
-        .shortcut-card { display: flex; align-items: center; gap: 14px; padding: 14px; border: 1px solid #e2e8f0; border-radius: 10px; text-decoration: none; color: #0f172a; margin-bottom: 12px; transition: 0.15s; background: #ffffff; }
-        .shortcut-card:hover { border-color: #6aa332; transform: translateX(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .shortcut-icon { width: 42px; height: 42px; border-radius: 8px; background: #f0fdf4; color: #166534; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-        .shortcut-info h4 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
-        .shortcut-info p { font-size: 11px; color: #64748b; margin: 0; }
+        /* Grid Content on Desktop */
+        .content-grid {
+            padding: 0 28px 30px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+        @media (min-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr 1fr;
+                padding: 0 48px 48px;
+                gap: 24px;
+            }
+        }
 
-        .demo-box { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 10px; padding: 14px; margin-top: 16px; }
-        .demo-account { background: #ffffff; border: 1px solid #e2e8f0; padding: 8px 12px; border-radius: 6px; font-size: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-copy { background: #e2e8f0; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
+        /* Card Sections */
+        .content-box {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .box-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .box-desc { font-size: 13px; color: #475569; line-height: 1.6; }
+
+        /* Map Section */
+        .map-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .map-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 14px; font-weight: 700; color: #0f172a; }
+        .map-header .verified { font-size: 12px; color: #64748b; font-weight: 500; text-decoration: underline; }
+        .map-banner {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            border-radius: 12px;
+            flex: 1;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            text-align: center;
+            padding: 16px;
+        }
+        .map-banner .pin { font-size: 32px; margin-bottom: 4px; }
+        .map-banner a { font-size: 12px; font-weight: 700; color: #15803d; text-decoration: none; background: #fff; padding: 5px 14px; border-radius: 20px; margin-top: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+
+        /* WhatsApp Card */
+        .wa-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: inherit;
+            transition: 0.2s;
+            height: 100%;
+        }
+        .wa-card:hover { border-color: #22c55e; background: #f0fdf4; transform: translateY(-2px); }
+        .wa-left { display: flex; align-items: center; gap: 14px; }
+        .wa-icon { width: 42px; height: 42px; background: #25d366; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; }
+        .wa-label { font-size: 14px; font-weight: 800; color: #0f172a; }
+        .wa-num { font-size: 13px; color: #64748b; margin-top: 2px; }
+        .wa-arrow { font-size: 20px; color: #94a3b8; }
+
+        /* Mutu OMYU Card */
+        .mutu-card {
+            background: #d8efb7;
+            border: 1px solid #c2e592;
+            border-radius: 16px;
+            padding: 20px;
+            color: #143507;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .mutu-title { font-size: 14px; font-weight: 900; letter-spacing: 0.5px; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+        .mutu-point { display: flex; gap: 10px; margin-bottom: 12px; font-size: 13px; line-height: 1.5; }
+        .mutu-point:last-child { margin-bottom: 0; }
+        .mutu-point .check { color: #166534; font-weight: 900; font-size: 16px; }
+        .mutu-point strong { color: #0c2602; }
+
+        /* Footer */
+        .desktop-footer {
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            padding: 24px;
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+            margin-top: auto;
+        }
+
+        /* Bottom Fixed Navigation Bar (Mobile Only) */
+        .bottom-nav {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            body { padding-bottom: 75px; }
+            .bottom-nav {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: #ffffff;
+                border-top: 1px solid #e2e8f0;
+                justify-content: space-around;
+                padding: 8px 0 10px;
+                z-index: 100;
+            }
+            .bottom-nav a {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-decoration: none;
+                color: #64748b;
+                font-size: 11px;
+                font-weight: 700;
+                gap: 3px;
+                position: relative;
+            }
+            .bottom-nav a.active { color: #4d8822; }
+            .bottom-nav a .nav-icon { font-size: 18px; }
+            .bottom-badge { position: absolute; top: -2px; right: 8px; background: #ef4444; color: #fff; font-size: 9px; font-weight: 800; border-radius: 50%; width: 15px; height: 15px; display: flex; align-items: center; justify-content: center; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Navbar -->
-    <header class="navbar">
-        <a href="/" class="brand">
-            OMYU JUICE <span>| Fresh Juice, Smarter Business</span>
-        </a>
-        <div class="nav-actions">
-            @auth
-                <span style="font-size: 13px; font-weight: 600; color: #475569;">
-                    Halo, {{ auth()->user()->nama }} ({{ ucfirst(auth()->user()->peran) }})
-                </span>
-                <a href="{{ route('panel.beranda') }}" class="btn btn-primary">
-                    📊 Buka Panel
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="top-navbar">
+            <a href="/">
+                <img src="{{ asset('images/logo-omyu.png') }}" alt="OMYU" class="logo-img">
+            </a>
+            <nav class="nav-menu">
+                <a href="/" class="active">Beranda</a>
+                <a href="{{ route('pelanggan.katalog') }}">Menu Lengkap</a>
+                <a href="{{ route('pelanggan.lacak') }}">Lacak Pesanan</a>
+            </nav>
+            <div class="nav-icons">
+                <a href="{{ route('pelanggan.katalog') }}" title="Cari Menu">🔍</a>
+                <a href="{{ route('pelanggan.keranjang') }}" title="Keranjang">
+                    🛒
+                    @if(count(session('keranjang', [])) > 0)
+                        <span class="cart-badge">{{ count(session('keranjang', [])) }}</span>
+                    @endif
                 </a>
-            @else
-                <button type="button" class="btn btn-primary" onclick="bukaSlidePanel()">
-                    🔐 Masuk Backend Staf
-                </button>
-            @endauth
-        </div>
-    </header>
+            </div>
+        </header>
 
-    <!-- Hero Showcase -->
-    <section class="hero">
-        <div class="tagline">🥤 Sistem Manajemen UMKM Jus Buah</div>
-        <h1>Fresh Juice, <span>Smarter Business</span></h1>
-        <p>
-            Sistem terintegrasi untuk kasir, manajemen stok bahan, resep, dan pesanan jus buah asli tanpa ribet.
-        </p>
-        <div style="display: flex; justify-content: center; gap: 12px;">
-            <button type="button" class="btn btn-dark" style="font-size: 14px; padding: 12px 24px;" onclick="bukaSlidePanel()">
-                🚀 Akses Backend Staf Sekarang
-            </button>
-            <a href="{{ route('panel.staf.kasir.index') }}" class="btn btn-outline" style="font-size: 14px; padding: 12px 24px;">
-                🛒 Buka Kasir POS Langsung
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div>
+                <div class="tag-pill">🌿 100% BUAH MURNI</div>
+                <h1 class="hero-title">
+                    Sensasi Segar <span>Rendah Gula,</span><br>Manis Alami.
+                </h1>
+                <p class="hero-desc">
+                    Perasan buah asli pilihan tanpa pemanis buatan untuk gaya hidup sehat Anda. Pesan online tanpa antre dan ambil di outlet OMYU!
+                </p>
+                <a href="{{ route('pelanggan.katalog') }}" class="btn-order-now">
+                    🍹 Pesan Sekarang Tanpa Antre &rarr;
+                </a>
+            </div>
+
+            <div class="hero-visual-wrap">
+                <div class="hero-juice-circle">
+                    <img src="https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=500&auto=format&fit=crop&q=80" alt="OMYU Fresh Juice">
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Bar 3 Pills -->
+        <section class="feature-bar">
+            <div class="feature-item">
+                <div class="icon">🍎</div>
+                <div class="title">100% Buah Segar</div>
+                <div class="sub">Tanpa esens sintetis</div>
+            </div>
+            <div class="feature-item">
+                <div class="icon">🍯</div>
+                <div class="title">Atur Manismu</div>
+                <div class="sub">0%, 25%, 50%, Normal</div>
+            </div>
+            <div class="feature-item">
+                <div class="icon">⚡</div>
+                <div class="title">Ambil Kilat</div>
+                <div class="sub">Tanpa antre & ribet</div>
+            </div>
+        </section>
+
+        <!-- Content Grid (2x2 on Desktop, 1 Column on Mobile) -->
+        <div class="content-grid">
+            <!-- Layanan Booth & Info -->
+            <section class="content-box">
+                <div class="box-title">🌿 Layanan Booth & Informasi</div>
+                <p class="box-desc">
+                    <strong>Hubungi & Kunjungi Booth OMYU:</strong> Temukan segelas kesegaran alami 100% buah murni di booth kami atau hubungi tim barista kami untuk pesanan katering, acara kantor, dan kemitraan buah lokal.
+                </p>
+            </section>
+
+            <!-- Mutu OMYU Card -->
+            <section class="mutu-card">
+                <div class="mutu-title">🌿 STANDAR MUTU OMYU</div>
+                <div class="mutu-point">
+                    <span class="check">✔</span>
+                    <div>
+                        <strong>Tanpa Sirup Pemanis Buatan:</strong> Rasa manis alami asli dari kematangan buah atau opsi madu randu murni.
+                    </div>
+                </div>
+                <div class="mutu-point">
+                    <span class="check">✔</span>
+                    <div>
+                        <strong>Higienitas Booth Terjaga:</strong> Seluruh buah dicuci bersih dengan ozone water dan disimpan dalam chiller steril.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Peta Lokasi -->
+            <section class="map-card">
+                <div class="map-header">
+                    <span>Peta Lokasi</span>
+                    <span class="verified">Terverifikasi Google Maps</span>
+                </div>
+                <div class="map-banner">
+                    <div class="pin">📍</div>
+                    <div style="font-size: 14px; font-weight: 700; color: #0f172a;">Booth OMYU Juice Center</div>
+                    <div style="font-size: 12px; color: #475569;">Buka Setiap Hari: 09.00 - 21.00 WIB</div>
+                    <a href="https://maps.google.com" target="_blank">Buka Petunjuk Arah ↗</a>
+                </div>
+            </section>
+
+            <!-- WhatsApp Card -->
+            <a href="https://wa.me/6285643123456?text=Halo%20OMYU,%20saya%20ingin%20tanya%20menu" target="_blank" class="wa-card">
+                <div class="wa-left">
+                    <div class="wa-icon">💬</div>
+                    <div>
+                        <div class="wa-label">WhatsApp Admin / Barista</div>
+                        <div class="wa-num">085643123456 (Respon Cepat)</div>
+                    </div>
+                </div>
+                <div class="wa-arrow">❯</div>
             </a>
         </div>
-    </section>
 
-    <!-- Menu Showcase -->
-    <section class="catalog">
-        <div class="section-header">
-            <h2>🍹 Menu Jus Buah Pilihan OMYU</h2>
-            <span style="font-size: 13px; color: #64748b;">Dikelola langsung lewat Panel Staf & Kasir</span>
-        </div>
+        <!-- Footer -->
+        <footer class="desktop-footer">
+            <p><strong>OMYU Fresh Juice</strong> &bull; Less Sugar, More Fruits &bull; Buka Setiap Hari</p>
+            <p style="margin-top: 6px; font-size: 12px; color: #94a3b8;">&copy; {{ date('Y') }} OMYU. Hak Cipta Dilindungi.</p>
+        </footer>
 
-        <div class="menu-grid">
-            @forelse($daftarProduk as $produk)
-                <div class="menu-card">
-                    <div>
-                        <h3>{{ $produk->nama }}</h3>
-                        <p>{{ $produk->deskripsi ?: 'Jus buah murni segar pilihan.' }}</p>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 10px;">
-                        <span class="price">Rp {{ number_format($produk->harga, 0, ',', '.') }}</span>
-                        <span style="font-size: 11px; font-weight: 700; color: {{ $produk->stok > 0 ? '#16a34a' : '#dc2626' }};">
-                            {{ $produk->stok > 0 ? "Stok: {$produk->stok} cup" : 'Habis' }}
-                        </span>
-                    </div>
-                </div>
-            @empty
-                <div style="grid-column: 1 / -1; padding: 30px; text-align: center; color: #94a3b8; background: #fff; border-radius: 10px;">
-                    Belum ada menu yang ditampilkan.
-                </div>
-            @endforelse
-        </div>
-    </section>
-
-    <!-- Floating Action Button: Slide Panel Trigger -->
-    <button type="button" class="floating-btn" onclick="bukaSlidePanel()">
-        <span class="pulse-dot"></span>
-        <span>Akses Backend Staf</span>
-        <span style="font-size: 16px;">&rarr;</span>
-    </button>
-
-    <!-- Slide Panel Overlay & Drawer Container -->
-    <div class="slide-overlay" id="slideOverlay" onclick="tutupSlidePanel()"></div>
-
-    <aside class="slide-panel" id="slidePanel">
-        <div class="panel-header">
-            <div>
-                <h2>🚀 Panel Akses Staf OMYU</h2>
-                <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Navigasi Cepat Pengujian Fitur</div>
-            </div>
-            <button type="button" class="btn-close" onclick="tutupSlidePanel()">✕</button>
-        </div>
-
-        <div class="panel-body">
-            @auth
-                <!-- Jika Sedang Login -->
-                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px; margin-bottom: 20px;">
-                    <div style="font-size: 11px; color: #166534; font-weight: 700; text-transform: uppercase;">Akun Aktif Saat Ini</div>
-                    <div style="font-size: 16px; font-weight: 800; color: #0f172a; margin-top: 2px;">{{ auth()->user()->nama }}</div>
-                    <div style="font-size: 12px; color: #475569;">{{ auth()->user()->email }} &bull; <strong>{{ ucfirst(auth()->user()->peran) }}</strong></div>
-                </div>
-
-                <div style="margin-bottom: 16px; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">
-                    Menu Backend Staf:
-                </div>
-
-                <a href="{{ route('panel.beranda') }}" class="shortcut-card">
-                    <div class="shortcut-icon">📊</div>
-                    <div class="shortcut-info">
-                        <h4>Dashboard Staf (K-02)</h4>
-                        <p>Ringkasan antrean pesanan & ketersediaan stok</p>
-                    </div>
-                </a>
-
-                <a href="{{ route('panel.staf.kasir.index') }}" class="shortcut-card">
-                    <div class="shortcut-icon" style="background: #eff6ff; color: #1d4ed8;">🛒</div>
-                    <div class="shortcut-info">
-                        <h4>Kasir POS Penjualan (K-07)</h4>
-                        <p>Melayani transaksi langsung & cetak struk</p>
-                    </div>
-                </a>
-
-                <a href="{{ route('panel.staf.pesanan.index') }}" class="shortcut-card">
-                    <div class="shortcut-icon" style="background: #fefce8; color: #a16207;">📋</div>
-                    <div class="shortcut-info">
-                        <h4>Pesanan Masuk (K-03)</h4>
-                        <p>Verifikasi pembayaran & tahapan produksi</p>
-                    </div>
-                </a>
-
-                <a href="{{ route('panel.staf.stok.index') }}" class="shortcut-card">
-                    <div class="shortcut-icon" style="background: #fdf2f8; color: #be185d;">📦</div>
-                    <div class="shortcut-info">
-                        <h4>Cek & Atur Stok (K-09, K-10)</h4>
-                        <p>Penyesuaian stok fisik & catat bahan rusak</p>
-                    </div>
-                </a>
-
-                <a href="{{ route('panel.staf.aktivitas.index') }}" class="shortcut-card">
-                    <div class="shortcut-icon" style="background: #f1f5f9; color: #334155;">📝</div>
-                    <div class="shortcut-info">
-                        <h4>Riwayat Aktivitas (K-14)</h4>
-                        <p>Audit log seluruh aksi operasional staf</p>
-                    </div>
-                </a>
-
-                @if(auth()->user()->adalahAdmin())
-                    <a href="{{ route('panel.admin.beranda') }}" class="shortcut-card" style="border-color: #0f172a;">
-                        <div class="shortcut-icon" style="background: #0f172a; color: #ffffff;">👑</div>
-                        <div class="shortcut-info">
-                            <h4>Panel Owner Eksekutif</h4>
-                            <p>Laba rugi, rekap penjualan & HPP per cup</p>
-                        </div>
-                    </a>
+        <!-- Bottom Fixed Navigation Bar (Mobile Only) -->
+        <nav class="bottom-nav">
+            <a href="/" class="active">
+                <span class="nav-icon">🏠</span>
+                <span>Beranda</span>
+            </a>
+            <a href="{{ route('pelanggan.katalog') }}">
+                <span class="nav-icon">🍽️</span>
+                <span>Menu</span>
+            </a>
+            <a href="{{ route('pelanggan.keranjang') }}">
+                <span class="nav-icon">🛒</span>
+                <span>Pesanan</span>
+                @if(count(session('keranjang', [])) > 0)
+                    <span class="bottom-badge">{{ count(session('keranjang', [])) }}</span>
                 @endif
+            </a>
+            <a href="{{ route('pelanggan.lacak') }}">
+                <span class="nav-icon">🔍</span>
+                <span>Lacak</span>
+            </a>
+        </nav>
+    </div>
 
-                <form method="POST" action="{{ route('keluar') }}" style="margin-top: 20px;">
-                    @csrf
-                    <button type="submit" class="btn btn-outline" style="width: 100%; justify-content: center; color: #dc2626; border-color: #fecaca; background: #fef2f2;">
-                        🚪 Keluar dari Akun (Logout)
-                    </button>
-                </form>
-            @else
-                <!-- Jika Belum Login: Form Login Cepat / Demo Akun -->
-                <div style="margin-bottom: 20px;">
-                    <h3 style="font-size: 15px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Masuk ke Akun Staf / Admin</h3>
-                    <p style="font-size: 12px; color: #64748b;">Silakan masuk menggunakan akun internal untuk mengetes modul staf.</p>
-                </div>
-
-                <form method="POST" action="{{ route('login.proses') }}">
-                    @csrf
-                    <div style="margin-bottom: 12px;">
-                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 4px;">Email Staf:</label>
-                        <input type="email" name="email" id="inputEmail" required style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;" placeholder="budi@omyu.test">
-                    </div>
-
-                    <div style="margin-bottom: 16px;">
-                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 4px;">Kata Sandi:</label>
-                        <input type="password" name="password" id="inputPassword" required style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;" placeholder="••••••••">
-                    </div>
-
-                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px; font-size: 14px;">
-                        🔐 Masuk ke Panel Staf
-                    </button>
-                </form>
-
-                <!-- Kotak Bantuan Akun Uji Coba -->
-                <div class="demo-box">
-                    <div style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 6px;">
-                        🔑 Akun Uji Coba (Klik untuk Isi Cepat):
-                    </div>
-
-                    <div class="demo-account">
-                        <div>
-                            <strong>Budi (Kasir)</strong>
-                            <div style="color: #64748b;">budi@omyu.test</div>
-                        </div>
-                        <button type="button" class="btn-copy" onclick="isiAkunDemo('budi@omyu.test', 'Rahasia12345')">Pakai Ini</button>
-                    </div>
-
-                    <div class="demo-account">
-                        <div>
-                            <strong>Siti (Kasir)</strong>
-                            <div style="color: #64748b;">siti@omyu.test</div>
-                        </div>
-                        <button type="button" class="btn-copy" onclick="isiAkunDemo('siti@omyu.test', 'Rahasia67890')">Pakai Ini</button>
-                    </div>
-
-                    <div class="demo-account">
-                        <div>
-                            <strong>Admin / Owner</strong>
-                            <div style="color: #64748b;">admin@omyu.test</div>
-                        </div>
-                        <button type="button" class="btn-copy" onclick="isiAkunDemo('admin@omyu.test', 'ADMIN123')">Pakai Ini</button>
-                    </div>
-                </div>
-            @endauth
-        </div>
-    </aside>
-
-    <script>
-        function bukaSlidePanel() {
-            document.getElementById('slideOverlay').classList.add('active');
-            document.getElementById('slidePanel').classList.add('active');
-        }
-
-        function tutupSlidePanel() {
-            document.getElementById('slideOverlay').classList.remove('active');
-            document.getElementById('slidePanel').classList.remove('active');
-        }
-
-        function isiAkunDemo(email, password) {
-            const emailInput = document.getElementById('inputEmail');
-            const passInput = document.getElementById('inputPassword');
-            if (emailInput && passInput) {
-                emailInput.value = email;
-                passInput.value = password;
-                emailInput.focus();
-            }
-        }
-    </script>
 </body>
 </html>
-

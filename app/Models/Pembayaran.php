@@ -13,7 +13,7 @@ class Pembayaran extends Model
 
     protected $fillable = [
         'pesanan_id', 'gerbang', 'referensi_gerbang', 'metode',
-        'jumlah', 'status', 'dibayar_pada', 'data_mentah',
+        'jumlah', 'status', 'dibayar_pada', 'data_mentah', 'bukti_path',
     ];
 
     protected $casts = [

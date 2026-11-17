@@ -65,7 +65,8 @@
 
     <div class="topbar">
         <a href="{{ route('panel.beranda') }}" class="brand">
-            OMYU JUICE <span>| Panel Staf</span>
+            <img src="{{ asset('images/logo-omyu.png') }}" alt="OMYU Juice" style="height: 32px; width: auto; object-fit: contain;">
+            <span>| Panel Staf</span>
         </a>
         <div class="user-nav">
             <span class="user-badge">👤 {{ auth()->user()->nama }} ({{ ucfirst(auth()->user()->peran) }})</span>
