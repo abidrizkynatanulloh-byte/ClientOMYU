@@ -63,7 +63,12 @@ class StafPanelTest extends TestCase
     {
         $response = $this->actingAs($this->staf)->get(route('panel.beranda'));
         $response->assertStatus(200);
-        $response->assertSee('Dashboard Operasional');
+        $response->assertSee('Ringkasan Antrean');
+        $response->assertSee('Bahan Baku Segar');
+        $response->assertSee('Antrean Prioritas Cepat');
+        $response->assertSee('Aksi Cepat Barista');
+        $response->assertSee('Menerima Pesanan');
+        $response->assertSee('bottom-nav');
     }
 
     public function test_staf_dapat_melakukan_transaksi_kasir_pos()
@@ -120,7 +125,7 @@ class StafPanelTest extends TestCase
             'ongkir'            => 0,
             'total'             => 24000,
             'status_pembayaran' => 'menunggu',
-            'status_pesanan'    => 'baru',
+            'status_pesanan'    => 'menunggu_verifikasi',
             'kedaluwarsa_pada'  => now()->addHours(2),
         ]);
 
@@ -182,7 +187,7 @@ class StafPanelTest extends TestCase
             'ongkir'            => 0,
             'total'             => 12000,
             'status_pembayaran' => 'menunggu',
-            'status_pesanan'    => 'baru',
+            'status_pesanan'    => 'menunggu_verifikasi',
             'kedaluwarsa_pada'  => now()->addHours(2),
         ]);
 
@@ -226,5 +231,173 @@ class StafPanelTest extends TestCase
 
         $response->assertSessionHas('sukses');
         $this->assertTrue(Hash::check('sandiBaru456', $this->staf->fresh()->password));
+    }
+
+    public function test_staf_dapat_mengakses_halaman_produksi_antrean_racik()
+    {
+        $response = $this->actingAs($this->staf)->get(route('panel.staf.produksi.index'));
+        $response->assertStatus(200);
+        $response->assertSee('Antrean Racik Jus');
+        $response->assertSee('PESANAN AKTIF');
+        $response->assertSee('Tampilan Kartu');
+        $response->assertSee('KDS Mode');
+        $response->assertSee('Blender Station 01 Aktif');
+        $response->assertSee('Catat Bahan Tumpah / Gagal / gagal racik, dll');
+    }
+
+    public function test_staf_dapat_mengakses_produksi_mode_kds()
+    {
+        $response = $this->actingAs($this->staf)->get(route('panel.staf.produksi.index', ['mode' => 'kds']));
+        $response->assertStatus(200);
+        $response->assertSee('Kitchen Display System');
+        $response->assertSee('Refresh Layar');
+    }
+
+    public function test_staf_dapat_memulai_dan_menyelesaikan_racik_pesanan()
+    {
+        $pesanan = Pesanan::create([
+            'kode_pesanan'      => 'OMY-TEST-' . rand(100, 999),
+            'token_akses'       => Str::random(32),
+            'nama_pembeli'      => 'Pembeli Racik Uji',
+            'subtotal'          => 12000,
+            'ongkir'            => 0,
+            'total'             => 12000,
+            'status_pembayaran' => 'lunas',
+            'status_pesanan'    => 'dikonfirmasi',
+            'kedaluwarsa_pada'  => now()->addHours(2),
+        ]);
+
+        // Mulai Racik
+        $respMulai = $this->actingAs($this->staf)->post(route('panel.staf.produksi.mulai-racik', $pesanan->id));
+        $respMulai->assertSessionHas('sukses');
+        $this->assertEquals('diproses', $pesanan->fresh()->status_pesanan);
+
+        // Selesai Racik (Pindah ke Siap Diambil)
+        $respSelesai = $this->actingAs($this->staf)->post(route('panel.staf.produksi.selesai-racik', $pesanan->id));
+        $respSelesai->assertSessionHas('sukses');
+        $this->assertEquals('siap_diambil', $pesanan->fresh()->status_pesanan);
+    }
+
+    public function test_staf_dapat_mencatat_gagal_racik_atau_bahan_tumpah()
+    {
+        $stokAwal = $this->produk->fresh()->stok;
+
+        $response = $this->actingAs($this->staf)->post(route('panel.staf.produksi.catat-gagal'), [
+            'tipe_item' => 'produk',
+            'item_id'   => $this->produk->id,
+            'jumlah'    => 1,
+            'alasan'    => 'Blender tumpah saat penuangan',
+        ]);
+
+        $response->assertSessionHas('sukses');
+        $this->assertEquals($stokAwal - 1, $this->produk->fresh()->stok);
+
+        $this->assertDatabaseHas('riwayat_stok', [
+            'produk_id' => $this->produk->id,
+            'catatan'   => '[Gagal Racik/Waste] Blender tumpah saat penuangan',
+        ]);
+    }
+
+    public function test_staf_dapat_mengakses_manajemen_stok_dan_bahan_segar()
+    {
+        $response = $this->actingAs($this->staf)->get(route('panel.staf.stok.index'));
+        $response->assertStatus(200);
+        $response->assertSee('Manajemen Stok');
+        $response->assertSee('Audit Rutin: Pukul 14:00 WIB');
+        $response->assertSee('Semua Item');
+        $response->assertSee('Stok Menipis');
+        $response->assertSee('Habis');
+        $response->assertSee('Input Pasokan / Masuk');
+        $response->assertSee('Catat Pembuangan (Rusak/Busuk)');
+        $response->assertSee('Bahan Baku Segar');
+        $response->assertSee('Katalog Resep');
+        $response->assertSee('Penggunaan');
+        $response->assertSee('Kerusakan Bahan');
+    }
+
+    public function test_staf_dapat_menginput_pasokan_bahan_masuk()
+    {
+        $bahan = \App\Models\Bahan::firstOrCreate(
+            ['nama' => 'Mangga Uji Pasokan'],
+            [
+                'jenis'         => 'buah',
+                'satuan_dasar'  => 'g',
+                'satuan_beli'   => 'kg',
+                'konversi'      => 1000,
+                'stok'          => 5000,
+                'batas_minimum' => 3000,
+                'aktif'         => 1,
+            ]
+        );
+
+        $stokAwal = (float) $bahan->fresh()->stok;
+
+        $response = $this->actingAs($this->staf)->post(route('panel.staf.stok.pasokan'), [
+            'bahan_id'     => $bahan->id,
+            'jumlah_masuk' => 5, // 5 kg = 5000 g
+            'satuan_input' => 'kg',
+            'catatan'      => 'Pasokan Segar Pagi',
+        ]);
+
+        $response->assertSessionHas('sukses');
+        $this->assertEquals($stokAwal + 5000, (float) $bahan->fresh()->stok);
+    }
+
+    public function test_staf_dapat_mencatat_pembuangan_bahan_rusak_busuk()
+    {
+        $bahan = \App\Models\Bahan::firstOrCreate(
+            ['nama' => 'Alpukat Uji Buang'],
+            [
+                'jenis'         => 'buah',
+                'satuan_dasar'  => 'g',
+                'satuan_beli'   => 'kg',
+                'konversi'      => 1000,
+                'stok'          => 8000,
+                'batas_minimum' => 2000,
+                'aktif'         => 1,
+            ]
+        );
+
+        $stokAwal = (float) $bahan->fresh()->stok;
+
+        $response = $this->actingAs($this->staf)->post(route('panel.staf.stok.pembuangan'), [
+            'bahan_id'     => $bahan->id,
+            'jumlah_buang' => 1.5, // 1.5 kg = 1500 g
+            'satuan_input' => 'kg',
+            'alasan'       => 'Buah busuk / berjamur saat sortiran pagi',
+        ]);
+
+        $response->assertSessionHas('sukses');
+        $this->assertEquals($stokAwal - 1500, (float) $bahan->fresh()->stok);
+    }
+
+    public function test_staf_dapat_audit_dan_toggle_aktif_bahan()
+    {
+        $bahan = \App\Models\Bahan::firstOrCreate(
+            ['nama' => 'Jeruk Uji Audit'],
+            [
+                'jenis'         => 'buah',
+                'satuan_dasar'  => 'g',
+                'satuan_beli'   => 'kg',
+                'konversi'      => 1000,
+                'stok'          => 3000,
+                'batas_minimum' => 1000,
+                'aktif'         => 1,
+            ]
+        );
+
+        // Audit opname ke 4 kg (4000 g)
+        $respAudit = $this->actingAs($this->staf)->post(route('panel.staf.stok.audit', $bahan->id), [
+            'stok_fisik'   => 4,
+            'satuan_input' => 'kg',
+            'catatan'      => 'Timbangan fisik opname 14:00 WIB',
+        ]);
+        $respAudit->assertSessionHas('sukses');
+        $this->assertEquals(4000, (float) $bahan->fresh()->stok);
+
+        // Toggle Aktif
+        $respToggle = $this->actingAs($this->staf)->post(route('panel.staf.stok.toggle-aktif', $bahan->id));
+        $respToggle->assertSessionHas('sukses');
+        $this->assertEquals(0, $bahan->fresh()->aktif);
     }
 }

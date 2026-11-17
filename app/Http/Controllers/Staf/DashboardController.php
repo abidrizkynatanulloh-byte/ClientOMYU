@@ -11,57 +11,57 @@ use Illuminate\Http\Request;
 class DashboardController extends Controller
 {
     /**
-     * K-02: Dashboard Operasional Staf
-     * Menampilkan metrik operasional harian, antrean pesanan mendesak, dan status stok.
+     * K-02: Dashboard Operasional Staf / Barista
+     * Menampilkan metrik operasional harian, antrean prioritas cepat, dan status stok bahan.
      */
     public function index()
     {
         $hariIni = Carbon::today();
 
-        // 1. Counter status pesanan hari ini
-        $pesananHariIni = Pesanan::whereDate('created_at', $hariIni);
+        // 1. Ringkasan Antrean (sesuai 4 kartu pada desain mockup)
+        $pesananBaru = Pesanan::whereIn('status_pesanan', ['menunggu_pembayaran', 'menunggu_verifikasi'])->count();
+        $pesananDiproses = Pesanan::where('status_pesanan', 'diproses')->count();
+        $pesananVerif = Pesanan::where('status_pesanan', 'dikonfirmasi')->count();
+        $pesananSiap = Pesanan::where('status_pesanan', 'siap_diambil')->count();
+        $pesananSelesaiHariIni = Pesanan::where('status_pesanan', 'selesai')->whereDate('created_at', $hariIni)->count();
 
-        $totalPesananHariIni = (clone $pesananHariIni)->count();
-        $pesananBaru = (clone $pesananHariIni)->where('status_pesanan', 'baru')->count();
-        $pesananDiproses = (clone $pesananHariIni)->where('status_pesanan', 'diproses')->count();
-        $pesananSiap = (clone $pesananHariIni)->where('status_pesanan', 'dikirim')->count(); // dikirim = siap diambil
-        $pesananSelesai = (clone $pesananHariIni)->where('status_pesanan', 'selesai')->count();
-        $pesananMenungguBayar = (clone $pesananHariIni)->where('status_pembayaran', 'menunggu')->count();
-
-        // 2. Daftar pesanan yang sedang aktif dan perlu perhatian segera
-        $antreanPesanan = Pesanan::with(['itemPesanan', 'penangan'])
-            ->whereIn('status_pesanan', ['baru', 'diproses', 'dikirim'])
-            ->orderByRaw("FIELD(status_pesanan, 'baru', 'diproses', 'dikirim')")
+        // 2. Antrean Prioritas Cepat (pesanan aktif yang mendesak)
+        $antreanPesanan = Pesanan::with(['itemPesanan.produk', 'penangan'])
+            ->whereIn('status_pesanan', ['menunggu_verifikasi', 'dikonfirmasi', 'diproses', 'siap_diambil'])
+            ->orderByRaw("FIELD(status_pesanan, 'dikonfirmasi', 'diproses', 'menunggu_verifikasi', 'siap_diambil')")
             ->orderBy('created_at', 'asc')
-            ->take(10)
+            ->take(8)
             ->get();
 
-        // 3. Status Stok Produk (K-02 Cek Ketersediaan Stok)
-        $totalProduk = Produk::where('aktif', 1)->count();
-        $produkHabis = Produk::where('aktif', 1)->where('stok', '<=', 0)->count();
-        $produkMenipis = Produk::where('aktif', 1)->where('stok', '>', 0)->where('stok', '<=', 5)->count();
+        // 3. Status Bahan Baku Segar (Tersedia, Menipis, Habis)
+        $totalSku = Produk::where('aktif', 1)->count();
         $produkTersedia = Produk::where('aktif', 1)->where('stok', '>', 5)->count();
+        $produkMenipis = Produk::where('aktif', 1)->where('stok', '>', 0)->where('stok', '<=', 5)->count();
+        $produkHabis = Produk::where('aktif', 1)->where('stok', '<=', 0)->count();
 
-        // Produk dengan stok paling kritis
-        $daftarStokKritis = Produk::where('aktif', 1)
-            ->orderBy('stok', 'asc')
-            ->take(6)
-            ->get();
+        $namaMenipis = Produk::where('aktif', 1)->where('stok', '>', 0)->where('stok', '<=', 5)->value('nama') ?? 'Mangga';
+        $namaHabis = Produk::where('aktif', 1)->where('stok', '<=', 0)->value('nama') ?? 'Tomat';
+
+        // 4. Informasi Shift & Waktu
+        $jam = Carbon::now()->hour;
+        $shiftInfo = ($jam >= 7 && $jam < 16) ? 'Shift Pagi (08:00 - 16:00)' : 'Shift Sore (16:00 - 22:00)';
+        $waktuUpdate = Carbon::now()->format('H:i') . ' WIB';
 
         return view('panel.staf.beranda', compact(
-            'totalPesananHariIni',
             'pesananBaru',
             'pesananDiproses',
+            'pesananVerif',
             'pesananSiap',
-            'pesananSelesai',
-            'pesananMenungguBayar',
+            'pesananSelesaiHariIni',
             'antreanPesanan',
-            'totalProduk',
-            'produkHabis',
-            'produkMenipis',
+            'totalSku',
             'produkTersedia',
-            'daftarStokKritis'
+            'produkMenipis',
+            'produkHabis',
+            'namaMenipis',
+            'namaHabis',
+            'shiftInfo',
+            'waktuUpdate'
         ));
     }
 }
-

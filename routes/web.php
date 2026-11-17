@@ -11,8 +11,10 @@ use App\Http\Controllers\Staf\AktivitasController as StafAktivitasController;
 use App\Http\Controllers\Staf\DashboardController as StafDashboardController;
 use App\Http\Controllers\Staf\KasirController as StafKasirController;
 use App\Http\Controllers\Staf\PesananController as StafPesananController;
+use App\Http\Controllers\Staf\ProduksiController as StafProduksiController;
 use App\Http\Controllers\Staf\ProfilController as StafProfilController;
 use App\Http\Controllers\Staf\StokController as StafStokController;
+use App\Http\Controllers\PelangganPesananController;
 use App\Models\Produk;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +52,14 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
             Route::post('/{id}/batal', [StafPesananController::class, 'batalkan'])->name('batal');
         });
 
+        // K-06: Antrean Racik Jus & KDS Mode (Kitchen Display System)
+        Route::prefix('produksi')->name('staf.produksi.')->group(function () {
+            Route::get('/', [StafProduksiController::class, 'index'])->name('index');
+            Route::post('/{id}/mulai-racik', [StafProduksiController::class, 'mulaiRacik'])->name('mulai-racik');
+            Route::post('/{id}/selesai-racik', [StafProduksiController::class, 'selesaiRacik'])->name('selesai-racik');
+            Route::post('/catat-gagal', [StafProduksiController::class, 'catatGagal'])->name('catat-gagal');
+        });
+
         // K-07: Penjualan Langsung di Kasir (POS)
         Route::prefix('kasir')->name('staf.kasir.')->group(function () {
             Route::get('/', [StafKasirController::class, 'index'])->name('index');
@@ -57,9 +67,13 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
             Route::get('/struk/{id}', [StafKasirController::class, 'struk'])->name('struk');
         });
 
-        // K-09, K-10, K-11: Manajemen Stok & Kerusakan Produk
+        // K-09, K-10, K-11: Manajemen Stok Bahan Baku Segar & Kerusakan
         Route::prefix('stok')->name('staf.stok.')->group(function () {
             Route::get('/', [StafStokController::class, 'index'])->name('index');
+            Route::post('/pasokan', [StafStokController::class, 'pasokanMasuk'])->name('pasokan');
+            Route::post('/pembuangan', [StafStokController::class, 'catatPembuangan'])->name('pembuangan');
+            Route::post('/{id}/toggle-aktif', [StafStokController::class, 'toggleAktif'])->name('toggle-aktif');
+            Route::post('/{id}/audit', [StafStokController::class, 'auditBahan'])->name('audit');
             Route::post('/{id}/penyesuaian', [StafStokController::class, 'penyesuaian'])->name('penyesuaian');
         });
 
@@ -98,3 +112,28 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
                 Route::patch('/karyawan/{id}/toggle-status', [KaryawanController::class, 'toggleStatus'])->name('karyawan.toggle_status');
             });
     });
+
+// ==========================================
+// FITUR SISI PEMBELI (TANPA LOGIN - BAB 3)
+// ==========================================
+Route::prefix('order')->name('pelanggan.')->group(function () {
+    // P-02: Katalog Menu
+    Route::get('/menu', [PelangganPesananController::class, 'katalog'])->name('katalog');
+
+    // P-04: Keranjang Belanja
+    Route::post('/keranjang/tambah', [PelangganPesananController::class, 'tambahKeranjang'])->name('keranjang.tambah');
+    Route::post('/keranjang/update', [PelangganPesananController::class, 'updateKeranjang'])->name('keranjang.update');
+    Route::get('/keranjang', [PelangganPesananController::class, 'lihatKeranjang'])->name('keranjang');
+    Route::delete('/keranjang/{key}', [PelangganPesananController::class, 'hapusKeranjang'])->name('keranjang.hapus');
+
+    // P-05: Checkout
+    Route::get('/checkout', [PelangganPesananController::class, 'checkout'])->name('checkout');
+    Route::post('/checkout', [PelangganPesananController::class, 'prosesCheckout'])->name('checkout.proses');
+
+    // P-06 & P-07: Pembayaran & Konfirmasi
+    Route::get('/pembayaran/{kode}', [PelangganPesananController::class, 'halamanPembayaran'])->name('pembayaran');
+    Route::post('/pembayaran/{kode}/konfirmasi', [PelangganPesananController::class, 'konfirmasiBayar'])->name('pembayaran.konfirmasi');
+
+    // P-08: Cek Status Pesanan Real-time
+    Route::get('/lacak', [PelangganPesananController::class, 'lacakStatus'])->name('lacak');
+});
