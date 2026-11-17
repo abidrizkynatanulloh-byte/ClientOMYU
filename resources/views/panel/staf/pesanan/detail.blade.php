@@ -152,7 +152,7 @@
                     </div>
                 @else
                     <div style="display: flex; flex-direction: column; gap: 10px;">
-                        @if($pesanan->status_pesanan === 'baru')
+                        @if(in_array($pesanan->status_pesanan, ['baru', 'menunggu_pembayaran', 'menunggu_verifikasi', 'dikonfirmasi']))
                             <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
                                 @csrf
                                 <input type="hidden" name="status_pesanan" value="diproses">
@@ -163,12 +163,12 @@
                         @elseif($pesanan->status_pesanan === 'diproses')
                             <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
                                 @csrf
-                                <input type="hidden" name="status_pesanan" value="dikirim">
+                                <input type="hidden" name="status_pesanan" value="siap_diambil">
                                 <button type="submit" class="btn" style="width: 100%; background: #4f46e5; color: #fff;">
                                     ✓ Jus Selesai Dibuat & Siap Diambil
                                 </button>
                             </form>
-                        @elseif($pesanan->status_pesanan === 'dikirim')
+                        @elseif($pesanan->status_pesanan === 'siap_diambil' || $pesanan->status_pesanan === 'dikirim')
                             <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
                                 @csrf
                                 <input type="hidden" name="status_pesanan" value="selesai">
