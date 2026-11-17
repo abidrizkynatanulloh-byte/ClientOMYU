@@ -1,125 +1,232 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Manajemen Persediaan & Bahan Baku - OMYU</title>
-    <style>
-        body { font-family: sans-serif; padding: 24px; background: #f8fafc; color: #1e293b; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
-        .card { background: #fff; padding: 16px; border-radius: 10px; border: 1px solid #e2e8f0; }
-        .card h3 { margin: 0 0 6px; font-size: 13px; color: #64748b; }
-        .card .angka { font-size: 20px; font-weight: bold; margin: 0; }
-        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; margin-top: 16px; border: 1px solid #e2e8f0; }
-        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-        th { background: #f1f5f9; }
-        .nav a { margin-right: 10px; text-decoration: none; padding: 6px 12px; background: #e2e8f0; color: #334155; border-radius: 6px; font-size: 13px; font-weight: bold; }
-        .nav a.active { background: #0f172a; color: white; }
-        .badge { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; }
-        .badge-aman { background: #dcfce7; color: #15803d; }
-        .badge-kritis { background: #fee2e2; color: #b91c1c; }
-        .pesan-sukses { background: #dcfce7; color: #15803d; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-weight: bold; }
-        .btn-tambah { background: #16a34a; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; }
-    </style>
-</head>
-<body>
+@extends('layouts.admin')
 
-    <div class="nav" style="margin-bottom: 20px;">
-        <a href="{{ route('panel.admin.beranda') }}">📊 Dashboard</a>
-        <a href="{{ route('panel.admin.penjualan.index') }}">🛒 Penjualan</a>
-        <a href="{{ route('panel.admin.resep.index') }}">🍹 Resep & HPP</a>
-        <a href="{{ route('panel.admin.bahan.index') }}" class="active">📦 Persediaan Bahan (O-04)</a>
-        <a href="{{ route('panel.admin.keuangan.laba_rugi') }}">
-            💰 Keuangan & Laba Rugi (O-05)
-        </a>
-    </div>
+@section('title', 'Persediaan Bahan Baku')
+@section('page_title', 'Persediaan Bahan Baku')
+@section('badge', 'O-04')
+@section('page_subtitle', 'Monitor aset stok buah segar, bahan pembantu, kemasan, batas minimum, dan rendemen.')
 
-    @if(session('sukses'))
-        <div class="pesan-sukses">{{ session('sukses') }}</div>
-    @endif
+@section('header_actions')
+    <a href="{{ route('panel.admin.bahan.create') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs sm:text-sm shadow-xs transition-all hover:shadow-md">
+        <i class="fa-solid fa-plus"></i>
+        <span>Tambah Bahan Baru</span>
+    </a>
+@endsection
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h1>Daftar Persediaan & Stok Bahan Baku (O-04)</h1>
-        <a href="{{ route('panel.admin.bahan.create') }}" class="btn-tambah">+ Tambah Bahan Baru</a>
-    </div>
+@section('content')
+<div class="space-y-6">
 
-    <!-- Ringkasan Aset Persediaan -->
-    <div class="grid">
-        <div class="card">
-            <h3>Total Jenis Bahan</h3>
-            <p class="angka">{{ $totalJenisBahan }} Jenis</p>
+    <!-- Ringkasan Aset Persediaan KPI Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+                <i class="fa-solid fa-boxes-stacked"></i>
+            </div>
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Total Jenis Bahan</span>
+                <h3 class="text-2xl font-extrabold text-slate-900 tracking-tight mt-0.5">
+                    {{ $totalJenisBahan }} <span class="text-sm font-semibold text-slate-500">Jenis</span>
+                </h3>
+                <span class="text-[11px] text-slate-400">Buah, pelengkap & kemasan</span>
+            </div>
         </div>
-        <div class="card">
-            <h3>Total Nilai Persediaan</h3>
-            <p class="angka" style="color: #16a34a;">Rp {{ number_format($totalNilaiPersediaan, 0, ',', '.') }}</p>
-            <small>Aset di gudang/kulkas</small>
+
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+                <i class="fa-solid fa-vault"></i>
+            </div>
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Total Nilai Persediaan</span>
+                <h3 class="text-2xl font-extrabold text-emerald-700 tracking-tight mt-0.5">
+                    Rp {{ number_format($totalNilaiPersediaan, 0, ',', '.') }}
+                </h3>
+                <span class="text-[11px] text-slate-400">Estimasi nilai aset gudang & kulkas</span>
+            </div>
         </div>
-        <div class="card">
-            <h3>Bahan Stok Kritis</h3>
-            <p class="angka" style="color: #dc2626;">{{ $jumlahBahanKritis }} Bahan</p>
-            <small>Perlu segera belanja</small>
+
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl {{ $jumlahBahanKritis > 0 ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-600' }} flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Stok Kritis</span>
+                <h3 class="text-2xl font-extrabold {{ $jumlahBahanKritis > 0 ? 'text-rose-600' : 'text-slate-800' }} tracking-tight mt-0.5">
+                    {{ $jumlahBahanKritis }} <span class="text-sm font-semibold text-slate-500">Bahan</span>
+                </h3>
+                <span class="text-[11px] text-slate-400">Perlu segera dilakukan restock</span>
+            </div>
         </div>
+
     </div>
 
-    <!-- Tabel Data Bahan -->
-    <table>
-        <thead>
-            <tr>
-                <th>Nama Bahan</th>
-                <th>Jenis</th>
-                <th>Satuan Beli</th>
-                <th>Rendemen Standar</th>
-                <th>Stok Siap Pakai</th>
-                <th>Batas Minimum</th>
-                <th>Biaya Rata-rata</th>
-                <th>Nilai Persediaan</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($daftarBahan as $b)
-                <tr>
-                    <td><strong>{{ $b->nama }}</strong></td>
-                    <td>{{ ucfirst($b->jenis) }}</td>
-                    <td>1 {{ $b->satuan_beli }} = {{ (float) $b->konversi }} {{ $b->satuan_dasar }}</td>
-                    <td><strong>{{ (float) $b->rendemen_standar }}%</strong></td>
-                    <td>
-                        <strong>{{ (float) $b->stok_tersedia }}</strong> {{ $b->satuan_dasar }}
-                        @if((float) $b->stok_dicadangkan > 0)
-                            <br><small style="color: #f59e0b;">(Cadangan: {{ (float) $b->stok_dicadangkan }})</small>
-                        @endif
-                    </td>
-                    <td>{{ (float) $b->batas_minimum }} {{ $b->satuan_dasar }}</td>
-                    <td>Rp {{ number_format($b->biaya_rata_rata, 2, ',', '.') }} / {{ $b->satuan_dasar }}</td>
-                    <td>Rp {{ number_format((float) $b->stok * (float) $b->biaya_rata_rata, 0, ',', '.') }}</td>
-                    <td>
-                        <span class="badge {{ $b->is_kritis ? 'badge-kritis' : 'badge-aman' }}">
-                            {{ $b->is_kritis ? 'KRITIS' : 'AMAN' }}
-                        </span>
-                    </td>
-                                        <td style="display: flex; gap: 10px; align-items: center;">
-                        <a href="{{ route('panel.admin.bahan.edit', $b->id) }}">Edit</a>
+    <!-- Filter Bar Card -->
+    <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+        <form method="GET" action="{{ route('panel.admin.bahan.index') }}" class="space-y-4">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                
+                <!-- Search -->
+                <div class="sm:col-span-5">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Cari Nama Bahan</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" name="cari" value="{{ request('cari') }}" 
+                               placeholder="Contoh: Belimbing, Melon, Gula..."
+                               class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400 transition-all">
+                    </div>
+                </div>
 
-                        <form method="POST" action="{{ route('panel.admin.bahan.destroy', $b->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus bahan {{ $b->nama }}?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" style="background: none; border: none; color: #dc2626; cursor: pointer; text-decoration: underline; padding: 0; font-size: 14px;">
-                                Hapus
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="10" style="text-align: center; color: #64748b;">Belum ada bahan baku yang terdaftar.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+                <!-- Jenis Filter -->
+                <div class="sm:col-span-4">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Kategori Jenis</label>
+                    <select name="jenis" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        <option value="">Semua Jenis</option>
+                        <option value="buah" {{ request('jenis') == 'buah' ? 'selected' : '' }}>Buah Segar</option>
+                        <option value="bahan_lain" {{ request('jenis') == 'bahan_lain' ? 'selected' : '' }}>Bahan Lain (Gula, Susu, Es)</option>
+                        <option value="kemasan" {{ request('jenis') == 'kemasan' ? 'selected' : '' }}>Kemasan (Cup, Tutup, Sedotan)</option>
+                    </select>
+                </div>
 
-    <div style="margin-top: 16px;">
-        {{ $daftarBahan->links() }}
+                <!-- Status Filter -->
+                <div class="sm:col-span-3">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Status Ketersediaan</label>
+                    <select name="status" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        <option value="">Semua Status</option>
+                        <option value="kritis" {{ request('status') == 'kritis' ? 'selected' : '' }}>Stok Kritis (Perlu Beli)</option>
+                        <option value="aman" {{ request('status') == 'aman' ? 'selected' : '' }}>Stok Aman</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                <span class="text-xs text-slate-400">
+                    Menampilkan <strong>{{ $daftarBahan->total() }}</strong> bahan terdaftar
+                </span>
+                <div class="flex items-center gap-2">
+                    @if(request()->hasAny(['cari', 'jenis', 'status']))
+                        <a href="{{ route('panel.admin.bahan.index') }}" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-colors">
+                            Reset
+                        </a>
+                    @endif
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-filter text-xs"></i>
+                        <span>Terapkan Filter</span>
+                    </button>
+                </div>
+            </div>
+
+        </form>
     </div>
 
-</body>
-</html>
+    <!-- Data Table Card -->
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs sm:text-sm">
+                <thead>
+                    <tr class="bg-slate-50/80 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200/80">
+                        <th class="py-3.5 px-6 font-bold">Nama Bahan Baku</th>
+                        <th class="py-3.5 px-4 font-bold">Jenis</th>
+                        <th class="py-3.5 px-4 font-bold">Satuan Beli & Konversi</th>
+                        <th class="py-3.5 px-4 font-bold text-center">Rendemen</th>
+                        <th class="py-3.5 px-4 font-bold text-center">Stok Siap Pakai</th>
+                        <th class="py-3.5 px-4 font-bold text-center">Batas Minimum</th>
+                        <th class="py-3.5 px-4 font-bold text-right">Biaya Rata-rata</th>
+                        <th class="py-3.5 px-4 font-bold text-right">Nilai Persediaan</th>
+                        <th class="py-3.5 px-4 font-bold text-center">Status</th>
+                        <th class="py-3.5 px-6 font-bold text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($daftarBahan as $b)
+                        <tr class="hover:bg-brand-50/30 transition-colors">
+                            <td class="py-4 px-6">
+                                <span class="font-extrabold text-slate-900 block">{{ $b->nama }}</span>
+                            </td>
+                            <td class="py-4 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 uppercase">
+                                    {{ $b->jenis }}
+                                </span>
+                            </td>
+                            <td class="py-4 px-4 text-slate-600 text-xs">
+                                1 {{ $b->satuan_beli }} = <strong>{{ (float) $b->konversi }} {{ $b->satuan_dasar }}</strong>
+                            </td>
+                            <td class="py-4 px-4 text-center font-bold text-slate-800">
+                                {{ (float) $b->rendemen_standar }}%
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                <span class="font-extrabold text-slate-900">
+                                    {{ (float) $b->stok_tersedia }}
+                                </span> 
+                                <span class="text-xs text-slate-500">{{ $b->satuan_dasar }}</span>
+                                @if((float) $b->stok_dicadangkan > 0)
+                                    <span class="block text-[10px] text-amber-600 font-medium">
+                                        (Cadangan: {{ (float) $b->stok_dicadangkan }})
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="py-4 px-4 text-center text-slate-600 text-xs">
+                                {{ (float) $b->batas_minimum }} {{ $b->satuan_dasar }}
+                            </td>
+                            <td class="py-4 px-4 text-right text-slate-600 text-xs">
+                                Rp {{ number_format($b->biaya_rata_rata, 2, ',', '.') }} <span class="text-[10px] text-slate-400">/{{ $b->satuan_dasar }}</span>
+                            </td>
+                            <td class="py-4 px-4 text-right font-extrabold text-slate-900">
+                                Rp {{ number_format((float) $b->stok * (float) $b->biaya_rata_rata, 0, ',', '.') }}
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                @if($b->is_kritis)
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                        <i class="fa-solid fa-triangle-exclamation text-[10px]"></i> Kritis
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <i class="fa-solid fa-circle-check text-[10px]"></i> Aman
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <div class="inline-flex items-center gap-1.5">
+                                    <a href="{{ route('panel.admin.bahan.edit', $b->id) }}" 
+                                       title="Edit Bahan"
+                                       class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-brand-400 hover:text-brand-950 text-slate-600 flex items-center justify-center transition-colors">
+                                        <i class="fa-regular fa-pen-to-square text-xs"></i>
+                                    </a>
+
+                                    <form method="POST" action="{{ route('panel.admin.bahan.destroy', $b->id) }}" 
+                                          onsubmit="return confirm('Apakah Anda yakin ingin menonaktifkan bahan {{ $b->nama }}?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                title="Hapus / Nonaktifkan"
+                                                class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-500 hover:text-white text-slate-600 flex items-center justify-center transition-colors">
+                                            <i class="fa-regular fa-trash-can text-xs"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="10" class="py-16 text-center text-slate-400">
+                                <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-300 text-2xl mx-auto mb-3">
+                                    <i class="fa-solid fa-boxes-stacked"></i>
+                                </div>
+                                <p class="text-sm font-bold text-slate-700">Belum Ada Bahan Baku</p>
+                                <p class="text-xs text-slate-400 mt-1">Daftarkan bahan baku baru melalui tombol tambah bahan.</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if($daftarBahan->hasPages())
+            <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50">
+                {{ $daftarBahan->links() }}
+            </div>
+        @endif
+    </div>
+
+</div>
+@endsection

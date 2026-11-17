@@ -1,90 +1,151 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Tambah Bahan Baku Baru - OMYU</title>
-    <style>
-        body { font-family: sans-serif; padding: 24px; background: #f8fafc; color: #1e293b; max-width: 650px; margin: auto; }
-        .box { background: #fff; padding: 24px; border-radius: 10px; border: 1px solid #e2e8f0; }
-        .form-group { margin-bottom: 16px; }
-        label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 14px; }
-        input, select { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
-        small { color: #64748b; font-size: 12px; display: block; margin-top: 4px; }
-        button { background: #16a34a; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
-        .galat { color: #dc2626; font-size: 13px; margin-top: 4px; }
-    </style>
-</head>
-<body>
+@extends('layouts.admin')
 
-    <p><a href="{{ route('panel.admin.bahan.index') }}">← Kembali ke Daftar Bahan</a></p>
-    <h1>Form Tambah Bahan Baru</h1>
+@section('title', 'Tambah Bahan Baku Baru')
+@section('page_title', 'Tambah Bahan Baku')
+@section('badge', 'O-04')
+@section('page_subtitle', 'Daftarkan buah segar, bahan pembantu, atau kemasan baru ke dalam sistem persediaan OMYU.')
 
-    <div class="box">
-        <form method="POST" action="{{ route('panel.admin.bahan.store') }}">
+@section('header_actions')
+    <a href="{{ route('panel.admin.bahan.index') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Kembali ke Persediaan</span>
+    </a>
+@endsection
+
+@section('content')
+<div class="max-w-2xl mx-auto">
+
+    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-soft">
+        
+        <div class="flex items-center gap-3.5 pb-6 mb-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-800 flex items-center justify-center text-xl font-bold shrink-0">
+                <i class="fa-solid fa-apple-whole"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-extrabold text-slate-900">Formulir Pendaftaran Bahan Baku</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Lengkapi parameter satuan, konversi, rendemen buah, dan batas peringatan stok.</p>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ route('panel.admin.bahan.store') }}" class="space-y-5">
             @csrf
 
-            <div class="form-group">
-                <label>Nama Bahan / Buah</label>
-                <input type="text" name="nama" value="{{ old('nama') }}" placeholder="Contoh: Belimbing, Melon, Gula" required>
-                @error('nama') <div class="galat">{{ $message }}</div> @enderror
+            <!-- Nama Bahan -->
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                    Nama Bahan Baku / Buah <span class="text-rose-500">*</span>
+                </label>
+                <input type="text" name="nama" value="{{ old('nama') }}" 
+                       placeholder="Contoh: Belimbing Manis, Melon Madu, Gula Pasir..."
+                       required
+                       class="w-full px-4 py-2.5 rounded-xl border @error('nama') border-rose-300 bg-rose-50/30 @else border-slate-200 bg-slate-50/40 @enderror text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400 transition-all">
+                @error('nama')
+                    <p class="text-xs text-rose-600 mt-1 font-semibold">{{ $message }}</p>
+                @enderror
             </div>
 
-            <div class="form-group">
-                <label>Jenis Bahan</label>
-                <select name="jenis" required>
-                    <option value="buah" {{ old('jenis') == 'buah' ? 'selected' : '' }}>Buah Segar</option>
-                    <option value="bahan_lain" {{ old('jenis') == 'bahan_lain' ? 'selected' : '' }}>Bahan Lain (Gula, Susu, Es)</option>
-                    <option value="kemasan" {{ old('jenis') == 'kemasan' ? 'selected' : '' }}>Kemasan (Cup, Sedotan, Tutup)</option>
+            <!-- Jenis Bahan -->
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                    Jenis Kategori Bahan <span class="text-rose-500">*</span>
+                </label>
+                <select name="jenis" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/40 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+                    <option value="buah" {{ old('jenis') == 'buah' ? 'selected' : '' }}>Buah Segar (Melon, Belimbing, Mangga, dll)</option>
+                    <option value="bahan_lain" {{ old('jenis') == 'bahan_lain' ? 'selected' : '' }}>Bahan Lain / Pembantu (Gula, Susu, Es Batu)</option>
+                    <option value="kemasan" {{ old('jenis') == 'kemasan' ? 'selected' : '' }}>Kemasan (Cup Plastik, Tutup, Sedotan)</option>
                 </select>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <div class="form-group">
-                    <label>Satuan Beli di Toko/Pasar</label>
-                    <input type="text" name="satuan_beli" value="{{ old('satuan_beli', 'kg') }}" placeholder="Contoh: kg, liter, pack" required>
+            <!-- Satuan Beli & Satuan Dasar -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                        Satuan Beli di Toko/Pasar <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text" name="satuan_beli" value="{{ old('satuan_beli', 'kg') }}" 
+                           placeholder="Contoh: kg, liter, dus, pack"
+                           required
+                           class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/40 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+                    <span class="text-[11px] text-slate-400 mt-1 block">Satuan ketika belanja pembelian.</span>
                 </div>
-                <div class="form-group">
-                    <label>Satuan Dasar di Gudang</label>
-                    <select name="satuan_dasar" required>
-                        <option value="g" {{ old('satuan_dasar') == 'g' ? 'selected' : '' }}>Gram (g)</option>
-                        <option value="ml" {{ old('satuan_dasar') == 'ml' ? 'selected' : '' }}>Mililiter (ml)</option>
-                        <option value="pcs" {{ old('satuan_dasar') == 'pcs' ? 'selected' : '' }}>Pcs (Buah)</option>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                        Satuan Dasar di Gudang / Resep <span class="text-rose-500">*</span>
+                    </label>
+                    <select name="satuan_dasar" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/40 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        <option value="g" {{ old('satuan_dasar') == 'g' ? 'selected' : '' }}>Gram (g) - untuk padatan/buah</option>
+                        <option value="ml" {{ old('satuan_dasar') == 'ml' ? 'selected' : '' }}>Mililiter (ml) - untuk cairan/sirup</option>
+                        <option value="pcs" {{ old('satuan_dasar') == 'pcs' ? 'selected' : '' }}>Pcs - untuk kemasan/cup</option>
                     </select>
+                    <span class="text-[11px] text-slate-400 mt-1 block">Satuan standar kalkulasi takaran.</span>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Konversi ke Satuan Dasar</label>
-                <input type="number" step="any" name="konversi" value="{{ old('konversi', 1000) }}" required>
-                <small>Contoh: 1 kg = 1000 g, 1 liter = 1000 ml, 1 pack = 50 pcs</small>
+            <!-- Konversi -->
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                    Nilai Konversi Satuan Beli ke Dasar <span class="text-rose-500">*</span>
+                </label>
+                <input type="number" step="any" name="konversi" value="{{ old('konversi', 1000) }}" required
+                       class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/40 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+                <span class="text-[11px] text-slate-400 mt-1 block">Contoh: 1 kg = 1000 g, 1 liter = 1000 ml, 1 pack cup = 50 pcs.</span>
             </div>
 
-            <div class="form-group" style="background: #f0fdf4; padding: 12px; border-radius: 8px; border: 1px solid #bbf7d0;">
-                <label style="color: #166534;">Rendemen Standar Daging Buah (%)</label>
-                <input type="number" step="0.01" min="1" max="100" name="rendemen_standar" value="{{ old('rendemen_standar', 100) }}" required>
-                <small>Berapa % daging buah yang bisa dipakai setelah dikupas. (Melon: 70%. Untuk gula/kemasan isi 100%).</small>
+            <!-- Rendemen Card -->
+            <div class="rounded-2xl bg-brand-50/70 border border-brand-200 p-4">
+                <label class="block text-xs font-extrabold text-brand-900 mb-1">
+                    Rendemen Standar Daging Buah (%) <span class="text-rose-500">*</span>
+                </label>
+                <input type="number" step="0.01" min="1" max="100" name="rendemen_standar" value="{{ old('rendemen_standar', 100) }}" required
+                       class="w-full px-4 py-2.5 rounded-xl border border-brand-300 bg-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 font-bold">
+                <p class="text-[11px] text-brand-800 mt-1.5 leading-relaxed">
+                    Persentase daging buah siap jus setelah dikupas & dibuang biji/kulitnya. (Contoh: Melon ±70%, Belimbing ±85%. Untuk gula pasir atau kemasan isi 100%).
+                </p>
             </div>
 
-            <div class="form-group">
-                <label>Batas Minimum Peringatan Stok</label>
-                <input type="number" step="any" name="batas_minimum" value="{{ old('batas_minimum', 500) }}" required>
-                <small>Jika stok di bawah angka ini (dalam satuan dasar), sistem akan memberi peringatan Stok Kritis.</small>
+            <!-- Batas Minimum Stok Kritis -->
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                    Batas Minimum Peringatan Stok (Satuan Dasar) <span class="text-rose-500">*</span>
+                </label>
+                <input type="number" step="any" name="batas_minimum" value="{{ old('batas_minimum', 500) }}" required
+                       class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/40 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+                <span class="text-[11px] text-slate-400 mt-1 block">Sistem akan memicu alert "Stok Kritis" jika persediaan di bawah angka ini.</span>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <div class="form-group">
-                    <label>Stok Awal di Kulkas (Opsional)</label>
-                    <input type="number" step="any" name="stok_awal" value="{{ old('stok_awal', 0) }}"><small>(gram)</small>
+            <!-- Stok Awal & Biaya Rata-rata -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                        Stok Awal Gudang / Kulkas (Opsional)
+                    </label>
+                    <input type="number" step="any" name="stok_awal" value="{{ old('stok_awal', 0) }}"
+                           class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/40 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+                    <span class="text-[11px] text-slate-400 mt-1 block">Dalam satuan dasar (g / ml / pcs).</span>
                 </div>
-                <div class="form-group">
-                    <label>Harga Rata-rata per Satuan Dasar (Rp)</label>
-                    <input type="number" step="0.0001" name="biaya_rata_rata" value="{{ old('biaya_rata_rata', 0) }}">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                        Biaya Rata-rata per Satuan Dasar (Rp)
+                    </label>
+                    <input type="number" step="0.0001" name="biaya_rata_rata" value="{{ old('biaya_rata_rata', 0) }}"
+                           class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/40 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+                    <span class="text-[11px] text-slate-400 mt-1 block">Harga pokok modal awal.</span>
                 </div>
             </div>
 
-            <button type="submit">Simpan Bahan Baru</button>
+            <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+                <a href="{{ route('panel.admin.bahan.index') }}" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
+                    Batal
+                </a>
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs sm:text-sm shadow-xs transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Simpan Bahan Baru</span>
+                </button>
+            </div>
+
         </form>
+
     </div>
 
-</body>
-</html>
+</div>
+@endsection
