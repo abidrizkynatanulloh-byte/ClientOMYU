@@ -3,321 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout Pemesanan - OMYU</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background: #f8fafc; color: #1e293b; }
-
-        .app-container {
-            max-width: 1100px;
-            margin: 0 auto;
-            background: #ffffff;
-            min-height: 100vh;
-            box-shadow: 0 4px 30px rgba(0,0,0,0.05);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Topbar */
-        .checkout-topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 28px;
-            border-bottom: 1px solid #f1f5f9;
-            position: sticky;
-            top: 0;
-            background: #ffffff;
-            z-index: 50;
-        }
-        @media (min-width: 768px) { .checkout-topbar { padding: 18px 48px; } }
-        .checkout-logo { height: 32px; object-fit: contain; }
-        .checkout-cart-link { text-decoration: none; color: #1e293b; font-size: 22px; position: relative; }
-        .cart-badge {
-            position: absolute;
-            top: -6px;
-            right: -8px;
-            background: #22c55e;
-            color: white;
-            font-size: 10px;
-            font-weight: 800;
-            border-radius: 50%;
-            width: 17px;
-            height: 17px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Layout Grid */
-        .checkout-form {
-            padding: 20px 24px 100px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-        @media (min-width: 768px) {
-            .checkout-form {
-                grid-template-columns: 1.25fr 0.85fr;
-                padding: 32px 48px;
-                gap: 32px;
-            }
-        }
-
-        .checkout-left { display: flex; flex-direction: column; gap: 16px; }
-        .checkout-right { display: flex; flex-direction: column; gap: 16px; }
-
-        /* Item Preview Cards */
-        .item-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 14px 16px;
-            display: flex;
-            gap: 14px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-        }
-        .item-thumb {
-            width: 65px;
-            height: 65px;
-            border-radius: 10px;
-            background: #f8fafc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-        .item-thumb img { width: 100%; height: 100%; object-fit: cover; }
-        .item-detail { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .item-name { font-size: 14px; font-weight: 800; color: #0f172a; }
-        .item-desc { font-size: 11.5px; color: #64748b; line-height: 1.35; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
-        .item-price { font-size: 13.5px; font-weight: 800; color: #0f172a; }
-        .item-qty-badge { font-size: 11px; font-weight: 800; color: #15803d; background: #dcfce7; padding: 3px 10px; border-radius: 12px; }
-
-        /* Card Section General */
-        .section-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 18px 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
-        .section-header {
-            font-size: 14px;
-            font-weight: 800;
-            color: #0f172a;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 14px;
-        }
-
-        /* Schedule Card (Jadwal Pengambilan) */
-        .schedule-box { border: 1.5px solid #0f172a; border-radius: 10px; overflow: hidden; }
-        .schedule-date {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            border-bottom: 1px solid #0f172a;
-            background: #ffffff;
-        }
-        .schedule-date input {
-            border: none;
-            outline: none;
-            font-size: 13.5px;
-            font-weight: 700;
-            color: #0f172a;
-            width: 100%;
-            background: transparent;
-        }
-        .schedule-time {
-            padding: 12px 16px;
-            background: #ffffff;
-        }
-        .schedule-time select {
-            width: 100%;
-            border: none;
-            outline: none;
-            font-size: 13.5px;
-            font-weight: 700;
-            color: #0f172a;
-            background: transparent;
-            cursor: pointer;
-        }
-
-        /* Data Pemesanan Inputs */
-        .input-pill {
-            background: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 12px;
-            position: relative;
-        }
-        .input-pill:last-child { margin-bottom: 0; }
-        .input-pill label { display: block; font-size: 10.5px; font-weight: 800; color: #475569; letter-spacing: 0.5px; margin-bottom: 3px; }
-        .input-pill input, .input-pill textarea {
-            width: 100%;
-            border: none;
-            outline: none;
-            background: transparent;
-            font-size: 13.5px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-        .input-pill .pencil-icon { position: absolute; right: 16px; top: 18px; font-size: 15px; color: #64748b; }
-
-        /* Rincian Pembayaran Card */
-        .summary-row { display: flex; justify-content: space-between; font-size: 13px; color: #334155; margin-bottom: 8px; }
-        .summary-total {
-            display: flex;
-            justify-content: space-between;
-            font-size: 16px;
-            font-weight: 900;
-            color: #0f172a;
-            border-top: 1.5px solid #0f172a;
-            padding-top: 12px;
-            margin-top: 10px;
-        }
-
-        /* Radio Pembayaran Cards */
-        .payment-options { display: flex; flex-direction: column; gap: 12px; }
-        .payment-card {
-            border: 1px solid #cbd5e1;
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: 0.15s;
-        }
-        .payment-card:hover { border-color: #15803d; background: #f0fdf4; }
-        .payment-left { display: flex; align-items: center; gap: 14px; }
-        .custom-radio {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: 2px solid #94a3b8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        input[type="radio"]:checked + .payment-card-body .custom-radio {
-            border-color: #15803d;
-            background: #15803d;
-        }
-        .radio-dot { width: 8px; height: 8px; border-radius: 50%; background: #ffffff; display: none; }
-        input[type="radio"]:checked + .payment-card-body .radio-dot { display: block; }
-        .payment-info .name { font-size: 14px; font-weight: 800; color: #0f172a; }
-        .payment-info .sub { font-size: 11.5px; color: #64748b; margin-top: 2px; }
-        .payment-icon { font-size: 22px; color: #334155; }
-
-        /* Bottom Fixed Checkout Bar (Mobile Only) */
-        .bottom-checkout-bar {
-            display: flex;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: #ffffff;
-            border-top: 1px solid #e2e8f0;
-            padding: 14px 24px;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
-            z-index: 100;
-        }
-        @media (min-width: 768px) {
-            .bottom-checkout-bar { display: none; }
-        }
-        .total-box .total-label { font-size: 10px; font-weight: 800; color: #64748b; letter-spacing: 0.5px; }
-        .total-box .total-val { font-size: 17px; font-weight: 900; color: #0f172a; }
-        .btn-bayar {
-            background: #15803d;
-            color: #ffffff;
-            border: none;
-            font-size: 14px;
-            font-weight: 900;
-            padding: 13px 34px;
-            border-radius: 10px;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(21, 128, 61, 0.35);
-            transition: 0.15s;
-        }
-        .btn-bayar:hover { background: #166534; }
-    </style>
+    <title>Checkout Pesanan - OMYU</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/pelanggan.css') }}?v={{ filemtime(public_path('css/pelanggan.css')) }}">
 </head>
 <body>
 
-    <div class="app-container">
-        <!-- Topbar -->
-        <header class="checkout-topbar">
-            <a href="/">
-                <img src="{{ asset('images/logo-omyu.png') }}" alt="OMYU" class="checkout-logo">
-            </a>
-            <div style="font-weight: 800; font-size: 16px; color: #0f172a;">Konfirmasi & Checkout Pesanan</div>
-            <a href="{{ route('pelanggan.keranjang') }}" class="checkout-cart-link">
-                🛒
-                @if(count(session('keranjang', [])) > 0)
-                    <span class="cart-badge">{{ count(session('keranjang', [])) }}</span>
-                @endif
-            </a>
-        </header>
+    <div class="top-scroll-shield"></div>
 
-        <form method="POST" action="{{ route('pelanggan.checkout.proses') }}" class="checkout-form">
+    <!-- Floating Capsule Topbar -->
+    <div class="topbar-wrapper">
+        <header class="fixed-topbar">
+            <!-- Logo OMYU -->
+            <a href="/" class="brand-container">
+                <img src="{{ asset('images/logo_omyu.png') }}" alt="OMYU" class="brand-logo-img">
+                <span class="brand-text">MYU</span>
+            </a>
+
+            <nav class="nav-center">
+                <a href="/" class="nav-item">
+                    Beranda
+                </a>
+                <a href="{{ route('pelanggan.katalog') }}" class="nav-item">
+                    Menu
+                </a>
+                <a href="{{ url('/#tentang-kami') }}" class="nav-item">
+                    Tentang Kami
+                </a>
+                <a href="{{ url('/#kontak') }}" class="nav-item">
+                    Kontak
+                </a>
+            </nav>
+
+            <div class="nav-right">
+                <a href="{{ route('pelanggan.keranjang') }}" class="icon-circle-btn" title="Keranjang Belanja">
+                    <svg class="web-icon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <span class="cart-red-badge">
+                        {{ count(session('keranjang', [])) }}
+                    </span>
+                </a>
+            </div>
+        </header>
+    </div>
+
+    <main class="checkout-wrapper">
+        <form method="POST" action="{{ route('pelanggan.checkout.proses') }}" class="checkout-grid">
             @csrf
 
-            <!-- Left Column: Item List & Schedule & Customer Form -->
-            <div class="checkout-left">
-                <!-- Item Cart Previews -->
-                <div style="display:flex; flex-direction:column; gap:12px;">
+            <!-- Left: Items, Schedule & Buyer Data -->
+            <div>
+                <!-- Previews -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <svg class="web-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 6l-2 14H8L6 6h12z"></path>
+                            <line x1="4" y1="6" x2="20" y2="6"></line>
+                            <line x1="10" y1="2" x2="14" y2="6"></line>
+                        </svg>
+                        Ringkasan Menu Dipesan
+                    </div>
                     @foreach($keranjang as $item)
                         @php
                             $namaLower = strtolower($item['nama_produk']);
                             $imgUrl = 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=150&auto=format&fit=crop&q=80';
                             if (str_contains($namaLower, 'kentang')) {
                                 $imgUrl = 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=150&auto=format&fit=crop&q=80';
-                            } elseif (str_contains($namaLower, 'alpukat')) {
-                                $imgUrl = 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=150&auto=format&fit=crop&q=80';
                             } elseif (str_contains($namaLower, 'mangga')) {
                                 $imgUrl = 'https://images.unsplash.com/photo-1546173159-315724a31696?w=150&auto=format&fit=crop&q=80';
+                            } elseif (str_contains($namaLower, 'alpukat')) {
+                                $imgUrl = 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=150&auto=format&fit=crop&q=80';
                             }
                         @endphp
-                        <div class="item-card">
-                            <div class="item-thumb">
+                        <div class="item-preview-row">
+                            <div class="item-thumb-sm">
                                 <img src="{{ $imgUrl }}" alt="{{ $item['nama_produk'] }}">
                             </div>
-                            <div class="item-detail">
-                                <div>
-                                    <div class="item-name">{{ $item['nama_produk'] }}</div>
-                                    <div class="item-desc">{{ $item['catatan'] ?: 'Fresh jus alami pilihan.' }}</div>
-                                </div>
-                                <div class="item-row">
-                                    <span class="item-price">Rp {{ number_format($item['harga'], 0, ',', '.') }}</span>
-                                    <span class="item-qty-badge">{{ $item['qty'] }} cup / porsi</span>
-                                </div>
+                            <div class="item-preview-info">
+                                <div class="item-preview-name">{{ $item['nama_produk'] }} (x{{ $item['qty'] }})</div>
+                                <div class="item-preview-sub">{{ $item['catatan'] ?: 'Tanpa catatan khusus' }}</div>
                             </div>
+                            <div class="item-preview-price">Rp {{ number_format($item['harga'] * $item['qty'], 0, ',', '.') }}</div>
                         </div>
                     @endforeach
                 </div>
 
-                <!-- 1. Jadwal Pengambilan -->
+                <!-- Schedule -->
                 <div class="section-card">
                     <div class="section-header">
-                        <span>🕒</span>
-                        <span>Jadwal Pengambilan di Outlet</span>
+                        <svg class="web-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        Jadwal Pengambilan di Outlet
                     </div>
                     <div class="schedule-box">
                         <div class="schedule-date">
                             <input type="date" name="tanggal_ambil" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
-                            <span>📅</span>
+                            <svg class="web-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
                         </div>
                         <div class="schedule-time">
                             <select name="jam_ambil" required>
@@ -334,124 +127,112 @@
                     </div>
                 </div>
 
-                <!-- 2. Data Pemesanan -->
+                <!-- Buyer Details -->
                 <div class="section-card">
                     <div class="section-header">
-                        <span>📋</span>
-                        <span>Data Pemesanan</span>
+                        <svg class="web-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                        </svg>
+                        Data Pemesan & Catatan
                     </div>
                     <div class="input-pill">
-                        <label>NAMA</label>
+                        <label>NAMA ANDA</label>
                         <input type="text" name="nama_pembeli" placeholder="Masukkan nama pemesan..." required>
-                        <span class="pencil-icon">✏️</span>
                     </div>
                     <div class="input-pill">
-                        <label>NO WHATSAPP</label>
+                        <label>NOMOR WHATSAPP</label>
                         <input type="text" name="telepon_pembeli" placeholder="Contoh: 085888333445" required>
-                        <span class="pencil-icon">✏️</span>
                     </div>
-                </div>
-
-                <!-- 3. Catatan -->
-                <div class="section-card">
-                    <div class="section-header">
-                        <span>✏️</span>
-                        <span>Catatan Pesanan</span>
-                    </div>
-                    <div class="input-pill" style="margin-bottom:0;">
-                        <textarea name="catatan" rows="2" placeholder="Masukkan catatan anda... (opsional)"></textarea>
-                        <span class="pencil-icon">✏️</span>
+                    <div class="input-pill">
+                        <label>CATATAN (OPSIONAL)</label>
+                        <textarea name="catatan" rows="2" placeholder="Contoh: Es sedikit, jangan terlalu manis..."></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Payment Details & Submit Button (Sticky on Desktop) -->
-            <div class="checkout-right">
-                <!-- 4. Rincian Pembayaran -->
-                <div class="section-card">
-                    <div class="section-header">
-                        <span>Rincian Pembayaran</span>
+            <!-- Right: Payment & Summary -->
+            <div>
+                <div class="sidebar-box">
+                    <div class="section-header" style="margin-bottom:14px;">
+                        <svg class="web-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                        Metode Pembayaran
                     </div>
-                    <div class="summary-row" style="font-weight:700; color:#0f172a; margin-bottom:8px;">
-                        <span>Total Produk : {{ count($keranjang) }} macam</span>
-                    </div>
-                    @foreach($keranjang as $item)
-                        <div class="summary-row">
-                            <span>{{ $item['nama_produk'] }} (x{{ $item['qty'] }})</span>
-                            <span>Rp {{ number_format($item['harga'] * $item['qty'], 0, ',', '.') }}</span>
+
+                    <!-- QRIS -->
+                    <label style="cursor: pointer; display:block;">
+                        <input type="radio" name="metode_bayar" value="qris" checked style="display:none;">
+                        <div class="payment-card">
+                            <div class="payment-left">
+                                <div class="custom-radio" style="background:#4d8822; border-color:#4d8822;">
+                                    <div class="radio-dot" style="display:block;"></div>
+                                </div>
+                                <div class="payment-info">
+                                    <div class="name">QRIS Instan</div>
+                                    <div class="sub">Dana, GoPay, OVO, ShopeePay</div>
+                                </div>
+                            </div>
+                            <div style="color: #475569;">
+                                <svg class="web-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                                    <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                                </svg>
+                            </div>
                         </div>
-                    @endforeach
-                    <div class="summary-total">
-                        <span>TOTAL</span>
-                        <span>Rp {{ number_format($totalHarga, 0, ',', '.') }}</span>
-                    </div>
-                </div>
+                    </label>
 
-                <!-- 5. Metode Pembayaran -->
-                <div class="section-card">
-                    <div class="section-header">
-                        <span>Pilihan Metode Pembayaran</span>
-                    </div>
-                    <div class="payment-options">
-                        <!-- QRIS -->
-                        <label style="cursor: pointer; display:block;">
-                            <input type="radio" name="metode_bayar" value="qris" checked style="display:none;">
-                            <div class="payment-card">
-                                <div class="payment-left">
-                                    <div class="custom-radio" style="background:#15803d; border-color:#15803d;">
-                                        <div class="radio-dot" style="display:block;"></div>
-                                    </div>
-                                    <div class="payment-info">
-                                        <div class="name">QRIS Instan</div>
-                                        <div class="sub">Dana, Gopay, Ovo, ShopeePay</div>
-                                    </div>
+                    <!-- Transfer Bank -->
+                    <label style="cursor: pointer; display:block;">
+                        <input type="radio" name="metode_bayar" value="transfer" style="display:none;">
+                        <div class="payment-card">
+                            <div class="payment-left">
+                                <div class="custom-radio">
+                                    <div class="radio-dot"></div>
                                 </div>
-                                <div class="payment-icon">📱</div>
-                            </div>
-                        </label>
-
-                        <!-- Transfer Bank -->
-                        <label style="cursor: pointer; display:block;">
-                            <input type="radio" name="metode_bayar" value="transfer" style="display:none;">
-                            <div class="payment-card">
-                                <div class="payment-left">
-                                    <div class="custom-radio">
-                                        <div class="radio-dot"></div>
-                                    </div>
-                                    <div class="payment-info">
-                                        <div class="name">Transfer Bank</div>
-                                        <div class="sub">BCA / Mandiri</div>
-                                    </div>
+                                <div class="payment-info">
+                                    <div class="name">Transfer Bank</div>
+                                    <div class="sub">BCA / Mandiri</div>
                                 </div>
-                                <div class="payment-icon">💳</div>
                             </div>
-                        </label>
-                    </div>
+                            <div style="color: #475569;">
+                                <svg class="web-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                                </svg>
+                            </div>
+                        </div>
+                    </label>
+                    </label>
 
-                    <!-- Desktop Submit Button inside right column -->
-                    <div style="margin-top: 24px; display: none;" class="desktop-btn-wrap">
-                        <button type="submit" class="btn-bayar" style="width: 100%;">
-                            BAYAR SEKARANG (RP {{ number_format($totalHarga, 0, ',', '.') }}) &rarr;
+                    <!-- Summary -->
+                    <div style="margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+                        <div class="summary-row">
+                            <span>Total Item:</span>
+                            <span>{{ count($keranjang) }} macam</span>
+                        </div>
+                        @foreach($keranjang as $item)
+                            <div class="summary-row">
+                                <span>{{ $item['nama_produk'] }} (x{{ $item['qty'] }})</span>
+                                <span>Rp {{ number_format($item['harga'] * $item['qty'], 0, ',', '.') }}</span>
+                            </div>
+                        @endforeach
+
+                        <div class="summary-total">
+                            <span>TOTAL BAYAR:</span>
+                            <span>Rp {{ number_format($totalHarga, 0, ',', '.') }}</span>
+                        </div>
+
+                        <button type="submit" class="btn-bayar-glow">
+                            BUAT PESANAN & BAYAR SEKARANG &rarr;
                         </button>
                     </div>
                 </div>
             </div>
-
-            <!-- Bottom Fixed Bar (Mobile Only) -->
-            <div class="bottom-checkout-bar">
-                <div class="total-box">
-                    <div class="total-label">TOTAL PEMBAYARAN</div>
-                    <div class="total-val">RP {{ number_format($totalHarga, 0, ',', '.') }}</div>
-                </div>
-                <button type="submit" class="btn-bayar">BAYAR</button>
-            </div>
         </form>
-    </div>
+    </main>
 
-    <style>
-        @media (min-width: 768px) {
-            .desktop-btn-wrap { display: block !important; }
-        }
-    </style>
 </body>
 </html>

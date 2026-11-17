@@ -40,8 +40,13 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
     ->prefix('panel')->name('panel.')
     ->group(function () {
 
-        // K-02: Dashboard Operasional Staf
-        Route::get('/', [StafDashboardController::class, 'index'])->name('beranda');
+        // K-02: Dashboard Operasional Staf (Admin otomatis diarahkan ke web admin)
+        Route::get('/', function () {
+            if (auth()->user()?->adalahAdmin()) {
+                return redirect()->route('panel.admin.beranda');
+            }
+            return app(StafDashboardController::class)->index();
+        })->name('beranda');
 
         // K-03, K-04, K-05, K-06, K-12: Manajemen Pesanan Masuk & Verifikasi
         Route::prefix('pesanan')->name('staf.pesanan.')->group(function () {
