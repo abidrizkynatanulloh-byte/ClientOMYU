@@ -58,14 +58,15 @@
 
     <style>
         [x-cloak] { display: none !important; }
+        html { font-size: 13px; } /* ← SCALE GLOBAL: kecilkan angka ini untuk perkecil semua UI */
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             -webkit-font-smoothing: antialiased;
         }
         /* Custom scrollbar */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
         }
         ::-webkit-scrollbar-track {
             background: #F1F5F0;
@@ -99,20 +100,20 @@
 
         <!-- Sidebar Navigation -->
         <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-               class="fixed inset-y-0 left-0 z-50 w-72 bg-brand-900 text-white flex flex-col transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shadow-2xl lg:shadow-none">
+               class="fixed inset-y-0 left-0 z-50 w-56 bg-brand-900 text-white flex flex-col transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shadow-2xl lg:shadow-none">
             
             <!-- Brand Logo Header -->
-            <div class="px-6 py-6 border-b border-brand-800/80 flex items-center justify-between">
-                <a href="{{ route('panel.admin.beranda') }}" class="flex items-center gap-3.5 group">
-                    <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md p-1.5 flex items-center justify-center border border-white/15 shadow-inner transition-transform group-hover:scale-105">
+            <div class="px-4 py-4 border-b border-brand-800/80 flex items-center justify-between">
+                <a href="{{ route('panel.admin.beranda') }}" class="flex items-center gap-2.5 group">
+                    <div class="w-9 h-9 rounded-xl bg-white/10 backdrop-blur-md p-1 flex items-center justify-center border border-white/15 shadow-inner transition-transform group-hover:scale-105">
                         <img src="{{ asset('images/logo-omyu.png') }}" alt="OMYU Logo" class="w-full h-full object-contain drop-shadow">
                     </div>
                     <div>
                         <div class="flex items-center gap-1.5">
-                            <span class="text-xl font-extrabold tracking-tight text-white font-sans">OMYU</span>
-                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-brand-400 text-brand-950 uppercase tracking-wider">Owner</span>
+                            <span class="text-base font-extrabold tracking-tight text-white font-sans">OMYU</span>
+                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-brand-400 text-brand-950 uppercase tracking-wider">Owner</span>
                         </div>
-                        <p class="text-xs text-brand-200 font-medium">Fresh Juice & Healthy Bar</p>
+                        <p class="text-[10px] text-brand-200 font-medium">Fresh Juice & Healthy Bar</p>
                     </div>
                 </a>
                 <button @click="sidebarOpen = false" class="lg:hidden text-white/70 hover:text-white p-2 rounded-xl hover:bg-white/10">
@@ -121,7 +122,7 @@
             </div>
 
             <!-- Outlet Status Indicator -->
-            <div class="mx-5 mt-4 px-3.5 py-2.5 rounded-2xl bg-emerald-950/60 border border-emerald-500/20 flex items-center justify-between">
+            <div class="mx-3 mt-3 px-3 py-2 rounded-xl bg-emerald-950/60 border border-emerald-500/20 flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
                     <span class="relative flex h-2.5 w-2.5">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -133,7 +134,7 @@
             </div>
 
             <!-- Sidebar Navigation Links -->
-            <nav class="flex-1 px-4 py-4 space-y-6 overflow-y-auto">
+            <nav class="flex-1 px-3 py-3 space-y-4 overflow-y-auto">
 
                 <!-- Modul Utama -->
                 <div>
@@ -224,7 +225,7 @@
             </nav>
 
             <!-- User Profile & Logout Section -->
-            <div class="p-4 border-t border-brand-800/80 bg-brand-950/40">
+            <div class="p-3 border-t border-brand-800/80 bg-brand-950/40">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3 min-w-0">
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-400 to-lime-200 text-brand-950 flex items-center justify-center font-extrabold text-base shadow-sm shrink-0">
@@ -254,7 +255,7 @@
 
             <!-- Top Header Bar -->
             <header class="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200/80 shadow-xs">
-                <div class="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
+                <div class="px-4 sm:px-5 lg:px-6 py-3 flex items-center justify-between gap-4">
                     
                     <!-- Left: Hamburger + Page Heading -->
                     <div class="flex items-center gap-4">
@@ -263,7 +264,7 @@
                         </button>
                         <div>
                             <div class="flex items-center gap-2">
-                                <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-sans">
+                                <h1 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight font-sans">
                                     @yield('page_title', 'Dashboard')
                                 </h1>
                                 @hasSection('badge')
@@ -293,7 +294,7 @@
             </header>
 
             <!-- Alert Flash Messages -->
-            <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+            <main class="flex-1 p-3 sm:p-4 lg:p-5 overflow-y-auto">
 
                 @if(session('sukses'))
                     <div x-data="{ show: true }" x-show="show" x-transition class="mb-6 rounded-2xl bg-emerald-50 border border-emerald-200 p-4 shadow-xs flex items-start justify-between gap-3">
