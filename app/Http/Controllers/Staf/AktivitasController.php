@@ -15,6 +15,12 @@ class AktivitasController extends Controller
      */
     public function index(Request $request)
     {
+        $request->validate([
+            'tanggal' => 'nullable|date_format:Y-m-d',
+            'aksi' => 'nullable|string|max:60',
+            'cari' => 'nullable|string|max:100',
+        ]);
+
         $query = LogAktivitas::with('pengguna')->latest();
 
         if ($request->filled('tanggal')) {
@@ -26,7 +32,11 @@ class AktivitasController extends Controller
         }
 
         if ($request->filled('cari')) {
-            $query->where('deskripsi', 'like', '%' . $request->cari . '%');
+            $cari = $request->cari;
+            $query->where(function ($q) use ($cari) {
+                $q->where('deskripsi', 'like', "%{$cari}%")
+                    ->orWhere('alasan', 'like', "%{$cari}%");
+            });
         }
 
         $daftarAktivitas = $query->paginate(20)->withQueryString();
@@ -35,14 +45,17 @@ class AktivitasController extends Controller
         $totalHariIni = LogAktivitas::whereDate('created_at', Carbon::today())->count();
 
         $transaksiHariIni = LogAktivitas::whereDate('created_at', Carbon::today())
-            ->whereIn('aksi', ['penjualan_langsung', 'verifikasi_pembayaran', 'update_status_pesanan'])
+            ->whereIn('aksi', [
+                'penjualan_langsung', 'verifikasi_pembayaran', 'update_status_pesanan',
+                'batalkan_pesanan', 'penyelesaian_pesanan', 'konfirmasi_pengambilan',
+            ])
             ->count();
 
         $stokProduksiHariIni = LogAktivitas::whereDate('created_at', Carbon::today())
             ->whereIn('aksi', [
                 'mulai_racik_produksi', 'selesai_racik_produksi', 'catat_waste_gagal_racik',
                 'pasokan_bahan_masuk', 'pembuangan_bahan_rusak', 'audit_stok_bahan',
-                'penyesuaian_stok', 'toggle_status_bahan',
+                'penyesuaian_stok', 'toggle_status_bahan', 'ubah_password',
             ])
             ->count();
 

@@ -12,13 +12,13 @@ class Produk extends Model
     protected $table = 'produk';
 
     protected $fillable = [
-        'kategori_id', 'nama', 'slug', 'deskripsi', 'harga', 'stok',
+        'kategori_id', 'nama', 'slug', 'barcode', 'deskripsi', 'harga', 'stok',
         'berat_gram', 'gambar', 'aktif', 'dibuat_oleh', 'diubah_oleh',
     ];
 
     protected $casts = [
         'harga' => 'integer',
-        'stok'  => 'integer',
+        'stok' => 'integer',
         'aktif' => 'boolean',
     ];
 
@@ -57,9 +57,8 @@ class Produk extends Model
         return $query->where('aktif', true);
     }
 
-        public function varian()
+    public function varian()
     {
         return $this->hasMany(VarianProduk::class, 'produk_id');
     }
-    
 }

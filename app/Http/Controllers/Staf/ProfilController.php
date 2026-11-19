@@ -26,16 +26,16 @@ class ProfilController extends Controller
     {
         $request->validate([
             'password_lama' => 'required',
-            'password'      => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ], [
             'password_lama.required' => 'Kata sandi saat ini wajib diisi.',
-            'password.min'           => 'Kata sandi baru minimal 6 karakter.',
-            'password.confirmed'     => 'Konfirmasi kata sandi baru tidak cocok.',
+            'password.min' => 'Kata sandi baru minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi baru tidak cocok.',
         ]);
 
         $user = auth()->user();
 
-        if (!Hash::check($request->password_lama, $user->password)) {
+        if (! Hash::check($request->password_lama, $user->password)) {
             return back()->with('error', 'Kata sandi saat ini tidak sesuai.');
         }
 
@@ -44,13 +44,14 @@ class ProfilController extends Controller
 
         LogAktivitas::create([
             'pengguna_id' => $user->id,
-            'aksi'        => 'ubah_password',
-            'tipe_objek'  => 'pengguna',
-            'id_objek'    => $user->id,
-            'deskripsi'   => 'Staf ' . $user->nama . ' memperbarui kata sandi akun.',
+            'aksi' => 'ubah_password',
+            'tipe_objek' => 'pengguna',
+            'id_objek' => $user->id,
+            'deskripsi' => 'Staf '.$user->nama.' memperbarui kata sandi akun.',
+            'alasan' => 'Perubahan kata sandi oleh pemilik akun',
+            'ip_address' => $request->ip(),
         ]);
 
         return back()->with('sukses', 'Kata sandi Anda berhasil diperbarui.');
     }
 }
-

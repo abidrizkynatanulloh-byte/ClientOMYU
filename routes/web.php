@@ -1,12 +1,12 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Owner\BahanController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
+use App\Http\Controllers\Owner\KaryawanController;
+use App\Http\Controllers\Owner\KeuanganController;
 use App\Http\Controllers\Owner\PenjualanController;
 use App\Http\Controllers\Owner\ResepHppController;
-use App\Http\Controllers\Owner\BahanController;
-use App\Http\Controllers\Owner\KeuanganController;
-use App\Http\Controllers\Owner\KaryawanController;
 use App\Http\Controllers\Staf\AktivitasController as StafAktivitasController;
 use App\Http\Controllers\Staf\DashboardController as StafDashboardController;
 use App\Http\Controllers\Staf\KasirController as StafKasirController;
@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     $daftarProduk = Produk::where('aktif', 1)->take(8)->get();
+
     return view('beranda', compact('daftarProduk'));
 });
 
@@ -51,6 +52,9 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
         // K-03, K-04, K-05, K-06, K-12: Manajemen Pesanan Masuk & Verifikasi
         Route::prefix('pesanan')->name('staf.pesanan.')->group(function () {
             Route::get('/', [StafPesananController::class, 'index'])->name('index');
+            Route::get('/scan', [StafPesananController::class, 'scan'])->name('scan');
+            Route::post('/scan/validasi', [StafPesananController::class, 'validasiQr'])->name('scan.validasi');
+            Route::post('/{id}/terima-qr', [StafPesananController::class, 'terimaQr'])->name('terima-qr');
             Route::get('/{id}', [StafPesananController::class, 'detail'])->name('detail');
             Route::post('/{id}/verifikasi-bayar', [StafPesananController::class, 'verifikasiPembayaran'])->name('verifikasi-bayar');
             Route::post('/{id}/status', [StafPesananController::class, 'updateStatus'])->name('update-status');
@@ -68,6 +72,7 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
         // K-07: Penjualan Langsung di Kasir (POS)
         Route::prefix('kasir')->name('staf.kasir.')->group(function () {
             Route::get('/', [StafKasirController::class, 'index'])->name('index');
+            Route::get('/cari-barcode', [StafKasirController::class, 'cariBarcode'])->name('cari-barcode');
             Route::post('/transaksi', [StafKasirController::class, 'simpanTransaksi'])->name('simpan');
             Route::get('/struk/{id}', [StafKasirController::class, 'struk'])->name('struk');
         });
@@ -105,10 +110,10 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
                 Route::get('/bahan/{id}/edit', [BahanController::class, 'edit'])->name('bahan.edit');
                 Route::put('/bahan/{id}', [BahanController::class, 'update'])->name('bahan.update');
                 Route::delete('/bahan/{id}', [BahanController::class, 'destroy'])->name('bahan.destroy');
-                                // O-05: Modul Keuangan & Laporan Laba Rugi
+                // O-05: Modul Keuangan & Laporan Laba Rugi
                 Route::get('/keuangan/laba-rugi', [KeuanganController::class, 'labaRugi'])->name('keuangan.laba_rugi');
                 Route::get('/keuangan/buku-kas', [KeuanganController::class, 'bukuKas'])->name('keuangan.buku_kas');
-                                // O-09: Modul Manajemen Karyawan
+                // O-09: Modul Manajemen Karyawan
                 Route::get('/karyawan', [KaryawanController::class, 'index'])->name('karyawan.index');
                 Route::get('/karyawan/tambah', [KaryawanController::class, 'create'])->name('karyawan.create');
                 Route::post('/karyawan', [KaryawanController::class, 'store'])->name('karyawan.store');

@@ -1,99 +1,110 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Struk Transaksi {{ $pesanan->kode_pesanan }} - OMYU</title>
-    <style>
-        body { font-family: 'Courier New', Courier, monospace; background: #f1f5f9; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .struk-card { background: #ffffff; width: 320px; padding: 20px; border: 1px dashed #cbd5e1; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .center { text-align: center; }
-        .line { border-bottom: 1px dashed #64748b; margin: 10px 0; }
-        .item-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
-        .item-sub { display: flex; justify-content: space-between; font-size: 11px; color: #475569; margin-bottom: 6px; }
-        .total-row { display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; margin-top: 6px; }
-        .btn-group { margin-top: 20px; display: flex; gap: 10px; }
-        .btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none; border: none; cursor: pointer; }
-        .btn-print { background: #0f172a; color: white; }
-        .btn-back { background: #6aa332; color: white; }
-        
-        @media print {
-            body { background: white; padding: 0; }
-            .btn-group { display: none; }
-            .struk-card { border: none; box-shadow: none; width: 100%; }
-        }
-    </style>
-</head>
-<body>
+@extends('layouts.staf')
 
-    @php
-        $pembayaran = $pesanan->pembayaran->first();
-        $raw = $pembayaran ? $pembayaran->data_mentah : [];
-        $uangDiterima = $raw['uang_diterima'] ?? $pesanan->total;
-        $kembalian = $raw['kembalian'] ?? 0;
-    @endphp
+@section('title', 'Struk ' . $pesanan->kode_pesanan)
+
+@section('styles')
+<style>
+    body { background: #f4f8f4; }
+    .struk-page { max-width: 420px; margin: 0 auto; }
+    .struk-actions { display: flex; gap: 8px; margin-bottom: 12px; }
+    .struk-actions a, .struk-actions button { flex: 1; text-align: center; text-decoration: none; border: 0; border-radius: 10px; padding: 10px 12px; font-family: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
+    .btn-kembali { background: #eaf8ef; color: #166534; }
+    .btn-cetak { background: #0f5132; color: #ffffff; }
+    .struk-card { background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 20px; font-family: 'Courier New', Courier, monospace; color: #0f172a; box-shadow: 0 4px 12px rgba(15, 23, 42, .05); }
+    .struk-center { text-align: center; }
+    .struk-card h1 { font-size: 18px; letter-spacing: 1px; margin: 0; }
+    .struk-sub { font-size: 10px; color: #64748b; margin-top: 3px; }
+    .struk-garis { border-bottom: 1px dashed #94a3b8; margin: 12px 0; }
+    .struk-baris { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; padding: 3px 0; }
+    .struk-baris span:first-child { color: #475569; }
+    .struk-item { margin-bottom: 8px; }
+    .struk-item-utama { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; font-weight: 700; }
+    .struk-item-detail { font-size: 10px; color: #64748b; margin-top: 2px; }
+    .struk-total { display: flex; justify-content: space-between; font-size: 14px; font-weight: 900; border-top: 1px dashed #94a3b8; margin-top: 10px; padding-top: 9px; }
+    .struk-catatan { font-size: 11px; color: #64748b; margin-top: 6px; }
+
+    @media print {
+        body { background: #ffffff !important; padding: 0 !important; }
+        .app-topbar, .bottom-nav, .alert, .struk-actions { display: none !important; }
+        .app-container { max-width: none !important; padding: 0 !important; }
+        .struk-page { max-width: none; margin: 0; }
+        .struk-card { border: 0; border-radius: 0; box-shadow: none; padding: 0; }
+    }
+</style>
+@endsection
+
+@section('content')
+@php
+    $pembayaran = $pesanan->pembayaran->first();
+    $uangDiterima = $pesanan->uang_diterima ?? data_get($pembayaran, 'data_mentah.uang_diterima', $pesanan->total);
+    $kembalian = $pesanan->kembalian ?? data_get($pembayaran, 'data_mentah.kembalian', 0);
+    $metodeBayar = $pembayaran?->metode ?: $pesanan->metode_bayar;
+    $namaKasir = $pesanan->penangan?->nama ?: data_get($pembayaran, 'data_mentah.kasir', 'Kasir OMYU');
+    $referensiBayar = data_get($pembayaran, 'data_mentah.referensi_bayar');
+    $waktuTransaksi = $pesanan->dibayar_pada ?? $pesanan->created_at;
+@endphp
+
+<div class="struk-page">
+    <div class="struk-actions">
+        <a href="{{ route('panel.staf.kasir.index') }}" class="btn-kembali">&larr; Kembali ke Kasir</a>
+        <button type="button" id="cetakStruk" class="btn-cetak">Cetak Struk</button>
+    </div>
 
     <div class="struk-card">
-        <div class="center">
-            <h2 style="margin: 0; font-size: 18px; letter-spacing: 1px;">OMYU JUICE</h2>
-            <div style="font-size: 11px; color: #475569;">Fresh Juice, Smarter Business</div>
-            <div style="font-size: 10px; color: #64748b; margin-top: 4px;">Jl. Raya UMKM Segar No. 88</div>
+        <div class="struk-center">
+            <h1>OMYU JUICE</h1>
+            <div class="struk-sub">Less Sugar, More Fruits</div>
+            <div class="struk-sub">Struk Penjualan Langsung</div>
         </div>
 
-        <div class="line"></div>
+        <div class="struk-garis"></div>
 
-        <div style="font-size: 11px;">
-            <div>No. Nota: <strong>{{ $pesanan->kode_pesanan }}</strong></div>
-            <div>Waktu   : {{ $pesanan->created_at->format('d/m/Y H:i') }}</div>
-            <div>Kasir   : {{ $pesanan->penangan ? $pesanan->penangan->nama : 'Kasir OMYU' }}</div>
-            <div>Pembeli : {{ $pesanan->nama_pembeli }}</div>
-        </div>
+        <div class="struk-baris"><span>Kode pesanan</span><strong>{{ $pesanan->kode_pesanan }}</strong></div>
+        <div class="struk-baris"><span>Waktu</span><span>{{ $waktuTransaksi->format('d/m/Y H:i') }} WIB</span></div>
+        <div class="struk-baris"><span>Kasir</span><span>{{ $namaKasir }}</span></div>
+        <div class="struk-baris"><span>Pembeli</span><span>{{ $pesanan->nama_pembeli }}</span></div>
 
-        <div class="line"></div>
+        <div class="struk-garis"></div>
 
-        <div>
-            @foreach($pesanan->itemPesanan as $item)
-                <div class="item-row">
+        @foreach($pesanan->itemPesanan as $item)
+            <div class="struk-item">
+                <div class="struk-item-utama">
                     <span>{{ $item->nama_produk }}</span>
                     <span>Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
                 </div>
-                <div class="item-sub">
-                    <span>{{ $item->jumlah }} x Rp {{ number_format($item->harga, 0, ',', '.') }}</span>
+                <div class="struk-item-detail">
+                    {{ $item->jumlah }} × Rp {{ number_format($item->harga, 0, ',', '.') }}
+                    @if($item->nama_varian) · {{ $item->nama_varian }} @endif
                 </div>
-            @endforeach
-        </div>
+            </div>
+        @endforeach
 
-        <div class="line"></div>
+        <div class="struk-garis"></div>
 
-        <div class="total-row">
-            <span>TOTAL:</span>
-            <span>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</span>
-        </div>
-        <div class="item-row" style="margin-top: 4px;">
-            <span>Metode:</span>
-            <span>{{ strtoupper($pembayaran ? $pembayaran->metode : 'TUNAI') }}</span>
-        </div>
-        <div class="item-row">
-            <span>Diterima:</span>
-            <span>Rp {{ number_format($uangDiterima, 0, ',', '.') }}</span>
-        </div>
-        <div class="item-row" style="font-weight: bold;">
-            <span>Kembalian:</span>
-            <span>Rp {{ number_format($kembalian, 0, ',', '.') }}</span>
-        </div>
+        <div class="struk-baris"><span>Subtotal</span><span>Rp {{ number_format($pesanan->subtotal, 0, ',', '.') }}</span></div>
+        <div class="struk-baris"><span>Metode bayar</span><span>{{ strtoupper($metodeBayar ?? '-') }}</span></div>
+        <div class="struk-baris"><span>Uang diterima</span><span>Rp {{ number_format($uangDiterima, 0, ',', '.') }}</span></div>
+        <div class="struk-baris"><span>Kembalian</span><span>Rp {{ number_format($kembalian, 0, ',', '.') }}</span></div>
+        @if($referensiBayar)
+            <div class="struk-baris"><span>Referensi</span><span>{{ $referensiBayar }}</span></div>
+        @endif
+        <div class="struk-total"><span>TOTAL</span><span>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</span></div>
 
-        <div class="line"></div>
+        @if($pesanan->catatan)
+            <div class="struk-catatan">Catatan: {{ $pesanan->catatan }}</div>
+        @endif
 
-        <div class="center" style="font-size: 11px; margin-top: 10px;">
-            <div>Terima kasih atas kunjungan Anda!</div>
-            <div style="font-size: 10px; color: #64748b; margin-top: 4px;">Nikmati kesegaran jus asli tanpa pengawet.</div>
-        </div>
+        <div class="struk-garis"></div>
+
+        <div class="struk-center struk-sub">Terima kasih atas kunjungan Anda!</div>
     </div>
+</div>
+@endsection
 
-    <div class="btn-group">
-        <button onclick="window.print()" class="btn btn-print">🖨 Cetak Struk</button>
-        <a href="{{ route('panel.staf.kasir.index') }}" class="btn btn-back">🛒 Transaksi Baru</a>
-    </div>
-
-</body>
-</html>
-
+@section('scripts')
+<script>
+    document.getElementById('cetakStruk').addEventListener('click', function () {
+        window.print();
+    });
+</script>
+@endsection

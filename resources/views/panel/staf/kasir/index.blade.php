@@ -1,303 +1,472 @@
 @extends('layouts.staf')
 
-@section('title', 'Kasir POS - Penjualan Langsung (K-07)')
+@section('title', 'Kasir POS - Penjualan Langsung')
 
 @section('styles')
 <style>
-    .pos-layout { display: grid; grid-template-columns: 1.6fr 1.2fr; gap: 20px; align-items: start; }
-    .kategori-tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 6px; }
-    .kategori-tab { padding: 6px 14px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 20px; text-decoration: none; font-size: 13px; font-weight: 600; color: #475569; white-space: nowrap; }
-    .kategori-tab.active { background: #6aa332; color: #ffffff; border-color: #6aa332; }
+    .kasir-head { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+    .kasir-head h1 { font-size: 20px; font-weight: 900; color: #0f172a; }
+    .kasir-head p { font-size: 12px; color: #64748b; margin-top: 3px; }
+    .head-link { font-size: 12px; font-weight: 800; color: #15803d; text-decoration: none; background: #eaf8ef; border-radius: 10px; padding: 8px 12px; }
 
-    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
-    .menu-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: 0.15s; position: relative; }
-    .menu-card:hover { border-color: #6aa332; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    .menu-card.out-of-stock { opacity: 0.55; cursor: not-allowed; }
-    .menu-nama { font-weight: 700; font-size: 14px; color: #0f172a; margin-bottom: 4px; }
-    .menu-harga { font-weight: 800; font-size: 15px; color: #6aa332; margin-bottom: 8px; }
-    .menu-stok { font-size: 11px; font-weight: 600; }
+    .pos-layout { display: grid; gap: 16px; align-items: start; }
+    .menu-panel, .cart-panel { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 14px; }
+
+    .btn-scan { width: 100%; border: 0; border-radius: 11px; background: #0f5132; color: #ffffff; padding: 11px 14px; font-size: 13px; font-weight: 800; cursor: pointer; }
+    .scan-pesan { min-height: 18px; margin-top: 8px; font-size: 12px; font-weight: 700; color: #64748b; }
+    .scan-pesan.sukses { color: #15803d; }
+    .scan-pesan.error { color: #b91c1c; }
+
+    .kategori-tabs { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 6px; margin: 12px 0; scrollbar-width: none; }
+    .kategori-tabs::-webkit-scrollbar { display: none; }
+    .kategori-tab { flex-shrink: 0; text-decoration: none; font-size: 11px; font-weight: 800; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 999px; padding: 6px 12px; }
+    .kategori-tab.active { background: #198754; color: #ffffff; border-color: #198754; }
+
+    .cari-form { display: flex; gap: 8px; margin-bottom: 12px; }
+    .cari-form input { flex: 1; min-width: 0; border: 1px solid #cbd5e1; border-radius: 10px; padding: 10px 12px; font-size: 13px; outline: none; font-family: inherit; }
+    .cari-form input:focus { border-color: #198754; }
+    .cari-form button { border: 0; border-radius: 10px; background: #eaf8ef; color: #166534; padding: 0 14px; font-size: 12px; font-weight: 800; cursor: pointer; }
+
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+    .menu-card { text-align: left; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 13px; padding: 10px; cursor: pointer; font-family: inherit; transition: .15s; }
+    .menu-card:hover:not(:disabled) { border-color: #198754; box-shadow: 0 4px 12px rgba(15, 81, 50, .08); }
+    .menu-card:disabled { opacity: .55; cursor: not-allowed; }
+    .menu-img { width: 100%; height: 88px; object-fit: cover; border-radius: 9px; margin-bottom: 8px; background: #f1f5f9; }
+    .menu-nama { font-size: 13px; font-weight: 800; color: #0f172a; line-height: 1.3; }
+    .menu-barcode { font-size: 10px; color: #94a3b8; margin-top: 2px; word-break: break-all; }
+    .menu-harga { font-size: 14px; font-weight: 900; color: #15803d; margin-top: 6px; }
+    .menu-stok { font-size: 10px; font-weight: 800; margin-top: 4px; }
     .stok-tersedia { color: #16a34a; }
     .stok-menipis { color: #d97706; }
     .stok-habis { color: #dc2626; }
 
-    .cart-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px; position: sticky; top: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
-    .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
-    .cart-item-name { font-weight: 700; color: #0f172a; }
-    .cart-item-price { color: #64748b; font-size: 12px; }
-    .cart-qty-ctrl { display: flex; align-items: center; gap: 6px; }
-    .btn-qty { width: 26px; height: 26px; background: #e2e8f0; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .btn-qty:hover { background: #cbd5e1; }
-    
-    .quick-cash { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-    .btn-cash { padding: 4px 8px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
-    .btn-cash:hover { background: #e2e8f0; }
+    .cart-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 10px; }
+    .cart-head h2 { font-size: 15px; font-weight: 900; color: #0f172a; }
+    .btn-kosongkan { border: 0; background: none; color: #dc2626; font-size: 11px; font-weight: 800; cursor: pointer; }
+    #cartItemsList { min-height: 70px; max-height: 280px; overflow-y: auto; }
+    .cart-empty { text-align: center; color: #94a3b8; font-size: 12px; padding: 28px 0; }
+    .cart-item { display: flex; justify-content: space-between; gap: 8px; padding: 9px 0; border-bottom: 1px solid #f1f5f9; }
+    .cart-item-name { font-size: 12px; font-weight: 800; color: #0f172a; }
+    .cart-item-price { font-size: 11px; color: #64748b; margin-top: 2px; }
+    .cart-qty { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .btn-qty { width: 25px; height: 25px; border: 0; border-radius: 7px; background: #e8f5e9; color: #166534; font-weight: 900; cursor: pointer; }
+    .cart-qty span { min-width: 18px; text-align: center; font-size: 12px; font-weight: 800; }
+
+    .ringkasan { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 11px; padding: 11px; margin: 12px 0; }
+    .ringkasan-row { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #475569; padding: 3px 0; }
+    .ringkasan-row.final { font-size: 16px; font-weight: 900; color: #0f5132; border-top: 1px dashed #cbd5e1; margin-top: 6px; padding-top: 8px; }
+
+    .field { margin-bottom: 10px; }
+    .field label { display: block; font-size: 11px; font-weight: 800; color: #475569; margin-bottom: 4px; }
+    .field input, .field select, .field textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 9px; padding: 9px 10px; font-size: 13px; font-family: inherit; outline: none; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: #198754; }
+    .field-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .wajib { color: #dc2626; }
+    .quick-cash { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+    .btn-cash { border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 8px; padding: 5px 9px; font-size: 11px; font-weight: 800; cursor: pointer; }
+    .kembalian-row { display: flex; justify-content: space-between; margin-top: 9px; font-size: 13px; font-weight: 900; color: #166534; }
+    .form-error { display: none; background: #fee2e2; border: 1px solid #fecaca; color: #b91c1c; border-radius: 9px; padding: 9px 11px; font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+    .form-error.show { display: block; }
+    .btn-simpan { width: 100%; border: 0; border-radius: 11px; background: #198754; color: #ffffff; padding: 12px; font-size: 14px; font-weight: 900; cursor: pointer; }
+    .btn-simpan:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+    @media (min-width: 768px) {
+        .pos-layout { grid-template-columns: 1.35fr 1fr; gap: 20px; }
+        .menu-panel, .cart-panel { padding: 18px; }
+        .cart-panel { position: sticky; top: 20px; }
+    }
 </style>
 @endsection
 
 @section('content')
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-        <div>
-            <h1 style="margin: 0; font-size: 22px;">Kasir POS - Penjualan Langsung (K-07)</h1>
-            <p style="margin: 4px 0 0; color: #64748b; font-size: 14px;">Melayani pesanan langsung di outlet, kalkulasi kembalian, dan pemotongan stok otomatis.</p>
-        </div>
+<div class="kasir-head">
+    <div>
+        <h1>Kasir POS - Penjualan Langsung</h1>
+        <p>Catat penjualan di outlet, hitung kembalian, dan potong stok secara otomatis.</p>
     </div>
+    <a href="{{ route('panel.staf.pesanan.index') }}" class="head-link">Pesanan Masuk</a>
+</div>
 
-    <div class="pos-layout">
-        <!-- Kolom Kiri: Menu Jus & Produk -->
-        <div>
-            <!-- Kategori Tabs -->
-            <div class="kategori-tabs">
-                <a href="{{ route('panel.staf.kasir.index') }}" class="kategori-tab {{ !request('kategori_id') ? 'active' : '' }}">
-                    Semua Kategori
-                </a>
-                @foreach($kategoriList as $kat)
-                    <a href="{{ route('panel.staf.kasir.index', ['kategori_id' => $kat->id]) }}" class="kategori-tab {{ request('kategori_id') == $kat->id ? 'active' : '' }}">
-                        {{ $kat->nama }}
-                    </a>
-                @endforeach
-            </div>
+<div class="pos-layout">
+    <section class="menu-panel">
+        <button type="button" class="btn-scan" id="scanBarcode">Scan Barcode</button>
+        <div class="scan-pesan" id="scanPesan" role="status"></div>
 
-            <!-- Pencarian Produk -->
-            <div style="margin-bottom: 14px;">
-                <form method="GET" action="{{ route('panel.staf.kasir.index') }}">
-                    @if(request('kategori_id'))
-                        <input type="hidden" name="kategori_id" value="{{ request('kategori_id') }}">
+        <div class="kategori-tabs">
+            <a href="{{ route('panel.staf.kasir.index') }}" class="kategori-tab {{ ! request('kategori_id') ? 'active' : '' }}">Semua Kategori</a>
+            @foreach($kategoriList as $kategori)
+                <a href="{{ route('panel.staf.kasir.index', ['kategori_id' => $kategori->id]) }}" class="kategori-tab {{ request('kategori_id') == $kategori->id ? 'active' : '' }}">{{ $kategori->nama }}</a>
+            @endforeach
+        </div>
+
+        <form method="GET" action="{{ route('panel.staf.kasir.index') }}" class="cari-form">
+            @if(request('kategori_id'))
+                <input type="hidden" name="kategori_id" value="{{ request('kategori_id') }}">
+            @endif
+            <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Cari nama menu atau barcode...">
+            <button type="submit">Cari</button>
+        </form>
+
+        <div class="menu-grid" id="menuGrid">
+            @forelse($daftarProduk as $produk)
+                @php
+                    $stokHabis = $produk->stok <= 0;
+                    $kelasStok = $stokHabis ? 'stok-habis' : ($produk->stok <= 5 ? 'stok-menipis' : 'stok-tersedia');
+                @endphp
+                <button type="button" class="menu-card" data-id="{{ $produk->id }}" data-nama="{{ $produk->nama }}" data-harga="{{ $produk->harga }}" data-stok="{{ $produk->stok }}" data-barcode="{{ $produk->barcode }}" {{ $stokHabis ? 'disabled' : '' }}>
+                    @if($produk->gambar)
+                        <img class="menu-img" src="{{ Storage::url($produk->gambar) }}" alt="{{ $produk->nama }}">
                     @endif
-                    <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Ketik nama jus / menu..." style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px;">
-                </form>
-            </div>
-
-            <!-- Grid Menu -->
-            <div class="menu-grid">
-                @forelse($daftarProduk as $produk)
-                    @php
-                        $isHabis = $produk->stok <= 0;
-                    @endphp
-                    <div class="menu-card {{ $isHabis ? 'out-of-stock' : '' }}" 
-                         onclick="{{ !$isHabis ? "tambahKeKeranjang({$produk->id}, '{$produk->nama}', {$produk->harga}, {$produk->stok})" : '' }}">
-                        <div>
-                            <div class="menu-nama">{{ $produk->nama }}</div>
-                            <div class="menu-harga">Rp {{ number_format($produk->harga, 0, ',', '.') }}</div>
-                        </div>
-                        <div class="menu-stok {{ $isHabis ? 'stok-habis' : ($produk->stok <= 5 ? 'stok-menipis' : 'stok-tersedia') }}">
-                            @if($isHabis)
-                                ✕ Stok Habis
-                            @elseif($produk->stok <= 5)
-                                ⚠ Sisa {{ $produk->stok }} cup
-                            @else
-                                ✓ Stok: {{ $produk->stok }} cup
-                            @endif
-                        </div>
+                    <div class="menu-nama">{{ $produk->nama }}</div>
+                    @if($produk->barcode)
+                        <div class="menu-barcode">{{ $produk->barcode }}</div>
+                    @endif
+                    <div class="menu-harga">Rp {{ number_format($produk->harga, 0, ',', '.') }}</div>
+                    <div class="menu-stok {{ $kelasStok }}">
+                        @if($stokHabis)
+                            Stok habis
+                        @else
+                            Sisa {{ $produk->stok }} cup
+                        @endif
                     </div>
-                @empty
-                    <div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: #94a3b8; background: #fff; border-radius: 10px;">
-                        Tidak ada menu yang sesuai dengan pencarian atau kategori ini.
-                    </div>
-                @endforelse
-            </div>
+                </button>
+            @empty
+                <div class="cart-empty" style="grid-column: 1 / -1;">Tidak ada menu yang sesuai dengan pencarian atau kategori ini.</div>
+            @endforelse
         </div>
+    </section>
 
-        <!-- Kolom Kanan: Keranjang Kasir (POS Cart) -->
-        <div>
-            <div class="cart-box">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 12px;">
-                    <h3 style="margin: 0; font-size: 16px; color: #0f172a;">🛒 Pesanan Aktif</h3>
-                    <button type="button" onclick="kosongkanKeranjang()" style="background: none; border: none; color: #ef4444; font-size: 12px; font-weight: 600; cursor: pointer;">Kosongkan</button>
+    <section class="cart-panel">
+        <form method="POST" action="{{ route('panel.staf.kasir.simpan') }}" id="formKasir" enctype="multipart/form-data">
+            @csrf
+            <div class="cart-head">
+                <h2>Pesanan Aktif</h2>
+                <button type="button" class="btn-kosongkan" id="kosongkanKeranjang">Kosongkan</button>
+            </div>
+
+            <div id="cartItemsList">
+                <div class="cart-empty" id="cartEmptyText">Pilih menu atau pindai barcode untuk mulai transaksi.</div>
+            </div>
+            <div id="hiddenInputs"></div>
+
+            <div class="ringkasan">
+                <div class="ringkasan-row"><span>Subtotal</span><span id="labelSubtotal">Rp 0</span></div>
+                <div class="ringkasan-row final"><span>Total bayar</span><span id="labelTotal">Rp 0</span></div>
+            </div>
+
+            <div class="field-2">
+                <div class="field">
+                    <label for="namaPembeli">Nama pelanggan</label>
+                    <input type="text" id="namaPembeli" name="nama_pembeli" maxlength="100" placeholder="Opsional">
                 </div>
-
-                <form method="POST" action="{{ route('panel.staf.kasir.simpan') }}" id="formKasir">
-                    @csrf
-
-                    <!-- Item List Container -->
-                    <div id="cartItemsList" style="max-height: 280px; overflow-y: auto; margin-bottom: 14px;">
-                        <p id="cartEmptyText" style="text-align: center; color: #94a3b8; padding: 30px 0; font-size: 13px;">
-                            Pilih menu di sebelah kiri untuk ditambahkan ke kasir.
-                        </p>
-                    </div>
-
-                    <!-- Hidden Inputs Container -->
-                    <div id="hiddenInputs"></div>
-
-                    <!-- Rincian Total -->
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 14px;">
-                        <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 800; color: #0f172a;">
-                            <span>TOTAL BAYAR:</span>
-                            <span id="labelTotal">Rp 0</span>
-                        </div>
-                    </div>
-
-                    <!-- Form Data Pembeli (Opsional) -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-                        <input type="text" name="nama_pembeli" placeholder="Nama Pelanggan" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
-                        <input type="text" name="telepon_pembeli" placeholder="No. WA (Opsional)" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
-                    </div>
-
-                    <!-- Metode Pembayaran -->
-                    <div style="margin-bottom: 12px;">
-                        <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; color: #475569;">Metode Pembayaran:</label>
-                        <select name="metode_bayar" id="selectMetodeBayar" onchange="toggleMetodeBayar()" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: 600;">
-                            <option value="tunai">💵 Uang Tunai (Cash)</option>
-                            <option value="qris">📱 QRIS OMYU</option>
-                            <option value="transfer">🏦 Transfer Bank</option>
-                        </select>
-                    </div>
-
-                    <!-- Input Tunai & Kembalian -->
-                    <div id="boxTunai" style="margin-bottom: 16px;">
-                        <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; color: #475569;">Uang Diterima (Rp):</label>
-                        <input type="number" name="uang_diterima" id="inputUangDiterima" placeholder="Contoh: 50000" oninput="hitungKembalian()" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; font-weight: 700;">
-                        
-                        <div class="quick-cash">
-                            <button type="button" class="btn-cash" onclick="isiUangPas()">Uang Pas</button>
-                            <button type="button" class="btn-cash" onclick="tambahUang(10000)">+10.000</button>
-                            <button type="button" class="btn-cash" onclick="tambahUang(20000)">+20.000</button>
-                            <button type="button" class="btn-cash" onclick="tambahUang(50000)">+50.000</button>
-                            <button type="button" class="btn-cash" onclick="tambahUang(100000)">+100.000</button>
-                        </div>
-
-                        <div style="margin-top: 10px; display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; color: #166534;">
-                            <span>KEMBALIAN:</span>
-                            <span id="labelKembalian">Rp 0</span>
-                        </div>
-                    </div>
-
-                    <!-- Tombol Simpan Transaksi -->
-                    <button type="submit" id="btnSimpan" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 15px; font-weight: 800; text-align: center;" disabled>
-                        ✓ SIMPAN & SELESAIKAN TRANSAKSI
-                    </button>
-                </form>
+                <div class="field">
+                    <label for="teleponPembeli">No. WhatsApp</label>
+                    <input type="text" id="teleponPembeli" name="telepon_pembeli" maxlength="20" placeholder="Opsional">
+                </div>
             </div>
-        </div>
-    </div>
+
+            <div class="field">
+                <label for="catatanPembeli">Catatan</label>
+                <textarea id="catatanPembeli" name="catatan" rows="2" maxlength="255" placeholder="Contoh: Less ice, tambah granat"></textarea>
+            </div>
+
+            <div class="field">
+                <label for="metodeBayar">Metode pembayaran</label>
+                <select id="metodeBayar" name="metode_bayar">
+                    <option value="tunai">Tunai</option>
+                    <option value="qris">QRIS</option>
+                    <option value="transfer">Transfer bank</option>
+                </select>
+            </div>
+
+            <div id="boxTunai">
+                <div class="field">
+                    <label for="uangDiterima">Uang diterima (Rp)</label>
+                    <input type="number" id="uangDiterima" name="uang_diterima" min="0" step="1" inputmode="numeric" placeholder="0">
+                </div>
+                <div class="quick-cash">
+                    <button type="button" class="btn-cash" data-nominal="pas">Uang pas</button>
+                    <button type="button" class="btn-cash" data-nominal="10000">+10.000</button>
+                    <button type="button" class="btn-cash" data-nominal="20000">+20.000</button>
+                    <button type="button" class="btn-cash" data-nominal="50000">+50.000</button>
+                    <button type="button" class="btn-cash" data-nominal="100000">+100.000</button>
+                </div>
+                <div class="kembalian-row"><span>Kembalian</span><span id="labelKembalian">Rp 0</span></div>
+            </div>
+
+            <div id="boxReferensi" style="display: none;">
+                <div class="field">
+                    <label for="referensiBayar">Referensi pembayaran <span class="wajib">*wajib</span></label>
+                    <input type="text" id="referensiBayar" name="referensi_bayar" maxlength="100" placeholder="ID transaksi QRIS / nomor transfer">
+                </div>
+                <div class="field">
+                    <label for="buktiBayar">Bukti pembayaran (opsional)</label>
+                    <input type="file" id="buktiBayar" name="bukti_bayar" accept="image/jpeg,image/png,image/webp">
+                </div>
+            </div>
+
+            <div class="form-error" id="formError" role="alert"></div>
+            <button type="submit" class="btn-simpan" id="btnSimpan" disabled>Simpan & selesaikan transaksi</button>
+        </form>
+    </section>
+</div>
 @endsection
 
 @section('scripts')
 <script>
-    let keranjang = {};
+(function () {
+    const rupaUang = new Intl.NumberFormat('id-ID');
+    const keranjang = Object.create(null);
+    const menuGrid = document.getElementById('menuGrid');
+    const cartItemsList = document.getElementById('cartItemsList');
+    const hiddenInputs = document.getElementById('hiddenInputs');
+    const labelSubtotal = document.getElementById('labelSubtotal');
+    const labelTotal = document.getElementById('labelTotal');
+    const labelKembalian = document.getElementById('labelKembalian');
+    const btnSimpan = document.getElementById('btnSimpan');
+    const metodeBayar = document.getElementById('metodeBayar');
+    const uangDiterima = document.getElementById('uangDiterima');
+    const referensiBayar = document.getElementById('referensiBayar');
+    const formError = document.getElementById('formError');
+    const scanPesan = document.getElementById('scanPesan');
 
-    function tambahKeKeranjang(id, nama, harga, maxStok) {
+    function escapeHtml(nilai) {
+        return String(nilai).replace(/[&<>"']/g, function (karakter) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[karakter];
+        });
+    }
+
+    function tampilPesan(pesan, tipe) {
+        scanPesan.textContent = pesan;
+        scanPesan.className = 'scan-pesan' + (tipe ? ' ' + tipe : '');
+    }
+
+    function tampilError(pesan) {
+        formError.textContent = pesan;
+        formError.classList.add('show');
+    }
+
+    function totalKeranjang() {
+        return Object.keys(keranjang).reduce(function (total, id) {
+            return total + (keranjang[id].harga * keranjang[id].qty);
+        }, 0);
+    }
+
+    function hitungKembalian() {
+        const total = totalKeranjang();
+        const dibayar = parseFloat(uangDiterima.value) || 0;
+        labelKembalian.textContent = 'Rp ' + rupaUang.format(Math.max(0, dibayar - total));
+    }
+
+    function tambahKeKeranjang(produk) {
+        const id = Number(produk.id);
+        const harga = Number(produk.harga);
+        const stok = Number(produk.stok);
+
+        if (!id || !Number.isFinite(harga) || !Number.isFinite(stok) || stok < 1) {
+            tampilPesan('Data produk tidak valid.', 'error');
+            return;
+        }
+
         if (!keranjang[id]) {
-            keranjang[id] = { id: id, nama: nama, harga: harga, qty: 1, maxStok: maxStok };
+            keranjang[id] = { id: id, nama: produk.nama, harga: harga, stok: stok, qty: 1 };
+        } else if (keranjang[id].qty >= keranjang[id].stok) {
+            tampilPesan('Stok ' + keranjang[id].nama + ' hanya tersedia ' + keranjang[id].stok + ' cup.', 'error');
+            return;
         } else {
-            if (keranjang[id].qty < maxStok) {
-                keranjang[id].qty += 1;
-            } else {
-                alert('Jumlah melebihi stok yang tersedia (' + maxStok + ' cup).');
-            }
+            keranjang[id].qty += 1;
         }
-        renderKeranjang();
-    }
 
-    function ubahQty(id, delta) {
-        if (!keranjang[id]) return;
-        keranjang[id].qty += delta;
-        if (keranjang[id].qty <= 0) {
-            delete keranjang[id];
-        } else if (keranjang[id].qty > keranjang[id].maxStok) {
-            keranjang[id].qty = keranjang[id].maxStok;
-            alert('Maksimal stok tercapai.');
-        }
-        renderKeranjang();
-    }
-
-    function kosongkanKeranjang() {
-        keranjang = {};
         renderKeranjang();
     }
 
     function renderKeranjang() {
-        const listContainer = document.getElementById('cartItemsList');
-        const hiddenContainer = document.getElementById('hiddenInputs');
-        const emptyText = document.getElementById('cartEmptyText');
-        const labelTotal = document.getElementById('labelTotal');
-        const btnSimpan = document.getElementById('btnSimpan');
+        const ids = Object.keys(keranjang);
+        let html = '';
+        let hidden = '';
+        let index = 0;
 
-        const keys = Object.keys(keranjang);
+        if (ids.length === 0) {
+            cartItemsList.innerHTML = '<div class="cart-empty">Pilih menu atau pindai barcode untuk mulai transaksi.</div>';
+            hiddenInputs.innerHTML = '';
+        } else {
+            ids.forEach(function (id) {
+                const item = keranjang[id];
+                const subtotal = item.harga * item.qty;
 
-        if (keys.length === 0) {
-            listContainer.innerHTML = '<p id="cartEmptyText" style="text-align: center; color: #94a3b8; padding: 30px 0; font-size: 13px;">Pilih menu di sebelah kiri untuk ditambahkan ke kasir.</p>';
-            hiddenContainer.innerHTML = '';
-            labelTotal.innerText = 'Rp 0';
-            btnSimpan.disabled = true;
-            hitungKembalian();
+                html += '<div class="cart-item">' +
+                    '<div><div class="cart-item-name">' + escapeHtml(item.nama) + '</div>' +
+                    '<div class="cart-item-price">Rp ' + rupaUang.format(item.harga) + ' × ' + item.qty + ' = <strong>Rp ' + rupaUang.format(subtotal) + '</strong></div></div>' +
+                    '<div class="cart-qty">' +
+                    '<button type="button" class="btn-qty" data-id="' + item.id + '" data-delta="-1">−</button>' +
+                    '<span>' + item.qty + '</span>' +
+                    '<button type="button" class="btn-qty" data-id="' + item.id + '" data-delta="1">+</button>' +
+                    '</div></div>';
+
+                hidden += '<input type="hidden" name="items[' + index + '][id]" value="' + item.id + '">' +
+                    '<input type="hidden" name="items[' + index + '][qty]" value="' + item.qty + '">';
+                index += 1;
+            });
+
+            cartItemsList.innerHTML = html;
+            hiddenInputs.innerHTML = hidden;
+        }
+
+        const total = totalKeranjang();
+        labelSubtotal.textContent = 'Rp ' + rupaUang.format(total);
+        labelTotal.textContent = 'Rp ' + rupaUang.format(total);
+        btnSimpan.disabled = ids.length === 0;
+        hitungKembalian();
+    }
+
+    menuGrid.addEventListener('click', function (event) {
+        const kartu = event.target.closest('.menu-card');
+        if (!kartu || kartu.disabled) {
             return;
         }
 
-        let html = '';
-        let hiddenHtml = '';
-        let total = 0;
-        let index = 0;
-
-        keys.forEach(k => {
-            const item = keranjang[k];
-            const lineTotal = item.harga * item.qty;
-            total += lineTotal;
-
-            html += `
-                <div class="cart-item">
-                    <div>
-                        <div class="cart-item-name">${item.nama}</div>
-                        <div class="cart-item-price">Rp ${item.harga.toLocaleString('id-ID')} &times; ${item.qty} = <strong>Rp ${lineTotal.toLocaleString('id-ID')}</strong></div>
-                    </div>
-                    <div class="cart-qty-ctrl">
-                        <button type="button" class="btn-qty" onclick="ubahQty(${item.id}, -1)">-</button>
-                        <span style="font-weight: 700; min-width: 20px; text-align: center;">${item.qty}</span>
-                        <button type="button" class="btn-qty" onclick="ubahQty(${item.id}, 1)">+</button>
-                    </div>
-                </div>
-            `;
-
-            hiddenHtml += `
-                <input type="hidden" name="items[${index}][id]" value="${item.id}">
-                <input type="hidden" name="items[${index}][qty]" value="${item.qty}">
-            `;
-            index++;
+        tambahKeKeranjang({
+            id: kartu.dataset.id,
+            nama: kartu.dataset.nama,
+            harga: kartu.dataset.harga,
+            stok: kartu.dataset.stok
         });
+        tampilPesan(kartu.dataset.nama + ' ditambahkan ke keranjang.', 'sukses');
+    });
 
-        listContainer.innerHTML = html;
-        hiddenContainer.innerHTML = hiddenHtml;
-        labelTotal.innerText = 'Rp ' + total.toLocaleString('id-ID');
-        btnSimpan.disabled = false;
+    cartItemsList.addEventListener('click', function (event) {
+        const tombol = event.target.closest('.btn-qty');
+        if (!tombol) {
+            return;
+        }
 
-        hitungKembalian();
-    }
+        const id = tombol.dataset.id;
+        if (!keranjang[id]) {
+            return;
+        }
 
-    function getTotalBelanja() {
-        let total = 0;
-        Object.keys(keranjang).forEach(k => {
-            total += (keranjang[k].harga * keranjang[k].qty);
-        });
-        return total;
-    }
-
-    function hitungKembalian() {
-        const total = getTotalBelanja();
-        const uangInput = parseFloat(document.getElementById('inputUangDiterima').value) || 0;
-        const kembalian = Math.max(0, uangInput - total);
-        document.getElementById('labelKembalian').innerText = 'Rp ' + kembalian.toLocaleString('id-ID');
-    }
-
-    function isiUangPas() {
-        const total = getTotalBelanja();
-        document.getElementById('inputUangDiterima').value = total;
-        hitungKembalian();
-    }
-
-    function tambahUang(nominal) {
-        let current = parseFloat(document.getElementById('inputUangDiterima').value) || 0;
-        document.getElementById('inputUangDiterima').value = current + nominal;
-        hitungKembalian();
-    }
-
-    function toggleMetodeBayar() {
-        const metode = document.getElementById('selectMetodeBayar').value;
-        const boxTunai = document.getElementById('boxTunai');
-        if (metode === 'tunai') {
-            boxTunai.style.display = 'block';
+        const delta = Number(tombol.dataset.delta);
+        if (delta < 0) {
+            keranjang[id].qty -= 1;
+            if (keranjang[id].qty < 1) {
+                delete keranjang[id];
+            }
+        } else if (keranjang[id].qty < keranjang[id].stok) {
+            keranjang[id].qty += 1;
         } else {
-            boxTunai.style.display = 'none';
+            tampilPesan('Stok ' + keranjang[id].nama + ' hanya tersedia ' + keranjang[id].stok + ' cup.', 'error');
+            return;
+        }
+
+        renderKeranjang();
+    });
+
+    document.getElementById('kosongkanKeranjang').addEventListener('click', function () {
+        Object.keys(keranjang).forEach(function (id) { delete keranjang[id]; });
+        renderKeranjang();
+        tampilPesan('Keranjang dikosongkan.');
+    });
+
+    async function cariBarcode(barcode) {
+        const kode = String(barcode || '').trim();
+        if (!kode) {
+            tampilPesan('Barcode kosong.', 'error');
+            return;
+        }
+
+        tampilPesan('Mencari produk dengan barcode ' + kode + '...');
+
+        try {
+            const response = await fetch('{{ route('panel.staf.kasir.cari-barcode') }}?barcode=' + encodeURIComponent(kode), {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            });
+            const hasil = await response.json();
+
+            if (!response.ok || !hasil.found) {
+                tampilPesan(hasil.pesan || 'Produk dengan barcode ' + kode + ' tidak ditemukan.', 'error');
+                return;
+            }
+
+            tambahKeKeranjang(hasil.produk);
+            tampilPesan(hasil.produk.nama + ' ditambahkan ke keranjang.', 'sukses');
+        } catch (error) {
+            tampilPesan('Barcode gagal dicek. Periksa koneksi lalu coba lagi.', 'error');
         }
     }
+
+    document.getElementById('scanBarcode').addEventListener('click', function () {
+        window.StafScanner.bukaBarcode({
+            onResult: function (barcode) { cariBarcode(barcode); }
+        });
+    });
+
+    document.querySelectorAll('.btn-cash').forEach(function (tombol) {
+        tombol.addEventListener('click', function () {
+            const nominal = tombol.dataset.nominal;
+            if (nominal === 'pas') {
+                uangDiterima.value = totalKeranjang();
+            } else {
+                uangDiterima.value = (parseFloat(uangDiterima.value) || 0) + Number(nominal);
+            }
+            hitungKembalian();
+            formError.classList.remove('show');
+        });
+    });
+
+    uangDiterima.addEventListener('input', function () {
+        hitungKembalian();
+        formError.classList.remove('show');
+    });
+
+    function sinkronMetodeBayar() {
+        const metode = metodeBayar.value;
+        const tunai = metode === 'tunai';
+        document.getElementById('boxTunai').style.display = tunai ? 'block' : 'none';
+        document.getElementById('boxReferensi').style.display = tunai ? 'none' : 'block';
+        uangDiterima.disabled = !tunai;
+        referensiBayar.required = !tunai;
+        if (!tunai) {
+            uangDiterima.value = '';
+            hitungKembalian();
+        }
+        formError.classList.remove('show');
+    }
+
+    metodeBayar.addEventListener('change', sinkronMetodeBayar);
+
+    document.getElementById('formKasir').addEventListener('submit', function (event) {
+        formError.classList.remove('show');
+
+        if (Object.keys(keranjang).length === 0) {
+            event.preventDefault();
+            tampilError('Pilih minimal satu menu sebelum menyimpan transaksi.');
+            return;
+        }
+
+        const metode = metodeBayar.value;
+        const total = totalKeranjang();
+
+        if (metode === 'tunai') {
+            const dibayar = parseFloat(uangDiterima.value);
+            if (!Number.isFinite(dibayar) || dibayar < total) {
+                event.preventDefault();
+                tampilError('Uang diterima kurang dari total pembayaran (' + rupaUang.format(total) + ').');
+                uangDiterima.focus();
+                return;
+            }
+        } else if (!referensiBayar.value.trim()) {
+            event.preventDefault();
+            tampilError('Referensi pembayaran wajib diisi untuk QRIS/transfer.');
+            referensiBayar.focus();
+        }
+    });
+
+    sinkronMetodeBayar();
+    renderKeranjang();
+})();
 </script>
 @endsection
-

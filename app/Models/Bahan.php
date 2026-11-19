@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class Bahan extends Model
 {
@@ -27,13 +28,13 @@ class Bahan extends Model
     ];
 
     protected $casts = [
-        'konversi'         => 'decimal:3',
+        'konversi' => 'decimal:3',
         'rendemen_standar' => 'decimal:2',
-        'batas_minimum'    => 'decimal:3',
-        'stok'             => 'decimal:3',
+        'batas_minimum' => 'decimal:3',
+        'stok' => 'decimal:3',
         'stok_dicadangkan' => 'decimal:3',
-        'biaya_rata_rata'  => 'decimal:4',
-        'aktif'            => 'boolean',
+        'biaya_rata_rata' => 'decimal:4',
+        'aktif' => 'boolean',
     ];
 
     // Helper: menghitung stok yang benar-benar siap dipakai (stok fisik - cadangan pesanan)
@@ -52,5 +53,54 @@ class Bahan extends Model
     public function pembelian()
     {
         return $this->hasMany(PembelianBahan::class, 'bahan_id');
+    }
+
+    public function konversiKeDasar(string $satuan, float $jumlah): float
+    {
+        $satuan = strtolower(trim($satuan));
+        $dasar = strtolower((string) $this->satuan_dasar);
+
+        if ($satuan === $dasar) {
+            return $jumlah;
+        }
+
+        if ($this->satuan_beli && $satuan === strtolower((string) $this->satuan_beli)) {
+            return $jumlah * (float) $this->konversi;
+        }
+
+        $faktor = match ($satuan) {
+            'kg' => $dasar === 'g' ? 1000 : 1,
+            'gram', 'gr', 'g' => $dasar === 'g' ? 1 : 1,
+            'liter', 'l' => $dasar === 'ml' ? 1000 : 1,
+            'ml' => 1,
+            'pack' => $dasar === 'pcs' ? (float) ($this->konversi ?: 50) : 1,
+            default => 1,
+        };
+
+        return $jumlah * $faktor;
+    }
+
+    public function catatPergerakan(
+        string $jenis,
+        float $jumlah,
+        float $stokSesudah,
+        ?string $rujukanTipe = null,
+        ?int $rujukanId = null,
+        ?int $stafId = null,
+        ?string $alasan = null,
+        float $nilai = 0
+    ): void {
+        DB::table('pergerakan_stok')->insert([
+            'bahan_id' => $this->id,
+            'jenis' => $jenis,
+            'jumlah' => $jumlah,
+            'nilai' => $nilai,
+            'stok_setelah' => $stokSesudah,
+            'biaya_rata_rata_setelah' => (float) $this->biaya_rata_rata,
+            'rujukan_tipe' => $rujukanTipe,
+            'rujukan_id' => $rujukanId,
+            'pengguna_id' => $stafId ?? auth()->id(),
+            'alasan' => $alasan,
+        ]);
     }
 }

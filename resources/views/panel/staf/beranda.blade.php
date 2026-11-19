@@ -1,733 +1,251 @@
 @extends('layouts.staf')
 
-@section('title', 'Dashboard Operasional Barista & Kasir')
+@section('title', 'Dashboard Operasional Staf')
 
 @section('styles')
 <style>
-    /* Styling khusus Dashboard Barista Mobile-First */
-    .dashboard-wrapper {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
-
-    /* 1. Shift Card */
-    .shift-card {
-        background: linear-gradient(135deg, #137333 0%, #0d5a26 100%);
+    .dash-page { display: grid; gap: 16px; }
+    .dash-hero {
+        background: linear-gradient(135deg,#137333,#0f5132);
+        color: #fff;
         border-radius: 18px;
-        padding: 14px 16px;
-        color: #ffffff;
+        padding: 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 4px 14px rgba(19, 115, 51, 0.2);
+        gap: 14px;
+        box-shadow: 0 8px 20px -12px rgba(15,81,50,.8);
     }
-    .shift-label-row {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 10px;
-        font-weight: 800;
-        color: #fef08a;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        margin-bottom: 2px;
-    }
-    .shift-clock-icon {
-        width: 14px;
-        height: 14px;
-        background: #facc15;
-        color: #0d5a26;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 9px;
-        font-weight: 900;
-    }
-    .shift-title {
-        font-size: 15px;
-        font-weight: 900;
-        line-height: 1.2;
-    }
-    .shift-barista {
-        font-size: 11px;
-        color: #bbf7d0;
-        margin-top: 2px;
-        font-weight: 600;
-    }
-    .shift-status-pill {
-        background: #a7f3d0;
-        color: #064e3b;
-        border-radius: 20px;
-        padding: 8px 12px;
-        font-size: 11px;
-        font-weight: 800;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        white-space: nowrap;
-    }
-    .pulse-dot-green {
-        width: 8px;
-        height: 8px;
-        background: #059669;
-        border-radius: 50%;
-        animation: pulse 1.8s infinite;
-    }
-
-    /* 2. Section Headers */
-    .section-title-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        margin-top: 4px;
-        margin-bottom: 8px;
-    }
-    .section-heading {
-        font-size: 15px;
-        font-weight: 900;
-        color: #0f172a;
-    }
-    .update-time {
-        font-size: 11px;
-        color: #64748b;
-        font-weight: 600;
-    }
-
-    /* 3. Ringkasan Antrean 2x2 Grid */
-    .queue-summary-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-    .queue-card {
-        border-radius: 16px;
-        padding: 12px 14px;
-        text-decoration: none;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        min-height: 96px;
-        transition: 0.15s transform, 0.15s box-shadow;
-        border: 1px solid transparent;
-    }
-    .queue-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-    .queue-card-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 4px;
-    }
-    .queue-icon-box {
-        width: 32px;
-        height: 32px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-    }
-    .queue-badge {
-        font-size: 9px;
-        font-weight: 800;
-        padding: 2px 7px;
-        border-radius: 10px;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        color: #ffffff;
-    }
-    .queue-number {
-        font-size: 26px;
-        font-weight: 900;
-        line-height: 1;
-        margin: 2px 0 3px;
-    }
-    .queue-label {
-        font-size: 11px;
-        font-weight: 700;
-        color: #334155;
-    }
-
-    /* Color Themes for 4 Queue Cards */
-    .qc-baru { background: #e8f7ee; border-color: #d1ebd8; }
-    .qc-baru .queue-number { color: #166534; }
-    .qc-baru .queue-icon-box { background: #dcfce7; color: #166534; }
-    .qc-baru .queue-badge { background: #15803d; }
-
-    .qc-live { background: #fff1ec; border-color: #ffe0d6; }
-    .qc-live .queue-number { color: #c2410c; }
-    .qc-live .queue-icon-box { background: #ffedd5; color: #c2410c; }
-    .qc-live .queue-badge { background: #ea580c; }
-
-    .qc-verif { background: #fefde8; border-color: #fef08a; }
-    .qc-verif .queue-number { color: #854d0e; }
-    .qc-verif .queue-icon-box { background: #fef9c3; color: #854d0e; }
-    .qc-verif .queue-badge { background: #65a30d; }
-
-    .qc-pickup { background: #e8f7ee; border-color: #d1ebd8; }
-    .qc-pickup .queue-number { color: #166534; }
-    .qc-pickup .queue-icon-box { background: #dcfce7; color: #166534; }
-    .qc-pickup .queue-badge { background: #15803d; }
-
-    /* 4. Bahan Baku Segar Card */
-    .bahan-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 14px 16px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-    }
-    .bahan-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-    }
-    .bahan-header-left {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 14px;
-        font-weight: 800;
-        color: #0f172a;
-    }
-    .bahan-sku-pill {
-        background: #e8f5e9;
-        color: #166534;
-        border: 1px solid #bbf7d0;
-        border-radius: 20px;
-        font-size: 10px;
-        font-weight: 800;
-        padding: 3px 10px;
-    }
-    .bahan-cols {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 8px;
-    }
-    .bahan-box {
-        border-radius: 12px;
-        padding: 10px 6px;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-    .bahan-box-badge {
-        font-size: 10px;
-        font-weight: 800;
-        padding: 2px 8px;
-        border-radius: 10px;
-        color: #ffffff;
-        margin-bottom: 4px;
-    }
-    .bahan-box-num {
-        font-size: 22px;
-        font-weight: 900;
-        line-height: 1.1;
-    }
-    .bahan-box-name {
-        font-size: 10px;
-        font-weight: 700;
-        margin-top: 2px;
-    }
-
-    .bb-tersedia { background: #e8f7ee; border: 1px solid #bbf7d0; }
-    .bb-tersedia .bahan-box-badge { background: #14532d; }
-    .bb-tersedia .bahan-box-num { color: #166534; }
-
-    .bb-menipis { background: #fff7ed; border: 1px solid #fed7aa; }
-    .bb-menipis .bahan-box-badge { background: #ea580c; }
-    .bb-menipis .bahan-box-num { color: #c2410c; }
-    .bb-menipis .bahan-box-name { color: #9a3412; }
-
-    .bb-habis { background: #fef2f2; border: 1px solid #fecaca; }
-    .bb-habis .bahan-box-badge { background: #991b1b; }
-    .bb-habis .bahan-box-num { color: #b91c1c; }
-    .bb-habis .bahan-box-name { color: #991b1b; }
-
-    /* 5. Antrean Prioritas Cepat Cards */
-    .order-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 14px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-        margin-bottom: 10px;
-    }
-    .order-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 4px;
-    }
-    .order-code-group {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .order-code {
-        font-size: 14px;
-        font-weight: 900;
-        color: #0f172a;
-    }
-    .pill-pickup {
-        background: #ffedd5;
-        color: #c2410c;
-        border-radius: 10px;
-        font-size: 9px;
-        font-weight: 800;
-        padding: 2px 7px;
-    }
-    .pill-takeaway {
-        background: #fef9c3;
-        color: #854d0e;
-        border-radius: 10px;
-        font-size: 9px;
-        font-weight: 800;
-        padding: 2px 7px;
-    }
-    .pill-time-left {
-        background: #fee2e2;
-        color: #991b1b;
-        border-radius: 10px;
-        font-size: 9px;
-        font-weight: 800;
-        padding: 2px 7px;
-    }
-    .order-buyer {
-        font-size: 11px;
-        color: #475569;
-        margin-bottom: 8px;
-    }
-    .order-items-box {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        margin-bottom: 10px;
-    }
-    .order-item-row {
-        background: #f8fafc;
-        border: 1px solid #f1f5f9;
-        border-radius: 8px;
-        padding: 5px 8px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 11px;
-    }
-    .order-item-left {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .qty-tag {
-        width: 18px;
-        height: 18px;
-        border-radius: 4px;
-        background: #0f172a;
-        color: #ffffff;
-        font-size: 9px;
-        font-weight: 900;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .qty-tag-orange { background: #ea580c; }
-    .qty-tag-yellow { background: #ca8a04; }
-
-    .order-item-title {
-        font-weight: 700;
-        color: #1e293b;
-    }
-    .item-pill-green {
-        background: #dcfce7;
-        color: #166534;
-        border-radius: 10px;
-        padding: 2px 7px;
-        font-size: 9px;
-        font-weight: 700;
-    }
-    .item-pill-peach {
-        background: #ffedd5;
-        color: #9a3412;
-        border-radius: 10px;
-        padding: 2px 7px;
-        font-size: 9px;
-        font-weight: 700;
-    }
-    .item-pill-yellow {
-        background: #fef9c3;
-        color: #854d0e;
-        border-radius: 10px;
-        padding: 2px 7px;
-        font-size: 9px;
-        font-weight: 700;
-    }
-
-    .order-action-row {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }
-    .btn-racik {
-        flex: 1;
-        background: #15803d;
-        color: #ffffff;
-        border: none;
-        border-radius: 10px;
-        padding: 9px;
-        font-size: 13px;
-        font-weight: 800;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        cursor: pointer;
-        text-decoration: none;
-        transition: 0.15s;
-    }
-    .btn-racik:hover {
-        background: #166534;
-    }
-    .btn-racik-peach {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-    .btn-racik-peach:hover {
-        background: #fecaca;
-    }
-    .btn-more-dots {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
-        color: #334155;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        cursor: pointer;
-        text-decoration: none;
-    }
-
-    /* 6. Aksi Cepat Barista (2x2 Grid) */
-    .quick-actions-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-    .quick-action-btn {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 10px 12px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        text-decoration: none;
-        color: #0f172a;
-        transition: 0.15s;
-    }
-    .quick-action-btn:hover {
-        border-color: #198754;
-        transform: translateY(-1px);
-    }
-    .qa-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 17px;
-        flex-shrink: 0;
-    }
-    .qa-text-col {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-    .qa-title {
-        font-size: 12px;
-        font-weight: 800;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-    .qa-sub {
-        font-size: 9px;
-        color: #64748b;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
+    .dash-kicker { font-size: 10px; font-weight: 900; letter-spacing: 1px; color: #bbf7d0; text-transform: uppercase; }
+    .dash-hero h1 { font-size: 19px; font-weight: 900; margin-top: 5px; line-height: 1.25; }
+    .dash-hero p { font-size: 12px; opacity: .85; margin-top: 5px; }
+    .dash-hero-count { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.25); border-radius: 14px; padding: 10px 14px; text-align: center; flex-shrink: 0; }
+    .dash-hero-count strong { display: block; font-size: 24px; font-weight: 900; line-height: 1; }
+    .dash-hero-count span { display: block; font-size: 10px; font-weight: 800; margin-top: 4px; opacity: .85; }
+    .dash-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 9px; }
+    .dash-head h2 { font-size: 15px; font-weight: 900; color: #0f172a; }
+    .dash-head a, .dash-head span { font-size: 11px; font-weight: 800; color: #15803d; text-decoration: none; }
+    .dash-head span { color: #64748b; }
+    .stat-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+    .stat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 14px; text-decoration: none; transition: .15s; }
+    .stat-card:hover { border-color: #86efac; transform: translateY(-1px); }
+    .stat-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .stat-tag { font-size: 9px; font-weight: 900; letter-spacing: .4px; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; }
+    .stat-num { font-size: 27px; font-weight: 900; line-height: 1; margin: 10px 0 3px; color: #0f172a; }
+    .stat-label { font-size: 11px; font-weight: 800; color: #475569; }
+    .tag-baru { background: #dcfce7; color: #166534; }
+    .tag-verif { background: #fef3c7; color: #92400e; }
+    .tag-proses { background: #dbeafe; color: #1e40af; }
+    .tag-siap { background: #ede9fe; color: #5b21b6; }
+    .tag-selesai { background: #e2e8f0; color: #334155; }
+    .dash-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; }
+    .stok-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+    .stok-cell { border-radius: 12px; padding: 11px 8px; text-align: center; border: 1px solid #e2e8f0; background: #f8fafc; }
+    .stok-cell.aman { background: #f0fdf4; border-color: #bbf7d0; }
+    .stok-cell.menipis { background: #fff7ed; border-color: #fed7aa; }
+    .stok-cell.habis { background: #fef2f2; border-color: #fecaca; }
+    .stok-cell strong { display: block; font-size: 21px; font-weight: 900; line-height: 1; }
+    .stok-cell span { display: block; font-size: 10px; font-weight: 800; margin-top: 5px; color: #475569; }
+    .stok-cell small { display: block; font-size: 10px; margin-top: 3px; color: #64748b; word-break: break-word; }
+    .stok-foot { font-size: 11px; color: #64748b; margin-top: 10px; text-align: center; }
+    .quick-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+    .quick-link { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px; text-decoration: none; color: #0f172a; transition: .15s; }
+    .quick-link:hover { border-color: #198754; }
+    .quick-icon { width: 34px; height: 34px; border-radius: 10px; background: #e8f5e9; color: #166534; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .quick-icon svg { width: 17px; height: 17px; }
+    .quick-link strong { display: block; font-size: 12px; font-weight: 900; }
+    .quick-link small { display: block; font-size: 10px; color: #64748b; margin-top: 2px; }
+    .queue-list { display: grid; gap: 10px; }
+    .queue-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 14px; }
+    .queue-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .queue-code { font-size: 14px; font-weight: 900; color: #0f172a; }
+    .badge { padding: 4px 9px; border-radius: 999px; font-size: 9px; font-weight: 900; background: #e2e8f0; color: #334155; text-transform: uppercase; }
+    .badge-dikonfirmasi { background: #fef3c7; color: #92400e; }
+    .badge-menunggu_verifikasi { background: #ffedd5; color: #9a3412; }
+    .badge-diproses { background: #dbeafe; color: #1e40af; }
+    .badge-siap_diambil { background: #dcfce7; color: #166534; }
+    .queue-meta { font-size: 11px; color: #64748b; margin: 7px 0 10px; }
+    .queue-items { display: grid; gap: 5px; }
+    .queue-item { display: flex; justify-content: space-between; gap: 8px; background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 9px; padding: 7px 9px; font-size: 11px; }
+    .queue-item strong { color: #0f172a; }
+    .queue-note { margin-top: 8px; background: #fffbeb; border: 1px solid #fef3c7; color: #78350f; border-radius: 9px; padding: 8px; font-size: 11px; }
+    .queue-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .btn { border-radius: 10px; padding: 10px 12px; font-size: 12px; font-weight: 900; cursor: pointer; text-align: center; text-decoration: none; border: 0; }
+    .btn-primary { background: #198754; color: #fff; flex: 1; }
+    .btn-ghost { background: #f1f5f9; color: #334155; }
+    .queue-actions form { flex: 1; display: flex; }
+    .queue-actions form .btn { width: 100%; }
+    .dash-empty { background: #fff; border: 1px dashed #cbd5e1; border-radius: 16px; padding: 30px 16px; text-align: center; color: #64748b; font-size: 13px; }
+    @media (min-width: 900px) {
+        .desktop-split-layout { grid-template-columns: 1fr 1fr; align-items: start; }
     }
 </style>
 @endsection
 
 @section('content')
 <div class="desktop-split-layout">
-
-    <!-- Kolom 1 (Mobile Utama & Kolom Kiri Desktop) -->
-    <div class="dashboard-wrapper">
-        
-        <!-- 1. Card Shift Berjalan -->
-        <div class="shift-card">
+    <div class="dash-page">
+        <section class="dash-hero">
             <div>
-                <div class="shift-label-row">
-                    <span class="shift-clock-icon">🕒</span>
-                    <span>SHIFT BERJALAN</span>
-                </div>
-                <div class="shift-title">{{ $shiftInfo }}</div>
-                <div class="shift-barista">Barista: {{ auth()->user()->nama }}</div>
+                <div class="dash-kicker">Shift Berjalan</div>
+                <h1>{{ $shiftInfo }}</h1>
+                <p>{{ auth()->user()->nama }} &middot; Update {{ $waktuUpdate }}</p>
             </div>
-            <div>
-                <div class="shift-status-pill">
-                    <span class="pulse-dot-green"></span>
-                    <span>Menerima Pesanan</span>
-                </div>
+            <div class="dash-hero-count">
+                <strong>{{ $pesananDiproses }}</strong>
+                <span>Sedang Diracik</span>
             </div>
-        </div>
+        </section>
 
-        <!-- 2. Section Ringkasan Antrean (4 Cards) -->
-        <div>
-            <div class="section-title-row">
-                <h2 class="section-heading">Ringkasan Antrean</h2>
-                <span class="update-time">Update: {{ $waktuUpdate }}</span>
+        <section>
+            <div class="dash-head">
+                <h2>Ringkasan Antrean Pesanan</h2>
+                <span>{{ $waktuUpdate }}</span>
             </div>
-
-            <div class="queue-summary-grid">
-                <!-- 1. Pesanan Baru Masuk -->
-                <a href="{{ route('panel.staf.pesanan.index', ['status' => 'baru']) }}" class="queue-card qc-baru">
-                    <div class="queue-card-top">
-                        <div class="queue-icon-box">📋</div>
-                        <span class="queue-badge">Baru</span>
-                    </div>
-                    <div>
-                        <div class="queue-number">{{ $pesananBaru }}</div>
-                        <div class="queue-label">Pesanan Baru Masuk</div>
-                    </div>
+            <div class="stat-grid">
+                <a href="{{ route('panel.staf.pesanan.index', ['tab' => 'menunggu_cek']) }}" class="stat-card">
+                    <div class="stat-top"><span class="stat-tag tag-baru">Baru</span></div>
+                    <div class="stat-num">{{ $pesananBaru }}</div>
+                    <div class="stat-label">Menunggu Pembayaran</div>
                 </a>
-
-                <!-- 2. Sedang Diracik -->
-                <a href="{{ route('panel.staf.pesanan.index', ['status' => 'diproses']) }}" class="queue-card qc-live">
-                    <div class="queue-card-top">
-                        <div class="queue-icon-box">🍹</div>
-                        <span class="queue-badge">Live</span>
-                    </div>
-                    <div>
-                        <div class="queue-number">{{ $pesananDiproses }}</div>
-                        <div class="queue-label">Sedang Diracik</div>
-                    </div>
+                <a href="{{ route('panel.staf.pesanan.index', ['status' => 'menunggu_verifikasi']) }}" class="stat-card">
+                    <div class="stat-top"><span class="stat-tag tag-verif">Verif</span></div>
+                    <div class="stat-num">{{ $pesananVerif }}</div>
+                    <div class="stat-label">Perlu Verifikasi</div>
                 </a>
-
-                <!-- 3. Perlu Konfirmasi -->
-                <a href="{{ route('panel.staf.pesanan.index', ['status' => 'dikonfirmasi']) }}" class="queue-card qc-verif">
-                    <div class="queue-card-top">
-                        <div class="queue-icon-box">⏳</div>
-                        <span class="queue-badge">Verif</span>
-                    </div>
-                    <div>
-                        <div class="queue-number">{{ $pesananVerif }}</div>
-                        <div class="queue-label">Perlu Konfirmasi</div>
-                    </div>
+                <a href="{{ route('panel.staf.pesanan.index', ['tab' => 'diproses']) }}" class="stat-card">
+                    <div class="stat-top"><span class="stat-tag tag-proses">Live</span></div>
+                    <div class="stat-num">{{ $pesananDiproses }}</div>
+                    <div class="stat-label">Sedang Diracik</div>
                 </a>
-
-                <!-- 4. Siap Diserahkan -->
-                <a href="{{ route('panel.staf.pesanan.index', ['status' => 'dikirim']) }}" class="queue-card qc-pickup">
-                    <div class="queue-card-top">
-                        <div class="queue-icon-box">🛍️</div>
-                        <span class="queue-badge">Pick Up</span>
-                    </div>
-                    <div>
-                        <div class="queue-number">{{ $pesananSiap }}</div>
-                        <div class="queue-label">Siap Diserahkan</div>
-                    </div>
+                <a href="{{ route('panel.staf.pesanan.index', ['tab' => 'siap']) }}" class="stat-card">
+                    <div class="stat-top"><span class="stat-tag tag-siap">Pick Up</span></div>
+                    <div class="stat-num">{{ $pesananSiap }}</div>
+                    <div class="stat-label">Siap Diambil</div>
+                </a>
+                <a href="{{ route('panel.staf.pesanan.index', ['tab' => 'selesai']) }}" class="stat-card">
+                    <div class="stat-top"><span class="stat-tag tag-selesai">Hari Ini</span></div>
+                    <div class="stat-num">{{ $pesananSelesaiHariIni }}</div>
+                    <div class="stat-label">Pesanan Selesai</div>
                 </a>
             </div>
-        </div>
+        </section>
 
-        <!-- 3. Card Bahan Baku Segar (16 SKU Total) -->
-        <div class="bahan-card">
-            <div class="bahan-header">
-                <div class="bahan-header-left">
-                    <span>📦</span>
-                    <span>Bahan Baku Segar</span>
-                </div>
-                <span class="bahan-sku-pill">{{ $totalSku }} SKU Total</span>
+        <section class="dash-card">
+            <div class="dash-head">
+                <h2>Bahan Baku Segar & Ketersediaan Produk</h2>
+                <a href="{{ route('panel.staf.stok.index') }}">Lihat stok &rarr;</a>
             </div>
-
-            <div class="bahan-cols">
-                <!-- Tersedia -->
-                <div class="bahan-box bb-tersedia">
-                    <span class="bahan-box-badge">Tersedia</span>
-                    <span class="bahan-box-num">{{ $produkTersedia }}</span>
+            <div class="stok-grid">
+                <div class="stok-cell aman">
+                    <strong>{{ $produkTersedia }}</strong>
+                    <span>Tersedia</span>
+                    <small>dari {{ $totalSku }} SKU aktif</small>
                 </div>
-
-                <!-- Menipis -->
-                <div class="bahan-box bb-menipis">
-                    <span class="bahan-box-badge">Menipis</span>
-                    <span class="bahan-box-num">{{ $produkMenipis }}</span>
-                    <span class="bahan-box-name">{{ $namaMenipis }}</span>
+                <div class="stok-cell menipis">
+                    <strong>{{ $produkMenipis }}</strong>
+                    <span>Menipis</span>
+                    <small>{{ $namaMenipis ?: 'Tidak ada' }}</small>
                 </div>
-
-                <!-- Habis -->
-                <div class="bahan-box bb-habis">
-                    <span class="bahan-box-badge">Habis</span>
-                    <span class="bahan-box-num">{{ $produkHabis }}</span>
-                    <span class="bahan-box-name">{{ $namaHabis }}</span>
+                <div class="stok-cell habis">
+                    <strong>{{ $produkHabis }}</strong>
+                    <span>Habis</span>
+                    <small>{{ $namaHabis ?: 'Tidak ada' }}</small>
                 </div>
             </div>
-        </div>
+            <div class="stok-foot">Batas stok menipis: {{ $ambangStok }} cup per produk</div>
+        </section>
 
-        <!-- 4. Aksi Cepat Barista (2x2 Grid) -->
-        <div>
-            <div class="section-title-row">
-                <h2 class="section-heading">Aksi Cepat Barista</h2>
-            </div>
-
-            <div class="quick-actions-grid">
-                <!-- 1. Scan Pengambilan -->
-                <a href="{{ route('panel.staf.pesanan.index') }}" class="quick-action-btn">
-                    <div class="qa-icon" style="background: #dcfce7; color: #166534;">📷</div>
-                    <div class="qa-text-col">
-                        <span class="qa-title">Scan: Pengambilan</span>
-                        <span class="qa-sub">Validasi serah pesanan</span>
-                    </div>
+        <section>
+            <div class="dash-head"><h2>Aksi Cepat Barista</h2></div>
+            <div class="quick-grid">
+                <a href="{{ route('panel.staf.produksi.index') }}" class="quick-link">
+                    <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 2h10l-2 11a4 4 0 0 1-8 0L5 2z"></path><path d="M10 16v4"></path><path d="M7 20h10"></path></svg></span>
+                    <span><strong>Produksi</strong><small>Antrean racik jus</small></span>
                 </a>
-
-                <!-- 2. Bahan Masuk / Kasir POS -->
-                <a href="{{ route('panel.staf.kasir.index') }}" class="quick-action-btn">
-                    <div class="qa-icon" style="background: #fee2e2; color: #b91c1c;">🛒</div>
-                    <div class="qa-text-col">
-                        <span class="qa-title">Kasir / Beli Bahan</span>
-                        <span class="qa-sub">Catat: Penjualan POS</span>
-                    </div>
+                <a href="{{ route('panel.staf.pesanan.scan') }}" class="quick-link">
+                    <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><path d="M14 14h3v3h-3zM19 19h2v2h-2z"></path></svg></span>
+                    <span><strong>Scan QR</strong><small>Validasi pengambilan</small></span>
                 </a>
-
-                <!-- 3. Catat Waste -->
-                <a href="{{ route('panel.staf.stok.index') }}" class="quick-action-btn">
-                    <div class="qa-icon" style="background: #fce7f3; color: #9d174d;">📋</div>
-                    <div class="qa-text-col">
-                        <span class="qa-title">Catat Waste</span>
-                        <span class="qa-sub">Buah busuk / susut</span>
-                    </div>
+                <a href="{{ route('panel.staf.kasir.index') }}" class="quick-link">
+                    <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M6 8h12M6 12h4v4H6zM14 12h4M14 16h4"></path></svg></span>
+                    <span><strong>Kasir POS</strong><small>Menerima Pesanan & transaksi langsung</small></span>
                 </a>
-
-                <!-- 4. Tutup Shift -->
-                <a href="{{ route('panel.staf.aktivitas.index') }}" class="quick-action-btn">
-                    <div class="qa-icon" style="background: #fef9c3; color: #854d0e;">📄</div>
-                    <div class="qa-text-col">
-                        <span class="qa-title">Tutup Shift</span>
-                        <span class="qa-sub">Rekap kas & cup</span>
-                    </div>
+                <a href="{{ route('panel.staf.stok.index') }}" class="quick-link">
+                    <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"></path><path d="M3.3 7L12 12l8.7-5M12 22V12"></path></svg></span>
+                    <span><strong>Stok & Bahan</strong><small>Pasokan dan audit</small></span>
+                </a>
+                <a href="{{ route('panel.staf.aktivitas.index') }}" class="quick-link">
+                    <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3"></path><path d="M9 3h6v4H9zM8 12h8M8 16h8"></path></svg></span>
+                    <span><strong>Aktivitas</strong><small>Riwayat audit staf</small></span>
+                </a>
+                <a href="{{ route('panel.staf.profil.index') }}" class="quick-link">
+                    <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
+                    <span><strong>Profil</strong><small>Akun dan kata sandi</small></span>
                 </a>
             </div>
-        </div>
-
+        </section>
     </div>
 
-    <!-- Kolom 2 (Kolom Kanan Desktop / Bagian Bawah Mobile) -->
-    <div class="dashboard-wrapper">
-        
-        <!-- 5. Antrean Prioritas Cepat -->
-        <div>
-            <div class="section-title-row">
-                <h2 class="section-heading">Antrean Prioritas Cepat</h2>
-                <a href="{{ route('panel.staf.pesanan.index') }}" style="font-size: 11px; font-weight: 700; color: #15803d; text-decoration: none;">Lihat Semua &rarr;</a>
+    <div class="dash-page">
+        <section>
+            <div class="dash-head">
+                <h2>Antrean Prioritas Cepat</h2>
+                <a href="{{ route('panel.staf.pesanan.index') }}">Semua pesanan &rarr;</a>
             </div>
-
-            @forelse($antreanPesanan as $idx => $pesanan)
-                <div class="order-card">
-                    <div class="order-header">
-                        <div class="order-code-group">
-                            <span class="order-code">#{{ $pesanan->kode_pesanan }}</span>
-                            <span class="{{ str_contains(strtolower($pesanan->alamat_pengiriman), 'takeaway') ? 'pill-takeaway' : 'pill-pickup' }}">
-                                {{ str_contains(strtolower($pesanan->alamat_pengiriman), 'takeaway') ? 'Takeaway' : 'Pick-Up ' . $pesanan->created_at->addMinutes(30)->format('H:i') }}
-                            </span>
+            <div class="queue-list">
+                @forelse($antreanPesanan as $pesanan)
+                    <article class="queue-card">
+                        <div class="queue-top">
+                            <span class="queue-code">#{{ $pesanan->kode_pesanan }}</span>
+                            <span class="badge badge-{{ $pesanan->status_pesanan }}">{{ str_replace('_', ' ', $pesanan->status_pesanan) }}</span>
                         </div>
-                        <span class="pill-time-left">
-                            {{ max(1, 15 - $pesanan->created_at->diffInMinutes(now())) }} mnt lagi
-                        </span>
-                    </div>
-
-                    <div class="order-buyer">
-                        Pemesan: <strong>{{ $pesanan->nama_pembeli }}</strong> &bull; {{ $pesanan->alamat_pengiriman }}
-                    </div>
-
-                    <!-- Items List -->
-                    <div class="order-items-box">
-                        @foreach($pesanan->itemPesanan as $i => $item)
-                            <div class="order-item-row">
-                                <div class="order-item-left">
-                                    <span class="qty-tag {{ $i % 2 == 1 ? 'qty-tag-orange' : '' }}">{{ $item->jumlah }}x</span>
-                                    <span class="order-item-title">{{ $item->nama_produk }}</span>
+                        <div class="queue-meta">{{ $pesanan->nama_pembeli }} &middot; {{ $pesanan->created_at->format('H:i') }} ({{ $pesanan->created_at->diffForHumans() }})</div>
+                        <div class="queue-items">
+                            @foreach($pesanan->itemPesanan as $item)
+                                <div class="queue-item">
+                                    <strong>{{ $item->jumlah }}x {{ $item->nama_produk }}</strong>
+                                    @if($item->nama_varian)<span>{{ $item->nama_varian }}</span>@endif
                                 </div>
-                                <div>
-                                    @if(str_contains(strtolower($pesanan->catatan ?? ''), 'less ice'))
-                                        <span class="item-pill-green">Less Ice 50%</span>
-                                    @elseif(str_contains(strtolower($pesanan->catatan ?? ''), 'no sugar'))
-                                        <span class="item-pill-peach">No Sugar</span>
-                                    @elseif(str_contains(strtolower($pesanan->catatan ?? ''), 'normal sweet'))
-                                        <span class="item-pill-yellow">Normal Sweet</span>
-                                    @else
-                                        <span class="item-pill-green">Fresh 100%</span>
-                                    @endif
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <!-- Action Button -->
-                    <div class="order-action-row">
-                        @if($pesanan->status_pesanan === 'dikonfirmasi' || $pesanan->status_pesanan === 'menunggu_verifikasi')
-                            <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}" style="flex: 1; display: flex;">
-                                @csrf
-                                <input type="hidden" name="status_pesanan" value="diproses">
-                                <button type="submit" class="btn-racik">
-                                    <span>🍹</span>
-                                    <span>Mulai Racik</span>
-                                </button>
-                            </form>
-                        @elseif($pesanan->status_pesanan === 'diproses')
-                            <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}" style="flex: 1; display: flex;">
-                                @csrf
-                                <input type="hidden" name="status_pesanan" value="siap_diambil">
-                                <button type="submit" class="btn-racik btn-racik-peach">
-                                    <span>📦</span>
-                                    <span>Lihat Stok & Racik</span>
-                                </button>
-                            </form>
-                        @else
-                            <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}" style="flex: 1; display: flex;">
-                                @csrf
-                                <input type="hidden" name="status_pesanan" value="selesai">
-                                <button type="submit" class="btn-racik" style="background: #166534;" onclick="return confirm('Serahkan pesanan ke pembeli?')">
-                                    <span>🤝</span>
-                                    <span>Serahkan ke Pembeli</span>
-                                </button>
-                            </form>
+                            @endforeach
+                        </div>
+                        @if($pesanan->catatan)
+                            <div class="queue-note">Catatan: {{ $pesanan->catatan }}</div>
                         @endif
-
-                        <a href="{{ route('panel.staf.pesanan.detail', $pesanan->id) }}" class="btn-more-dots" title="Detail Pesanan">
-                            ⋮
-                        </a>
-                    </div>
-                </div>
-            @empty
-                <div class="order-card" style="text-align: center; color: #94a3b8; padding: 24px;">
-                    Tidak ada antrean pesanan aktif saat ini.
-                </div>
-            @endforelse
-        </div>
-
+                        <div class="queue-actions">
+                            @if($pesanan->status_pesanan === 'menunggu_verifikasi')
+                                <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
+                                    @csrf
+                                    <input type="hidden" name="status_pesanan" value="dikonfirmasi">
+                                    <button type="submit" class="btn btn-primary">Konfirmasi</button>
+                                </form>
+                            @elseif($pesanan->status_pesanan === 'dikonfirmasi')
+                                <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
+                                    @csrf
+                                    <input type="hidden" name="status_pesanan" value="diproses">
+                                    <button type="submit" class="btn btn-primary">Mulai Racik</button>
+                                </form>
+                            @elseif($pesanan->status_pesanan === 'diproses')
+                                <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
+                                    @csrf
+                                    <input type="hidden" name="status_pesanan" value="siap_diambil">
+                                    <button type="submit" class="btn btn-primary">Siap Diambil</button>
+                                </form>
+                            @elseif($pesanan->status_pesanan === 'siap_diambil')
+                                <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
+                                    @csrf
+                                    <input type="hidden" name="status_pesanan" value="selesai">
+                                    <button type="submit" class="btn btn-primary" onclick="return confirm('Serahkan pesanan ini ke pembeli?')">Serahkan</button>
+                                </form>
+                            @endif
+                            <a href="{{ route('panel.staf.pesanan.detail', $pesanan->id) }}" class="btn btn-ghost">Detail</a>
+                        </div>
+                    </article>
+                @empty
+                    <div class="dash-empty">Tidak ada antrean pesanan aktif saat ini.</div>
+                @endforelse
+            </div>
+        </section>
     </div>
-
 </div>
 @endsection

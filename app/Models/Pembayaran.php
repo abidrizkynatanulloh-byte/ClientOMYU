@@ -13,17 +13,26 @@ class Pembayaran extends Model
 
     protected $fillable = [
         'pesanan_id', 'gerbang', 'referensi_gerbang', 'metode',
-        'jumlah', 'status', 'dibayar_pada', 'data_mentah', 'bukti_path',
+        'jumlah', 'status', 'dibayar_pada', 'data_mentah',
+        'bukti_path', 'biaya_transaksi', 'diverifikasi_oleh',
+        'diverifikasi_pada', 'catatan_verifikasi',
     ];
 
     protected $casts = [
-        'jumlah'       => 'integer',
+        'jumlah' => 'integer',
+        'biaya_transaksi' => 'decimal:2',
         'dibayar_pada' => 'datetime',
-        'data_mentah'  => 'array',
+        'diverifikasi_pada' => 'datetime',
+        'data_mentah' => 'array',
     ];
 
     public function pesanan()
     {
         return $this->belongsTo(Pesanan::class, 'pesanan_id');
+    }
+
+    public function verifikator()
+    {
+        return $this->belongsTo(Pengguna::class, 'diverifikasi_oleh');
     }
 }
