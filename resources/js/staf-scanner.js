@@ -22,11 +22,14 @@ const barcodeFormats = [
 
 const css = `
 .opencam-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(9,20,16,.72); display: none; align-items: center; justify-content: center; padding: 18px; backdrop-filter: blur(4px); }
-.opencam-overlay.active { display: flex; }
-.opencam-dialog { width: min(520px, 100%); background: #fff; border-radius: 20px; box-shadow: 0 24px 70px rgba(9,40,28,.35); overflow: hidden; }
+.opencam-overlay.active { display: flex; animation: opencamFade .18s ease-out; }
+@keyframes opencamFade { from { opacity: 0; } to { opacity: 1; } }
+.opencam-dialog { width: min(520px, 100%); background: #fff; border-radius: 20px; box-shadow: 0 24px 70px rgba(9,40,28,.35); overflow: hidden; animation: opencamPop .24s cubic-bezier(.2,.8,.2,1); }
+@keyframes opencamPop { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: none; } }
 .opencam-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #e7eee9; }
 .opencam-head strong { font-size: 16px; color: #153e2b; }
-.opencam-close { border: 0; background: #eef5f0; color: #153e2b; width: 34px; height: 34px; border-radius: 10px; cursor: pointer; font-size: 18px; }
+.opencam-close { border: 0; background: #eef5f0; color: #153e2b; width: 34px; height: 34px; border-radius: 10px; cursor: pointer; font-size: 18px; transition: background-color .2s ease, transform .15s ease; }
+.opencam-close:active { transform: scale(.9); }
 .opencam-body { padding: 16px 20px 20px; }
 .opencam-video { width: 100%; aspect-ratio: 4 / 3; background: #0d1b16; border-radius: 14px; object-fit: cover; }
 .opencam-frame { display: none; }
@@ -38,10 +41,12 @@ const css = `
 .opencam-manual input:focus { border-color: #198754; box-shadow: 0 0 0 3px rgba(25,135,84,.12); }
 .opencam-manual button { border: 0; border-radius: 10px; padding: 0 16px; background: #198754; color: white; font-weight: 700; cursor: pointer; }
 .opencam-hint { margin: 9px 0 0; font-size: 12px; color: #7a8f84; }
+.opencam-hint-mobile { display: none; }
 
 @media (max-width: 640px) {
     .opencam-overlay { padding: 0; background: #05110c; align-items: stretch; justify-content: stretch; backdrop-filter: none; }
-    .opencam-dialog { --opencam-frame: min(78vw, 320px); width: 100%; height: 100%; height: 100dvh; border-radius: 0; background: transparent; box-shadow: none; display: flex; flex-direction: column; }
+    .opencam-dialog { --opencam-frame: min(78vw, 320px, 42vh); --opencam-frame: min(78vw, 320px, 42dvh); width: 100%; height: 100%; height: 100dvh; border-radius: 0; background: transparent; box-shadow: none; display: flex; flex-direction: column; animation: opencamSlide .26s cubic-bezier(.2,.8,.2,1); }
+    @keyframes opencamSlide { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
     .opencam-head { position: absolute; top: 0; left: 0; right: 0; z-index: 3; padding: calc(env(safe-area-inset-top) + 14px) 16px 18px; border: 0; background: linear-gradient(to bottom, rgba(0,0,0,.55), transparent); }
     .opencam-head strong { color: #fff; font-size: 15px; text-shadow: 0 1px 3px rgba(0,0,0,.5); }
     .opencam-close { background: rgba(255,255,255,.18); color: #fff; border: 1px solid rgba(255,255,255,.35); width: 36px; height: 36px; border-radius: 50%; font-size: 22px; line-height: 1; }
@@ -64,6 +69,8 @@ const css = `
     .opencam-manual input:focus { border-color: #34d399; box-shadow: 0 0 0 3px rgba(52,211,153,.2); }
     .opencam-manual button { background: #34d399; color: #052e1c; border-radius: 12px; padding: 0 16px; }
     .opencam-hint { position: absolute; z-index: 3; left: 24px; right: 24px; bottom: calc(env(safe-area-inset-bottom) + 66px); margin: 0; color: rgba(255,255,255,.75); font-size: 11px; text-align: center; }
+    .opencam-hint-desktop { display: none; }
+    .opencam-hint-mobile { display: inline; }
 }
 `;
 
@@ -98,7 +105,10 @@ function ensureModal() {
                     <input class="opencam-input" type="text" inputmode="text" autocomplete="off" placeholder="Atau ketik / scan USB di sini" />
                     <button type="submit">Kirim</button>
                 </form>
-                <p class="opencam-hint">Scanner USB berfungsi seperti keyboard. Arahkan kamera ke kode atau tekan Enter setelah memindai dengan USB.</p>
+                <p class="opencam-hint">
+                    <span class="opencam-hint-desktop">Scanner USB berfungsi seperti keyboard. Arahkan kamera ke kode atau tekan Enter setelah memindai dengan USB.</span>
+                    <span class="opencam-hint-mobile">Arahkan kamera ke dalam kotak untuk memindai</span>
+                </p>
             </div>
         </div>
     `;

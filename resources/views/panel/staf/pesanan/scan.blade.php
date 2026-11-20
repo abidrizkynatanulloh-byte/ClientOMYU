@@ -168,6 +168,11 @@
     });
 
     window.scanPesananId = null;
+
+    const tokenAwal = new URLSearchParams(window.location.search).get('token');
+    if (tokenAwal) {
+        validasi(tokenAwal);
+    }
 })();
 </script>
 @endsection

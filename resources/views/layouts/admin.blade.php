@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>@yield('title', 'Owner Panel') - OMYU Fresh Juice</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/logo-omyu.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/logo_omyu.png') }}">
 
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -106,7 +106,7 @@
             <div class="px-4 py-4 border-b border-brand-800/80 flex items-center justify-between">
                 <a href="{{ route('panel.admin.beranda') }}" class="flex items-center gap-2.5 group">
                     <div class="w-9 h-9 rounded-xl bg-white/10 backdrop-blur-md p-1 flex items-center justify-center border border-white/15 shadow-inner transition-transform group-hover:scale-105">
-                        <img src="{{ asset('images/logo-omyu.png') }}" alt="OMYU Logo" class="w-full h-full object-contain drop-shadow">
+                        <img src="{{ asset('images/logo_omyu.png') }}" alt="OMYU Logo" class="w-full h-full object-contain drop-shadow">
                     </div>
                     <div>
                         <div class="flex items-center gap-1.5">

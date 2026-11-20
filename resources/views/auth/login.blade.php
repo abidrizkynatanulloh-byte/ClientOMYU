@@ -129,7 +129,7 @@
     </svg>
 
     <div class="logo">
-        <img src="{{ asset('images/logo-omyu.png') }}" alt="OMYU - Less Sugar, More Fruits"
+        <img src="{{ asset('images/logo_omyu.png') }}" alt="OMYU - Less Sugar, More Fruits"
              onerror="this.style.display='none'">
     </div>
 
