@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\PastikanPeran;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -15,12 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
 
         $middleware->alias([
-    'peran' => \App\Http\Middleware\PastikanPeran::class,
-]);
+            'peran' => PastikanPeran::class,
+        ]);
 
-$middleware->redirectUsersTo(fn (Request $request) => 
-    $request->user()?->peran === 'admin' ? '/panel/admin' : '/panel'
-);
+        $middleware->redirectUsersTo(fn (Request $request) => $request->user()?->peran === 'admin' ? '/panel/admin' : '/panel'
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

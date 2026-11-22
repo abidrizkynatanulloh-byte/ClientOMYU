@@ -15,7 +15,7 @@ class AuthController extends Controller
     public function masuk(Request $request)
     {
         $data = $request->validate([
-            'email'    => ['required', 'email'],
+            'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
@@ -28,7 +28,7 @@ class AuthController extends Controller
                 ->onlyInput('email');
         }
 
-                $request->session()->regenerate();
+        $request->session()->regenerate();
 
         // Cek peran pengguna: jika admin arahkan ke panel admin, jika karyawan ke panel biasa
         if (Auth::user()->peran === 'admin') {
@@ -37,6 +37,7 @@ class AuthController extends Controller
 
         return redirect()->intended('/panel');
     }
+
     public function keluar(Request $request)
     {
         Auth::logout();

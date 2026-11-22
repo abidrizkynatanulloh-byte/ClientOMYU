@@ -13,10 +13,10 @@ class DatabaseSeeder extends Seeder
         Pengguna::updateOrCreate(
             ['email' => 'admin@omyu.test'],
             [
-                'nama'     => 'Admin OMYU',
+                'nama' => 'Admin OMYU',
                 'password' => 'ADMIN123',
-                'peran'    => 'admin',
-                'aktif'    => true,
+                'peran' => 'admin',
+                'aktif' => true,
             ]
         );
 
@@ -30,11 +30,11 @@ class DatabaseSeeder extends Seeder
             Pengguna::updateOrCreate(
                 ['email' => $data['email']],
                 [
-                    'nama'     => $data['nama'],
+                    'nama' => $data['nama'],
                     'password' => $data['password'],
-                    'peran'    => 'karyawan',
-                    'aktif'    => true,
-                    'telepon'  => $data['telepon'],
+                    'peran' => 'karyawan',
+                    'aktif' => true,
+                    'telepon' => $data['telepon'],
                 ]
             );
         }

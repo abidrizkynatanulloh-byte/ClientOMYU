@@ -6,7 +6,7 @@
 @section('page_subtitle', 'Monitor aset stok buah segar, bahan pembantu, kemasan, batas minimum, dan rendemen.')
 
 @section('header_actions')
-    <a href="{{ route('panel.admin.bahan.create') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs sm:text-sm shadow-xs transition-all hover:shadow-md">
+    <a href="{{ route('panel.admin.bahan.create') }}" class="btn-press inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs sm:text-sm shadow-xs hover:shadow-md">
         <i class="fa-solid fa-plus"></i>
         <span>Tambah Bahan Baru</span>
     </a>
@@ -18,40 +18,45 @@
     <!-- Ringkasan Aset Persediaan KPI Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
         
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+        <div class="glass-card hover-lift rounded-3xl p-5 flex items-center gap-4 anim-fade-up delay-1">
+            <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-boxes-stacked"></i>
             </div>
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Total Jenis Bahan</span>
                 <h3 class="text-2xl font-extrabold text-slate-900 tracking-tight mt-0.5">
-                    {{ $totalJenisBahan }} <span class="text-sm font-semibold text-slate-500">Jenis</span>
+                    <span class="counter-value" data-counter data-counter-target="{{ $totalJenisBahan }}">{{ $totalJenisBahan }}</span>
+                    <span class="text-sm font-semibold text-slate-500">Jenis</span>
                 </h3>
                 <span class="text-[11px] text-slate-400">Buah, pelengkap & kemasan</span>
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+        <div class="glass-card hover-lift rounded-3xl p-5 flex items-center gap-4 anim-fade-up delay-2">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-vault"></i>
             </div>
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Total Nilai Persediaan</span>
-                <h3 class="text-2xl font-extrabold text-emerald-700 tracking-tight mt-0.5">
+                <h3 class="text-2xl font-extrabold text-emerald-700 tracking-tight mt-0.5 counter-value"
+                    data-counter
+                    data-counter-target="{{ $totalNilaiPersediaan }}"
+                    data-counter-prefix="Rp ">
                     Rp {{ number_format($totalNilaiPersediaan, 0, ',', '.') }}
                 </h3>
                 <span class="text-[11px] text-slate-400">Estimasi nilai aset gudang & kulkas</span>
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl {{ $jumlahBahanKritis > 0 ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-600' }} flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+        <div class="glass-card hover-lift rounded-3xl p-5 flex items-center gap-4 anim-fade-up delay-3">
+            <div class="w-12 h-12 rounded-2xl {{ $jumlahBahanKritis > 0 ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-600' }} flex items-center justify-center font-bold text-lg shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Stok Kritis</span>
                 <h3 class="text-2xl font-extrabold {{ $jumlahBahanKritis > 0 ? 'text-rose-600' : 'text-slate-800' }} tracking-tight mt-0.5">
-                    {{ $jumlahBahanKritis }} <span class="text-sm font-semibold text-slate-500">Bahan</span>
+                    <span class="counter-value" data-counter data-counter-target="{{ $jumlahBahanKritis }}">{{ $jumlahBahanKritis }}</span>
+                    <span class="text-sm font-semibold text-slate-500">Bahan</span>
                 </h3>
                 <span class="text-[11px] text-slate-400">Perlu segera dilakukan restock</span>
             </div>
@@ -60,7 +65,7 @@
     </div>
 
     <!-- Filter Bar Card -->
-    <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+    <div class="glass-card rounded-3xl p-5 anim-fade-up delay-4">
         <form method="GET" action="{{ route('panel.admin.bahan.index') }}" class="space-y-4">
             
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
@@ -109,7 +114,7 @@
                             Reset
                         </a>
                     @endif
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+                    <button type="submit" class="btn-press px-5 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs shadow-xs flex items-center gap-1.5">
                         <i class="fa-solid fa-filter text-xs"></i>
                         <span>Terapkan Filter</span>
                     </button>
@@ -120,9 +125,9 @@
     </div>
 
     <!-- Data Table Card -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden">
+    <div class="glass-card rounded-3xl border border-slate-100 shadow-soft overflow-hidden anim-fade-up delay-5">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs sm:text-sm">
+            <table class="w-full text-left text-xs sm:text-sm admin-table">
                 <thead>
                     <tr class="bg-slate-50/80 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200/80">
                         <th class="py-3.5 px-6 font-bold">Nama Bahan Baku</th>

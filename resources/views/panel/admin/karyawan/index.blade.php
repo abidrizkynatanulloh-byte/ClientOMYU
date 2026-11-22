@@ -6,7 +6,7 @@
 @section('page_subtitle', 'Kelola hak akses pengguna, peran kasir/admin, status akun, dan izin melihat margin HPP.')
 
 @section('header_actions')
-    <a href="{{ route('panel.admin.karyawan.create') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs sm:text-sm shadow-xs transition-all hover:shadow-md">
+    <a href="{{ route('panel.admin.karyawan.create') }}" class="btn-press inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs sm:text-sm shadow-xs hover:shadow-md">
         <i class="fa-solid fa-user-plus"></i>
         <span>Tambah Staf Baru</span>
     </a>
@@ -18,40 +18,43 @@
     <!-- Ringkasan Staf KPI Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
         
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+        <div class="glass-card hover-lift rounded-3xl p-5 flex items-center gap-4 anim-fade-up delay-1">
+            <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-users"></i>
             </div>
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Total Staf Terdaftar</span>
                 <h3 class="text-2xl font-extrabold text-slate-900 tracking-tight mt-0.5">
-                    {{ $totalStaf }} <span class="text-sm font-semibold text-slate-500">Orang</span>
+                    <span class="counter-value" data-counter data-counter-target="{{ $totalStaf }}">{{ $totalStaf }}</span>
+                    <span class="text-sm font-semibold text-slate-500">Orang</span>
                 </h3>
                 <span class="text-[11px] text-slate-400">Semua akun di sistem OMYU</span>
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+        <div class="glass-card hover-lift rounded-3xl p-5 flex items-center gap-4 anim-fade-up delay-2">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-user-shield"></i>
             </div>
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Administrator / Owner</span>
                 <h3 class="text-2xl font-extrabold text-indigo-700 tracking-tight mt-0.5">
-                    {{ $totalAdmin }} <span class="text-sm font-semibold text-slate-500">Akun</span>
+                    <span class="counter-value" data-counter data-counter-target="{{ $totalAdmin }}">{{ $totalAdmin }}</span>
+                    <span class="text-sm font-semibold text-slate-500">Akun</span>
                 </h3>
                 <span class="text-[11px] text-slate-400">Hak akses penuh ke seluruh modul</span>
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+        <div class="glass-card hover-lift rounded-3xl p-5 flex items-center gap-4 anim-fade-up delay-3">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-user-check"></i>
             </div>
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Kasir / Karyawan Aktif</span>
                 <h3 class="text-2xl font-extrabold text-emerald-700 tracking-tight mt-0.5">
-                    {{ $totalKaryawanAktif }} <span class="text-sm font-semibold text-slate-500">Orang</span>
+                    <span class="counter-value" data-counter data-counter-target="{{ $totalKaryawanAktif }}">{{ $totalKaryawanAktif }}</span>
+                    <span class="text-sm font-semibold text-slate-500">Orang</span>
                 </h3>
                 <span class="text-[11px] text-slate-400">Siap melayani kasir outlet</span>
             </div>
@@ -60,7 +63,7 @@
     </div>
 
     <!-- Filter Bar Card -->
-    <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+    <div class="glass-card rounded-3xl p-5 anim-fade-up delay-4">
         <form method="GET" action="{{ route('panel.admin.karyawan.index') }}" class="space-y-4">
             
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
@@ -108,7 +111,7 @@
                             Reset
                         </a>
                     @endif
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+                    <button type="submit" class="btn-press px-5 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs shadow-xs flex items-center gap-1.5">
                         <i class="fa-solid fa-filter text-xs"></i>
                         <span>Terapkan Filter</span>
                     </button>
@@ -119,9 +122,9 @@
     </div>
 
     <!-- Data Table Card -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden">
+    <div class="glass-card rounded-3xl border border-slate-100 shadow-soft overflow-hidden anim-fade-up delay-5">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs sm:text-sm">
+            <table class="w-full text-left text-xs sm:text-sm admin-table">
                 <thead>
                     <tr class="bg-slate-50/80 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200/80">
                         <th class="py-3.5 px-6 font-bold">Pengguna</th>

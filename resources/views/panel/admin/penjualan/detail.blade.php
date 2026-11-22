@@ -6,7 +6,7 @@
 @section('page_subtitle', 'Rincian transaksi, status pembayaran, kasir penangan, dan item pesanan.')
 
 @section('header_actions')
-    <a href="{{ route('panel.admin.penjualan.index') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
+    <a href="{{ route('panel.admin.penjualan.index') }}" class="btn-press inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
         <i class="fa-solid fa-arrow-left"></i>
         <span>Kembali ke Penjualan</span>
     </a>
@@ -16,7 +16,7 @@
 <div class="max-w-4xl mx-auto space-y-6">
 
     <!-- Header Status Summary -->
-    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="glass-card rounded-3xl p-6 border border-slate-100 shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4 anim-fade-up delay-1">
         <div>
             <div class="flex items-center gap-2 text-xs text-slate-400 mb-1">
                 <span>Waktu Transaksi</span>
@@ -54,7 +54,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
         <!-- Informasi Pelanggan & Kasir -->
-        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft space-y-4">
+        <div class="glass-card hover-lift rounded-3xl p-6 border border-slate-100 shadow-soft space-y-4 anim-fade-up delay-2">
             <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
                 <div class="w-10 h-10 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center font-bold">
                     <i class="fa-solid fa-user"></i>
@@ -90,7 +90,7 @@
         </div>
 
         <!-- Informasi Pembayaran -->
-        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft space-y-4">
+        <div class="glass-card hover-lift rounded-3xl p-6 border border-slate-100 shadow-soft space-y-4 anim-fade-up delay-3">
             <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
                 <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
                     <i class="fa-solid fa-credit-card"></i>
@@ -126,7 +126,7 @@
     </div>
 
     <!-- Items Pesanan Receipt Card -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden">
+    <div class="glass-card rounded-3xl border border-slate-100 shadow-soft overflow-hidden anim-fade-up delay-4">
         <div class="p-6 border-b border-slate-100 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center font-bold">
@@ -143,7 +143,7 @@
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs sm:text-sm">
+            <table class="w-full text-left text-xs sm:text-sm admin-table">
                 <thead>
                     <tr class="bg-slate-50/80 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200/80">
                         <th class="py-3 px-6 font-bold">Menu Produk</th>

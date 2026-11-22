@@ -142,6 +142,9 @@
             font-weight: 800;
             box-shadow: 0 2px 8px rgba(70, 126, 26, 0.16);
         }
+        .mobile-bottom-nav {
+            display: none !important;
+        }
 
         .web-icon {
             display: inline-flex;
@@ -694,15 +697,313 @@
 
         /* Mobile Adjustments */
         @media (max-width: 768px) {
-            .topbar-wrapper { padding: 0 10px; top: 8px; }
-            .fixed-topbar { height: 48px; padding: 0 14px; border-radius: 30px; }
-            .brand-logo-img { height: 34px; }
-            .nav-center { display: none; }
-            .search-pill { width: 120px; }
-            .main-wrapper { padding: 68px 14px 30px; min-height: auto; height: auto; }
-            .hero-headline { font-size: 26px; }
-            .mutu-card-box { flex-direction: column; gap: 14px; padding: 14px; text-align: left; }
-            .seal-badge-box { margin-left: 0; }
+            html {
+                scroll-behavior: smooth;
+            }
+            .topbar-wrapper {
+                padding: 0 12px;
+                top: 8px;
+            }
+            .fixed-topbar {
+                height: 48px;
+                padding: 0 12px;
+                border-radius: 30px;
+                background: rgba(255, 255, 255, 0.88);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.6);
+            }
+            .brand-logo-img {
+                height: 32px;
+            }
+            .brand-text {
+                font-size: 17px;
+                margin-left: -16px;
+                margin-top: 4px;
+            }
+            .search-pill {
+                width: 140px;
+                padding: 4px 10px;
+            }
+            .search-pill input {
+                font-size: 11px;
+            }
+            .icon-circle-btn {
+                width: 32px;
+                height: 32px;
+            }
+
+            /* Sembunyikan Nav Tengah di Topbar pada Mobile */
+            .nav-center {
+                display: none !important;
+            }
+
+            /* NAV BOTTOM (Floating Dock Melayang di Bagian Bawah Layar HP) */
+            .mobile-bottom-nav {
+                display: flex !important;
+                position: fixed !important;
+                bottom: 14px !important;
+                bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                width: calc(100% - 28px) !important;
+                max-width: 420px !important;
+                height: 58px !important;
+                background: rgba(255, 255, 255, 0.95) !important;
+                backdrop-filter: blur(20px) !important;
+                -webkit-backdrop-filter: blur(20px) !important;
+                border-radius: 35px !important;
+                padding: 4px 8px !important;
+                justify-content: space-around !important;
+                align-items: center !important;
+                box-shadow: 0 10px 30px rgba(25, 56, 8, 0.22), 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+                border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+                z-index: 99999 !important;
+                gap: 4px !important;
+            }
+
+            .mobile-nav-item {
+                flex: 1;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 3px !important;
+                padding: 5px 3px !important;
+                border-radius: 18px !important;
+                text-decoration: none !important;
+                color: #4b6343 !important;
+                min-width: 0 !important;
+                transition: all 0.2s ease !important;
+            }
+
+            .mobile-nav-item .mobile-nav-icon {
+                width: 20px !important;
+                height: 20px !important;
+                display: block !important;
+                transition: transform 0.2s !important;
+            }
+
+            .mobile-nav-item .mobile-nav-label {
+                font-size: 10px !important;
+                font-weight: 700 !important;
+                line-height: 1 !important;
+                white-space: nowrap !important;
+                letter-spacing: -0.2px !important;
+            }
+
+            .mobile-nav-item.active {
+                background: #dff2c8 !important;
+                color: #183d12 !important;
+                font-weight: 800 !important;
+                box-shadow: 0 2px 8px rgba(70, 126, 26, 0.18) !important;
+            }
+
+            .mobile-nav-item.active .mobile-nav-icon {
+                transform: translateY(-1px) !important;
+                stroke-width: 2.6 !important;
+            }
+
+            /* Ruang bawah untuk konten utama agar tidak tertutup nav bottom */
+            .main-wrapper {
+                padding: 68px 14px 90px;
+                min-height: auto;
+                height: auto;
+            }
+
+            /* HERO SECTION: Tulisan & Gambar Mengecil Menyesuaikan */
+            .hero-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+                margin-bottom: 14px;
+                gap: 8px;
+            }
+            .hero-left {
+                align-items: center;
+                padding-right: 0;
+            }
+            .pure-fruit-pill {
+                font-size: 10px;
+                padding: 4px 12px;
+                margin-bottom: 8px;
+            }
+            .hero-headline {
+                font-size: 25px;
+                line-height: 1.15;
+                align-items: center;
+                transform: none;
+                margin-bottom: 8px;
+            }
+            .hl-line {
+                justify-content: center;
+            }
+            .hl-light {
+                margin-left: 0;
+            }
+            .splash-rays {
+                margin-left: 6px;
+                transform: translateY(-3px);
+            }
+            .splash-rays svg {
+                width: 22px;
+                height: 18px;
+            }
+            .hero-subtitle {
+                font-size: 12px;
+                line-height: 1.45;
+                margin: 0 auto 12px;
+                max-width: 92%;
+            }
+            .hero-actions {
+                justify-content: center;
+            }
+            .btn-order-glow {
+                font-size: 12px;
+                padding: 8px 20px;
+            }
+
+            /* GAMBAR ES MENYESUAIKAN / MENGECIL */
+            .hero-right {
+                margin-top: 2px;
+            }
+            .es-img {
+                max-height: 170px;
+            }
+            .doodle-tag {
+                font-size: 10px;
+                top: -4px;
+                right: 15px;
+            }
+
+            /* 3-PILLS KEUNGGULAN MENYESUAIKAN */
+            .features-capsule {
+                grid-template-columns: 1fr;
+                border-radius: 18px;
+                gap: 8px;
+                padding: 10px 14px;
+                margin-bottom: 12px;
+            }
+            .feat-item {
+                gap: 10px;
+                padding: 4px 6px;
+            }
+            .feat-item:not(:last-child) {
+                border-right: none;
+                border-bottom: 1px solid #f1f5f9;
+                padding-bottom: 6px;
+            }
+            .feat-circle {
+                width: 30px;
+                height: 30px;
+            }
+            .feat-circle svg {
+                width: 15px;
+                height: 15px;
+            }
+            .feat-text h4 {
+                font-size: 12px;
+            }
+            .feat-text p {
+                font-size: 10px;
+            }
+
+            /* BOTTOM CARDS GRID: MENYESUAIKAN HP */
+            .bottom-cards-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .booth-card {
+                grid-template-columns: 85px 1fr;
+                border-radius: 16px;
+            }
+            .booth-photo-side {
+                padding: 10px 8px;
+            }
+            .booth-chalk-text {
+                font-size: 10px;
+            }
+            .booth-info-side {
+                padding: 10px 14px;
+            }
+            .booth-info-side h3 {
+                font-size: 12px;
+                margin-bottom: 3px;
+            }
+            .booth-info-side p {
+                font-size: 10.5px;
+                line-height: 1.35;
+                margin-bottom: 8px;
+            }
+            .btn-hubungi-wa {
+                font-size: 10.5px;
+                padding: 4px 12px;
+            }
+
+            .mutu-card-box {
+                flex-direction: row;
+                gap: 10px;
+                padding: 12px 14px;
+                text-align: left;
+                border-radius: 16px;
+            }
+            .mutu-header-title {
+                font-size: 11.5px;
+                margin-bottom: 6px;
+            }
+            .mutu-item-row {
+                font-size: 10px;
+                gap: 6px;
+            }
+            .mutu-item-row .mutu-check {
+                width: 13px;
+                height: 13px;
+            }
+            .seal-badge-box {
+                margin-left: 0;
+            }
+            .seal-circle-svg {
+                width: 60px;
+                height: 60px;
+            }
+            .seal-circle-svg .seal-100 {
+                font-size: 12.5px;
+            }
+            .seal-circle-svg .seal-sub {
+                font-size: 6.5px;
+            }
+        }
+
+        /* Extra Small Screens (<= 380px) */
+        @media (max-width: 380px) {
+            .mobile-bottom-nav {
+                height: 52px !important;
+                padding: 3px 4px !important;
+            }
+            .mobile-nav-item {
+                padding: 3px 2px !important;
+            }
+            .mobile-nav-item .mobile-nav-icon {
+                width: 17px !important;
+                height: 17px !important;
+            }
+            .mobile-nav-item .mobile-nav-label {
+                font-size: 9px !important;
+            }
+            .hero-headline {
+                font-size: 21px;
+            }
+            .es-img {
+                max-height: 140px;
+            }
+            .search-pill {
+                width: 115px;
+            }
+            .brand-logo-img {
+                height: 28px;
+            }
+            .brand-text {
+                font-size: 15px;
+            }
         }
     </style>
 </head>
@@ -720,7 +1021,7 @@
                 <span class="brand-text">MYU</span>
             </a>
 
-            <!-- Center Nav Links -->
+            <!-- Center Nav Links (Desktop Topbar) -->
             <nav class="nav-center">
                 <a href="/" class="nav-item active">
                     Beranda
@@ -731,7 +1032,7 @@
                 <a href="#tentang-kami" class="nav-item">
                     Tentang Kami
                 </a>
-                <a href="#kontak" class="nav-item">
+                <a href="https://wa.me/6285807106570?text=Halo%20OMYU,%20saya%20ingin%20tanya%20menu" target="_blank" class="nav-item">
                     Kontak
                 </a>
             </nav>
@@ -937,6 +1238,39 @@
         </section>
 
     </main>
+
+    <!-- Floating Bottom Navigation (Mobile Only) -->
+    <nav class="mobile-bottom-nav">
+        <a href="/" class="mobile-nav-item active">
+            <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <span class="mobile-nav-label">Beranda</span>
+        </a>
+        <a href="{{ route('pelanggan.katalog') }}" class="mobile-nav-item">
+            <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6l-2 14H8L6 6h12z"></path>
+                <line x1="4" y1="6" x2="20" y2="6"></line>
+                <line x1="10" y1="2" x2="14" y2="6"></line>
+            </svg>
+            <span class="mobile-nav-label">Menu</span>
+        </a>
+        <a href="#tentang-kami" class="mobile-nav-item">
+            <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span class="mobile-nav-label">Tentang Kami</span>
+        </a>
+        <a href="https://wa.me/6285807106570?text=Halo%20OMYU,%20saya%20ingin%20tanya%20menu" target="_blank" class="mobile-nav-item">
+            <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            </svg>
+            <span class="mobile-nav-label">Kontak</span>
+        </a>
+    </nav>
 
 </body>
 </html>

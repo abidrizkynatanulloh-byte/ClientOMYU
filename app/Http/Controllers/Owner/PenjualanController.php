@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pesanan;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -40,7 +39,7 @@ class PenjualanController extends Controller
             $cari = $request->cari;
             $query->where(function ($q) use ($cari) {
                 $q->where('kode_pesanan', 'like', "%{$cari}%")
-                  ->orWhere('nama_pembeli', 'like', "%{$cari}%");
+                    ->orWhere('nama_pembeli', 'like', "%{$cari}%");
             });
         }
 
@@ -58,8 +57,8 @@ class PenjualanController extends Controller
             ->count();
 
         // Average Order Value (AOV): Rata-rata nilai belanja per transaksi
-        $rataRataTransaksi = $transaksiSelesaiCount > 0 
-            ? round($omzetTerfilter / $transaksiSelesaiCount) 
+        $rataRataTransaksi = $transaksiSelesaiCount > 0
+            ? round($omzetTerfilter / $transaksiSelesaiCount)
             : 0;
 
         // Rekap per metode bayar

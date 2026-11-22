@@ -6,7 +6,7 @@
 @section('page_subtitle', 'Pencatatan arus kas masuk operasional dan arus kas keluar harian outlet OMYU.')
 
 @section('header_actions')
-    <a href="{{ route('panel.admin.keuangan.laba_rugi') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
+    <a href="{{ route('panel.admin.keuangan.laba_rugi') }}" class="btn-press inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
         <i class="fa-solid fa-file-invoice-dollar"></i>
         <span>Laporan Laba Rugi</span>
     </a>
@@ -16,7 +16,7 @@
 <div class="space-y-6">
 
     <!-- Filter Periode Bulan & Tahun Card -->
-    <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+    <div class="glass-card rounded-3xl p-5 anim-fade-up delay-1">
         <form method="GET" action="{{ route('panel.admin.keuangan.buku_kas') }}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             
             <div class="flex items-center gap-3">
@@ -44,7 +44,7 @@
                     @endfor
                 </select>
 
-                <button type="submit" class="px-5 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+                <button type="submit" class="btn-press px-5 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs shadow-xs flex items-center gap-1.5">
                     <i class="fa-solid fa-filter text-xs"></i>
                     <span>Tampilkan</span>
                 </button>
@@ -56,39 +56,48 @@
     <!-- 3 KPI Cards Kas Mutasi -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
         
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+        <div class="glass-card hover-lift rounded-3xl p-5 flex items-center gap-4 anim-fade-up delay-2">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-arrow-down-left"></i>
             </div>
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Total Kas Masuk</span>
-                <h3 class="text-2xl font-extrabold text-emerald-700 tracking-tight mt-0.5">
+                <h3 class="text-2xl font-extrabold text-emerald-700 tracking-tight mt-0.5 counter-value"
+                    data-counter
+                    data-counter-target="{{ $totalKasMasuk }}"
+                    data-counter-prefix="Rp ">
                     Rp {{ number_format($totalKasMasuk, 0, ',', '.') }}
                 </h3>
                 <span class="text-[11px] text-slate-400">Penerimaan kas outlet</span>
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+        <div class="glass-card hover-lift rounded-3xl p-5 flex items-center gap-4 anim-fade-up delay-3">
+            <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-arrow-up-right"></i>
             </div>
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Total Kas Keluar</span>
-                <h3 class="text-2xl font-extrabold text-rose-600 tracking-tight mt-0.5">
+                <h3 class="text-2xl font-extrabold text-rose-600 tracking-tight mt-0.5 counter-value"
+                    data-counter
+                    data-counter-target="{{ $totalKasKeluar }}"
+                    data-counter-prefix="Rp ">
                     Rp {{ number_format($totalKasKeluar, 0, ',', '.') }}
                 </h3>
                 <span class="text-[11px] text-slate-400">Beban & belanja operasional</span>
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+        <div class="glass-card hover-lift rounded-3xl p-5 flex items-center gap-4 anim-fade-up delay-4">
+            <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-scale-balanced"></i>
             </div>
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Saldo Kas Bersih</span>
-                <h3 class="text-2xl font-extrabold {{ $saldoKasBersih >= 0 ? 'text-brand-900' : 'text-rose-600' }} tracking-tight mt-0.5">
+                <h3 class="text-2xl font-extrabold {{ $saldoKasBersih >= 0 ? 'text-brand-900' : 'text-rose-600' }} tracking-tight mt-0.5 counter-value"
+                    data-counter
+                    data-counter-target="{{ $saldoKasBersih }}"
+                    data-counter-prefix="Rp ">
                     Rp {{ number_format($saldoKasBersih, 0, ',', '.') }}
                 </h3>
                 <span class="text-[11px] text-slate-400">Kas Masuk dikurangi Keluar</span>
@@ -98,9 +107,9 @@
     </div>
 
     <!-- Data Table Mutasi Kas -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden">
+    <div class="glass-card rounded-3xl border border-slate-100 shadow-soft overflow-hidden anim-fade-up delay-5">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs sm:text-sm">
+            <table class="w-full text-left text-xs sm:text-sm admin-table">
                 <thead>
                     <tr class="bg-slate-50/80 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200/80">
                         <th class="py-3.5 px-6 font-bold">Waktu Transaksi</th>

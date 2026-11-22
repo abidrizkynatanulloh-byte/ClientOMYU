@@ -6,7 +6,7 @@
 @section('page_subtitle', 'Breakdown takaran bahan baku, biaya rata-rata, estimasi laba kotor, dan faktor pembatas stok.')
 
 @section('header_actions')
-    <a href="{{ route('panel.admin.resep.index') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
+    <a href="{{ route('panel.admin.resep.index') }}" class="btn-press inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
         <i class="fa-solid fa-arrow-left"></i>
         <span>Kembali ke Daftar Resep</span>
     </a>
@@ -16,7 +16,7 @@
 <div class="max-w-5xl mx-auto space-y-6">
 
     <!-- Header Menu Info -->
-    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="glass-card rounded-3xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 anim-fade-up delay-1">
         <div class="flex items-center gap-4">
             <div class="w-14 h-14 rounded-2xl bg-brand-100 text-brand-800 flex items-center justify-center text-2xl font-black shadow-inner">
                 <i class="fa-solid fa-blender"></i>
@@ -45,31 +45,31 @@
     <!-- 5 KPI Cards Financial Breakdown -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+        <div class="glass-card hover-lift rounded-3xl p-5 anim-fade-up delay-2">
             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Harga Jual</span>
-            <p class="text-xl font-extrabold text-slate-900">Rp {{ number_format($hargaJual, 0, ',', '.') }}</p>
+            <p class="text-xl font-extrabold text-slate-900 counter-value" data-counter data-counter-target="{{ $hargaJual }}" data-counter-prefix="Rp ">Rp {{ number_format($hargaJual, 0, ',', '.') }}</p>
             <span class="text-[11px] text-slate-400">Per cup</span>
         </div>
 
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+        <div class="glass-card hover-lift rounded-3xl p-5 anim-fade-up delay-3">
             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Total HPP Bahan</span>
-            <p class="text-xl font-extrabold text-rose-600">Rp {{ number_format($totalHpp, 0, ',', '.') }}</p>
+            <p class="text-xl font-extrabold text-rose-600 counter-value" data-counter data-counter-target="{{ $totalHpp }}" data-counter-prefix="Rp ">Rp {{ number_format($totalHpp, 0, ',', '.') }}</p>
             <span class="text-[11px] text-slate-400">Modal bahan baku</span>
         </div>
 
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+        <div class="glass-card hover-lift rounded-3xl p-5 anim-fade-up delay-4">
             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Laba Kotor</span>
-            <p class="text-xl font-extrabold text-brand-900">Rp {{ number_format($labaKotor, 0, ',', '.') }}</p>
+            <p class="text-xl font-extrabold text-brand-900 counter-value" data-counter data-counter-target="{{ $labaKotor }}" data-counter-prefix="Rp ">Rp {{ number_format($labaKotor, 0, ',', '.') }}</p>
             <span class="text-[11px] text-slate-400">Keuntungan per cup</span>
         </div>
 
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+        <div class="glass-card hover-lift rounded-3xl p-5 anim-fade-up delay-5">
             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Margin Laba</span>
-            <p class="text-xl font-extrabold text-emerald-600">{{ $margin }}%</p>
+            <p class="text-xl font-extrabold text-emerald-600 counter-value" data-counter data-counter-target="{{ $margin }}" data-counter-suffix="%">{{ $margin }}%</p>
             <span class="text-[11px] text-slate-400">Persentase margin</span>
         </div>
 
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft col-span-2 sm:col-span-1">
+        <div class="glass-card hover-lift rounded-3xl p-5 col-span-2 sm:col-span-1 anim-fade-up delay-6">
             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Faktor Pembatas</span>
             <p class="text-sm font-extrabold text-amber-700 truncate" title="{{ $bahanPembatas ?? 'Semua Bahan Cukup' }}">
                 {{ $bahanPembatas ?? '-' }}
@@ -80,7 +80,7 @@
     </div>
 
     <!-- Table Rincian Komposisi Resep -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden">
+    <div class="glass-card rounded-3xl border border-slate-100 shadow-soft overflow-hidden anim-fade-up delay-7">
         <div class="p-6 border-b border-slate-100 flex items-center justify-between">
             <div>
                 <h3 class="text-base font-extrabold text-slate-900">Komposisi Takaran & Biaya Bahan Baku</h3>
@@ -92,7 +92,7 @@
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs sm:text-sm">
+            <table class="w-full text-left text-xs sm:text-sm admin-table">
                 <thead>
                     <tr class="bg-slate-50/80 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200/80">
                         <th class="py-3.5 px-6 font-bold">Nama Bahan</th>

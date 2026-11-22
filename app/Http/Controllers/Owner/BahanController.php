@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Owner;
 use App\Http\Controllers\Controller;
 use App\Models\Bahan;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class BahanController extends Controller
 {
@@ -36,7 +35,7 @@ class BahanController extends Controller
         $totalNilaiPersediaan = $semuaBahan->sum(function ($b) {
             return (float) $b->stok * (float) $b->biaya_rata_rata;
         });
-        $jumlahBahanKritis = $semuaBahan->filter(fn($b) => $b->is_kritis)->count();
+        $jumlahBahanKritis = $semuaBahan->filter(fn ($b) => $b->is_kritis)->count();
 
         $daftarBahan = $query->orderBy('nama')->paginate(15)->withQueryString();
 
@@ -56,29 +55,29 @@ class BahanController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nama'             => ['required', 'string', 'max:100', 'unique:bahan,nama'],
-            'jenis'            => ['required', 'in:buah,bahan_lain,kemasan'],
-            'satuan_dasar'     => ['required', 'in:g,ml,pcs'],
-            'satuan_beli'      => ['required', 'string', 'max:20'],
-            'konversi'         => ['required', 'numeric', 'min:1'],
+            'nama' => ['required', 'string', 'max:100', 'unique:bahan,nama'],
+            'jenis' => ['required', 'in:buah,bahan_lain,kemasan'],
+            'satuan_dasar' => ['required', 'in:g,ml,pcs'],
+            'satuan_beli' => ['required', 'string', 'max:20'],
+            'konversi' => ['required', 'numeric', 'min:1'],
             'rendemen_standar' => ['required', 'numeric', 'min:1', 'max:100'],
-            'batas_minimum'    => ['required', 'numeric', 'min:0'],
-            'stok_awal'        => ['nullable', 'numeric', 'min:0'],
-            'biaya_rata_rata'  => ['nullable', 'numeric', 'min:0'],
+            'batas_minimum' => ['required', 'numeric', 'min:0'],
+            'stok_awal' => ['nullable', 'numeric', 'min:0'],
+            'biaya_rata_rata' => ['nullable', 'numeric', 'min:0'],
         ]);
 
         Bahan::create([
-            'nama'             => $data['nama'],
-            'jenis'            => $data['jenis'],
-            'satuan_dasar'     => $data['satuan_dasar'],
-            'satuan_beli'      => $data['satuan_beli'],
-            'konversi'         => $data['konversi'],
+            'nama' => $data['nama'],
+            'jenis' => $data['jenis'],
+            'satuan_dasar' => $data['satuan_dasar'],
+            'satuan_beli' => $data['satuan_beli'],
+            'konversi' => $data['konversi'],
             'rendemen_standar' => $data['rendemen_standar'],
-            'batas_minimum'    => $data['batas_minimum'],
-            'stok'             => $data['stok_awal'] ?? 0,
+            'batas_minimum' => $data['batas_minimum'],
+            'stok' => $data['stok_awal'] ?? 0,
             'stok_dicadangkan' => 0,
-            'biaya_rata_rata'  => $data['biaya_rata_rata'] ?? 0,
-            'aktif'            => 1,
+            'biaya_rata_rata' => $data['biaya_rata_rata'] ?? 0,
+            'aktif' => 1,
         ]);
 
         return redirect()->route('panel.admin.bahan.index')
@@ -88,6 +87,7 @@ class BahanController extends Controller
     public function edit($id)
     {
         $bahan = Bahan::findOrFail($id);
+
         return view('panel.admin.bahan.edit', compact('bahan'));
     }
 
@@ -96,14 +96,14 @@ class BahanController extends Controller
         $bahan = Bahan::findOrFail($id);
 
         $data = $request->validate([
-            'nama'             => ['required', 'string', 'max:100', 'unique:bahan,nama,' . $bahan->id],
-            'jenis'            => ['required', 'in:buah,bahan_lain,kemasan'],
-            'satuan_dasar'     => ['required', 'in:g,ml,pcs'],
-            'satuan_beli'      => ['required', 'string', 'max:20'],
-            'konversi'         => ['required', 'numeric', 'min:1'],
+            'nama' => ['required', 'string', 'max:100', 'unique:bahan,nama,'.$bahan->id],
+            'jenis' => ['required', 'in:buah,bahan_lain,kemasan'],
+            'satuan_dasar' => ['required', 'in:g,ml,pcs'],
+            'satuan_beli' => ['required', 'string', 'max:20'],
+            'konversi' => ['required', 'numeric', 'min:1'],
             'rendemen_standar' => ['required', 'numeric', 'min:1', 'max:100'],
-            'batas_minimum'    => ['required', 'numeric', 'min:0'],
-            'aktif'            => ['required', 'boolean'],
+            'batas_minimum' => ['required', 'numeric', 'min:0'],
+            'aktif' => ['required', 'boolean'],
         ]);
 
         $bahan->update($data);

@@ -50,7 +50,7 @@ class ResepHppController extends Controller
                     }
 
                     // Kapasitas menu adalah nilai terkecil dari semua bahan (Bab 2.5)
-                    $kapasitasCup = !empty($kapasitasPerBahan) ? min($kapasitasPerBahan) : 0;
+                    $kapasitasCup = ! empty($kapasitasPerBahan) ? min($kapasitasPerBahan) : 0;
                 }
 
                 $hargaJual = $varian->harga > 0 ? $varian->harga : $produk->harga;
@@ -58,17 +58,17 @@ class ResepHppController extends Controller
                 $margin = $hargaJual > 0 && $adaResep ? round(($labaKotor / $hargaJual) * 100, 1) : 0;
 
                 $menuAnalisis[] = [
-                    'produk_id'    => $produk->id,
-                    'varian_id'    => $varian->id,
-                    'nama_produk'  => $produk->nama,
-                    'nama_varian'  => $varian->nama,
-                    'kategori'     => $produk->kategori?->nama ?? '-',
-                    'harga_jual'   => $hargaJual,
-                    'hpp_bahan'    => round($hppBahan),
-                    'laba_kotor'   => round($labaKotor),
-                    'margin'       => $margin,
-                    'kapasitas_cup'=> $kapasitasCup,
-                    'ada_resep'    => $adaResep,
+                    'produk_id' => $produk->id,
+                    'varian_id' => $varian->id,
+                    'nama_produk' => $produk->nama,
+                    'nama_varian' => $varian->nama,
+                    'kategori' => $produk->kategori?->nama ?? '-',
+                    'harga_jual' => $hargaJual,
+                    'hpp_bahan' => round($hppBahan),
+                    'laba_kotor' => round($labaKotor),
+                    'margin' => $margin,
+                    'kapasitas_cup' => $kapasitasCup,
+                    'ada_resep' => $adaResep,
                 ];
             }
         }
@@ -102,14 +102,14 @@ class ResepHppController extends Controller
                 }
 
                 $rincianBahan[] = [
-                    'nama_bahan'      => $b->nama,
-                    'jenis'           => $b->jenis,
-                    'satuan'          => $b->satuan_dasar,
-                    'takaran'         => $takaran,
-                    'biaya_satuan'    => $biayaPerSatuan,
-                    'biaya_per_cup'   => round($biayaPerCup),
-                    'stok_tersedia'   => $stokTersedia,
-                    'kapasitas_cup'   => $kapasitas,
+                    'nama_bahan' => $b->nama,
+                    'jenis' => $b->jenis,
+                    'satuan' => $b->satuan_dasar,
+                    'takaran' => $takaran,
+                    'biaya_satuan' => $biayaPerSatuan,
+                    'biaya_per_cup' => round($biayaPerCup),
+                    'stok_tersedia' => $stokTersedia,
+                    'kapasitas_cup' => $kapasitas,
                 ];
             }
         }

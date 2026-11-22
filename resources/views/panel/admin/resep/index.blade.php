@@ -6,7 +6,7 @@
 @section('page_subtitle', 'Analisis harga pokok produksi (HPP) per cup, margin keuntungan, dan kapasitas stok menu secara otomatis.')
 
 @section('header_actions')
-    <a href="{{ route('panel.admin.bahan.index') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-bold text-xs transition-all shadow-xs">
+    <a href="{{ route('panel.admin.bahan.index') }}" class="btn-press inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-bold text-xs shadow-xs">
         <i class="fa-solid fa-boxes-stacked"></i>
         <span>Kelola Persediaan Bahan</span>
     </a>
@@ -16,7 +16,7 @@
 <div class="space-y-6">
 
     <!-- Information Card -->
-    <div class="bg-gradient-to-r from-brand-900 to-emerald-950 rounded-3xl p-6 text-white shadow-soft flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="anim-fade-up delay-1 bg-gradient-to-r from-brand-900 to-emerald-950 rounded-3xl p-6 text-white shadow-soft flex flex-col md:flex-row md:items-center justify-between gap-4 hover-lift">
         <div class="flex items-center gap-4">
             <div class="w-12 h-12 rounded-2xl bg-white/10 text-brand-300 flex items-center justify-center font-bold text-xl border border-white/10 shrink-0">
                 <i class="fa-solid fa-calculator"></i>
@@ -31,13 +31,13 @@
         <div class="flex items-center gap-3 shrink-0">
             <div class="px-4 py-2 rounded-2xl bg-white/10 border border-white/10 text-center">
                 <span class="text-[10px] text-brand-300 uppercase block font-bold">Total Menu & Varian</span>
-                <span class="text-lg font-extrabold text-white">{{ count($menuAnalisis) }}</span>
+                <span class="text-lg font-extrabold text-white counter-value" data-counter data-counter-target="{{ count($menuAnalisis) }}">{{ count($menuAnalisis) }}</span>
             </div>
         </div>
     </div>
 
     <!-- Filter & Search Bar -->
-    <div class="bg-white rounded-3xl p-4 border border-slate-100 shadow-soft">
+    <div class="glass-card anim-fade-up delay-2 rounded-3xl p-4">
         <form method="GET" action="{{ route('panel.admin.resep.index') }}" class="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="w-full sm:w-96 relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
@@ -47,11 +47,11 @@
             </div>
             <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
                 @if(request('cari'))
-                    <a href="{{ route('panel.admin.resep.index') }}" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs">
+                    <a href="{{ route('panel.admin.resep.index') }}" class="btn-press px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs">
                         Reset
                     </a>
                 @endif
-                <button type="submit" class="px-4 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-bold text-xs flex items-center gap-1.5 shadow-xs">
+                <button type="submit" class="btn-press px-4 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-bold text-xs flex items-center gap-1.5 shadow-xs">
                     <i class="fa-solid fa-filter text-xs"></i>
                     <span>Cari Menu</span>
                 </button>
@@ -60,9 +60,9 @@
     </div>
 
     <!-- Data Table Card -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden">
+    <div class="glass-card anim-fade-up delay-3 rounded-3xl border border-slate-100 shadow-soft overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs sm:text-sm">
+            <table class="w-full text-left text-xs sm:text-sm admin-table">
                 <thead>
                     <tr class="bg-slate-50/80 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200/80">
                         <th class="py-3.5 px-6 font-bold">Menu Produk</th>

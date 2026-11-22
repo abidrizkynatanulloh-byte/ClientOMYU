@@ -6,7 +6,7 @@
 @section('page_subtitle', 'Buat akun staf kasir atau admin baru untuk mengakses sistem operasional OMYU.')
 
 @section('header_actions')
-    <a href="{{ route('panel.admin.karyawan.index') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
+    <a href="{{ route('panel.admin.karyawan.index') }}" class="btn-press inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
         <i class="fa-solid fa-arrow-left"></i>
         <span>Kembali ke Karyawan</span>
     </a>
@@ -15,7 +15,7 @@
 @section('content')
 <div class="max-w-xl mx-auto">
 
-    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-soft">
+    <div class="glass-card anim-fade-up delay-1 rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-soft">
         
         <div class="flex items-center gap-3.5 pb-6 mb-6 border-b border-slate-100">
             <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-800 flex items-center justify-center text-xl font-bold shrink-0">
@@ -108,10 +108,10 @@
             </div>
 
             <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                <a href="{{ route('panel.admin.karyawan.index') }}" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
+                <a href="{{ route('panel.admin.karyawan.index') }}" class="btn-press px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
                     Batal
                 </a>
-                <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs sm:text-sm shadow-xs transition-all flex items-center gap-2">
+                <button type="submit" class="btn-press px-6 py-2.5 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs sm:text-sm shadow-xs flex items-center gap-2">
                     <i class="fa-solid fa-user-plus"></i>
                     <span>Buat Akun Staf</span>
                 </button>

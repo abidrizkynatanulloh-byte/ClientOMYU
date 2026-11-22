@@ -158,5 +158,38 @@
         @endif
     </main>
 
+    <!-- Floating Bottom Navigation (Mobile Only) -->
+    <nav class="mobile-bottom-nav">
+        <a href="/" class="mobile-nav-item">
+            <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <span class="mobile-nav-label">Beranda</span>
+        </a>
+        <a href="{{ route('pelanggan.katalog') }}" class="mobile-nav-item">
+            <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6l-2 14H8L6 6h12z"></path>
+                <line x1="4" y1="6" x2="20" y2="6"></line>
+                <line x1="10" y1="2" x2="14" y2="6"></line>
+            </svg>
+            <span class="mobile-nav-label">Menu</span>
+        </a>
+        <a href="{{ url('/#tentang-kami') }}" class="mobile-nav-item">
+            <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span class="mobile-nav-label">Tentang Kami</span>
+        </a>
+        <a href="https://wa.me/6285807106570?text=Halo%20OMYU,%20saya%20ingin%20tanya%20menu" target="_blank" class="mobile-nav-item">
+            <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            </svg>
+            <span class="mobile-nav-label">Kontak</span>
+        </a>
+    </nav>
+
 </body>
 </html>

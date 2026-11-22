@@ -21,8 +21,8 @@ class Resep extends Model
     ];
 
     protected $casts = [
-        'versi'         => 'integer',
-        'aktif'         => 'boolean',
+        'versi' => 'integer',
+        'aktif' => 'boolean',
         'berlaku_mulai' => 'datetime',
     ];
 

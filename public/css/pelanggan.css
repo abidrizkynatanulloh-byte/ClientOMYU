@@ -208,6 +208,10 @@ body {
     box-shadow: 0 2px 8px rgba(70, 126, 26, 0.16);
 }
 
+.mobile-bottom-nav {
+    display: none !important;
+}
+
 .web-icon {
     display: inline-flex;
     align-items: center;
@@ -1164,32 +1168,137 @@ input[type="radio"]:checked ~ .payment-card .radio-dot {
 
 @media (max-width: 768px) {
     .fixed-topbar {
-        padding: 0 14px;
+        padding: 0 12px;
         height: 48px;
         border-radius: 30px;
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
     }
     .brand-logo-img {
-        height: 34px;
+        height: 32px;
     }
-    .nav-center {
-        display: none;
+    .brand-text {
+        font-size: 17px;
+        margin-left: -16px;
+        margin-top: 4px;
     }
     .search-pill {
-        width: 130px;
+        width: 140px;
+        padding: 4px 10px;
     }
+    .search-pill input {
+        font-size: 11px;
+    }
+    .icon-circle-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    /* Sembunyikan Nav Tengah di Topbar pada Mobile */
+    .nav-center {
+        display: none !important;
+    }
+
+    /* NAV BOTTOM (Floating Dock Melayang di Bagian Bawah Layar HP) */
+    .mobile-bottom-nav {
+        display: flex !important;
+        position: fixed !important;
+        bottom: 14px !important;
+        bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: calc(100% - 28px) !important;
+        max-width: 420px !important;
+        height: 58px !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-radius: 35px !important;
+        padding: 4px 8px !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        box-shadow: 0 10px 30px rgba(25, 56, 8, 0.22), 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+        z-index: 99999 !important;
+        gap: 4px !important;
+    }
+
+    .mobile-nav-item {
+        flex: 1;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 3px !important;
+        padding: 5px 3px !important;
+        border-radius: 18px !important;
+        text-decoration: none !important;
+        color: #4b6343 !important;
+        min-width: 0 !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .mobile-nav-item .mobile-nav-icon {
+        width: 20px !important;
+        height: 20px !important;
+        display: block !important;
+        transition: transform 0.2s !important;
+    }
+
+    .mobile-nav-item .mobile-nav-label {
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        line-height: 1 !important;
+        white-space: nowrap !important;
+        letter-spacing: -0.2px !important;
+    }
+
+    .mobile-nav-item.active {
+        background: #dff2c8 !important;
+        color: #183d12 !important;
+        font-weight: 800 !important;
+        box-shadow: 0 2px 8px rgba(70, 126, 26, 0.18) !important;
+    }
+
+    .mobile-nav-item.active .mobile-nav-icon {
+        transform: translateY(-1px) !important;
+        stroke-width: 2.6 !important;
+    }
+
     .catalog-wrapper {
-        padding: 64px 14px 30px;
+        padding: 64px 14px 88px;
     }
     .cart-wrapper {
-        padding: 64px 14px 30px;
+        padding: 64px 14px 88px;
     }
     .checkout-wrapper {
-        padding: 64px 14px 30px;
+        padding: 64px 14px 88px;
     }
     .pay-wrapper {
-        padding: 64px 14px 30px;
+        padding: 64px 14px 88px;
     }
     .ticket-wrapper {
-        padding: 64px 14px 30px;
+        padding: 64px 14px 88px;
+    }
+}
+
+@media (max-width: 380px) {
+    .mobile-bottom-nav {
+        height: 52px !important;
+        padding: 3px 4px !important;
+    }
+    .mobile-nav-item {
+        padding: 3px 2px !important;
+    }
+    .mobile-nav-item .mobile-nav-icon {
+        width: 17px !important;
+        height: 17px !important;
+    }
+    .mobile-nav-item .mobile-nav-label {
+        font-size: 9px !important;
+    }
+    .search-pill {
+        width: 115px;
     }
 }

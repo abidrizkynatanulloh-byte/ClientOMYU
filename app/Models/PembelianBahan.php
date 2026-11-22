@@ -28,13 +28,13 @@ class PembelianBahan extends Model
     ];
 
     protected $casts = [
-        'tanggal_beli'     => 'date',
+        'tanggal_beli' => 'date',
         'kedaluwarsa_pada' => 'date',
-        'jumlah_beli'      => 'decimal:3',
+        'jumlah_beli' => 'decimal:3',
         'rendemen_dipakai' => 'decimal:2',
-        'jumlah_bersih'    => 'decimal:3',
+        'jumlah_bersih' => 'decimal:3',
         'biaya_per_satuan' => 'decimal:4',
-        'total_harga'      => 'integer',
+        'total_harga' => 'integer',
     ];
 
     // Relasi ke bahan yang dibeli

@@ -7,6 +7,7 @@ use App\Http\Controllers\Owner\KaryawanController;
 use App\Http\Controllers\Owner\KeuanganController;
 use App\Http\Controllers\Owner\PenjualanController;
 use App\Http\Controllers\Owner\ResepHppController;
+use App\Http\Controllers\PelangganPesananController;
 use App\Http\Controllers\Staf\AktivitasController as StafAktivitasController;
 use App\Http\Controllers\Staf\BantuanController as StafBantuanController;
 use App\Http\Controllers\Staf\DashboardController as StafDashboardController;
@@ -15,7 +16,6 @@ use App\Http\Controllers\Staf\PesananController as StafPesananController;
 use App\Http\Controllers\Staf\ProduksiController as StafProduksiController;
 use App\Http\Controllers\Staf\ProfilController as StafProfilController;
 use App\Http\Controllers\Staf\StokController as StafStokController;
-use App\Http\Controllers\PelangganPesananController;
 use App\Models\Produk;
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +47,7 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
             if (auth()->user()?->adalahAdmin()) {
                 return redirect()->route('panel.admin.beranda');
             }
+
             return app(StafDashboardController::class)->index();
         })->name('beranda');
 

@@ -29,7 +29,7 @@ class KeuanganController extends Controller
         // 3. Hitung HPP Bahan Baku & Kemasan yang Terpakai
         $hpp = ItemPesanan::whereHas('pesanan', function ($q) use ($tanggalAwal, $tanggalAkhir) {
             $q->where('status_pesanan', 'selesai')
-              ->whereBetween('created_at', [$tanggalAwal, $tanggalAkhir]);
+                ->whereBetween('created_at', [$tanggalAwal, $tanggalAkhir]);
         })->sum(DB::raw('jumlah * (COALESCE(hpp_bahan, 0) + COALESCE(hpp_kemasan, 0))'));
 
         // 4. Laba Kotor & Food Cost Ratio (%)

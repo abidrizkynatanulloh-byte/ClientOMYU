@@ -6,11 +6,12 @@
 @section('page_subtitle', 'Pantau seluruh transaksi pesanan kasir outlet dan pesanan online.')
 
 @section('header_actions')
-    <div class="flex items-center gap-2">
-        <a href="{{ route('panel.admin.penjualan.index') }}" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
-            <i class="fa-solid fa-arrows-rotate mr-1"></i> Refresh
-        </a>
-    </div>
+    <a href="{{ route('panel.admin.penjualan.index') }}" 
+       title="Perbarui Data Pesanan"
+       class="btn-press group inline-flex items-center justify-center gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-white hover:bg-brand-50 text-slate-700 hover:text-brand-800 border border-slate-200/90 hover:border-brand-300 shadow-xs text-xs font-bold transition-all">
+        <i class="fa-solid fa-arrows-rotate text-brand-600 text-xs sm:text-sm transition-transform duration-300 group-hover:rotate-180 group-active:rotate-180"></i>
+        <span class="hidden sm:inline">Refresh</span>
+    </a>
 @endsection
 
 @section('content')
@@ -19,39 +20,47 @@
     <!-- Ringkasan Nilai Terfilter KPI Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
         
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+        <div class="glass-card hover-lift rounded-3xl p-5 flex items-center gap-4 anim-fade-up delay-1">
+            <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-receipt"></i>
             </div>
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Total Transaksi</span>
-                <h3 class="text-2xl font-extrabold text-slate-900 tracking-tight mt-0.5">
+                <h3 class="text-2xl font-extrabold text-slate-900 tracking-tight mt-0.5 counter-value"
+                    data-counter
+                    data-counter-target="{{ $totalTransaksi }}">
                     {{ number_format($totalTransaksi, 0, ',', '.') }}
                 </h3>
                 <span class="text-[11px] text-slate-400">Termasuk semua status pesanan</span>
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+        <div class="glass-card hover-lift rounded-3xl p-5 flex items-center gap-4 anim-fade-up delay-2">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-money-bill-wave"></i>
             </div>
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Omzet Terfilter</span>
-                <h3 class="text-2xl font-extrabold text-emerald-700 tracking-tight mt-0.5">
+                <h3 class="text-2xl font-extrabold text-emerald-700 tracking-tight mt-0.5 counter-value"
+                    data-counter
+                    data-counter-target="{{ $omzetTerfilter }}"
+                    data-counter-prefix="Rp ">
                     Rp {{ number_format($omzetTerfilter, 0, ',', '.') }}
                 </h3>
                 <span class="text-[11px] text-slate-400">Dari pesanan berstatus selesai</span>
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner">
+        <div class="glass-card hover-lift rounded-3xl p-5 flex items-center gap-4 anim-fade-up delay-3">
+            <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-scale-balanced"></i>
             </div>
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Rata-rata Belanja (AOV)</span>
-                <h3 class="text-2xl font-extrabold text-amber-700 tracking-tight mt-0.5">
+                <h3 class="text-2xl font-extrabold text-amber-700 tracking-tight mt-0.5 counter-value"
+                    data-counter
+                    data-counter-target="{{ $rataRataTransaksi }}"
+                    data-counter-prefix="Rp ">
                     Rp {{ number_format($rataRataTransaksi, 0, ',', '.') }}
                 </h3>
                 <span class="text-[11px] text-slate-400">Rata-rata omzet per pelanggan</span>
@@ -62,12 +71,12 @@
 
     <!-- Breakdown Metode Pembayaran Chips -->
     @if($rekapMetode->isNotEmpty())
-        <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-soft flex flex-wrap items-center gap-3">
+        <div class="glass-card rounded-2xl p-4 flex flex-wrap items-center gap-3 anim-fade-up delay-3">
             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 mr-2">
                 <i class="fa-solid fa-wallet text-brand-600"></i> Rekap Metode:
             </span>
             @foreach($rekapMetode as $metode)
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50/90 border border-slate-200/80 text-xs hover:border-brand-300 transition-colors">
                     <span class="font-bold uppercase text-slate-700">{{ $metode->metode_bayar ?? 'Lainnya' }}</span>
                     <span class="text-slate-400">|</span>
                     <span class="font-extrabold text-brand-800">Rp {{ number_format($metode->total_nominal, 0, ',', '.') }}</span>
@@ -80,7 +89,7 @@
     @endif
 
     <!-- Filter Bar Card -->
-    <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+    <div class="glass-card rounded-3xl p-5 anim-fade-up delay-4">
         <form method="GET" action="{{ route('panel.admin.penjualan.index') }}" class="space-y-4">
             
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3.5">
@@ -155,7 +164,7 @@
                             Reset Filter
                         </a>
                     @endif
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+                    <button type="submit" class="btn-press px-5 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs shadow-xs flex items-center gap-1.5">
                         <i class="fa-solid fa-filter text-xs"></i>
                         <span>Terapkan Filter</span>
                     </button>
@@ -166,10 +175,10 @@
     </div>
 
     <!-- Data Table Card -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden">
+    <div class="glass-card rounded-3xl border border-slate-100 shadow-soft overflow-hidden anim-fade-up delay-5">
         
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs sm:text-sm">
+            <table class="w-full text-left text-xs sm:text-sm admin-table">
                 <thead>
                     <tr class="bg-slate-50/80 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200/80">
                         <th class="py-3.5 px-5 font-bold">Kode Pesanan</th>

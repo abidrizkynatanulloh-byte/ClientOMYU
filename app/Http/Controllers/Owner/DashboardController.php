@@ -7,7 +7,6 @@ use App\Models\Bahan;
 use App\Models\ItemPesanan;
 use App\Models\Pesanan;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -33,19 +32,19 @@ class DashboardController extends Controller
         // 2. Hitung Total Cup Terjual Bulan Ini (dari item_pesanan)
         $totalCupBulanIni = ItemPesanan::whereHas('pesanan', function ($q) use ($awalBulan) {
             $q->where('status_pesanan', 'selesai')
-              ->where('created_at', '>=', $awalBulan);
+                ->where('created_at', '>=', $awalBulan);
         })->sum('jumlah');
 
         // 3. Hitung Estimasi Total HPP Bahan & Laba Kotor Bulan Ini
         // Formula: Laba Kotor = Omzet - HPP (Sesuai Bab 2 & 6 Buku Panduan)
         $totalHppBulanIni = ItemPesanan::whereHas('pesanan', function ($q) use ($awalBulan) {
             $q->where('status_pesanan', 'selesai')
-              ->where('created_at', '>=', $awalBulan);
+                ->where('created_at', '>=', $awalBulan);
         })->sum(DB::raw('COALESCE(hpp_bahan, 0) * jumlah'));
 
         $labaKotorBulanIni = $omzetBulanIni - $totalHppBulanIni;
-        $marginLabaKotor = $omzetBulanIni > 0 
-            ? round(($labaKotorBulanIni / $omzetBulanIni) * 100, 1) 
+        $marginLabaKotor = $omzetBulanIni > 0
+            ? round(($labaKotorBulanIni / $omzetBulanIni) * 100, 1)
             : 0;
 
         // 4. Bahan yang Stoknya Kritis (stok tersedia <= batas_minimum)
@@ -58,13 +57,13 @@ class DashboardController extends Controller
 
         // 5. 5 Menu Terlaris Bulan Ini (Top Products)
         $menuTerlaris = ItemPesanan::select(
-                'nama_produk',
-                DB::raw('SUM(jumlah) as total_terjual'),
-                DB::raw('SUM(subtotal) as total_omzet')
-            )
+            'nama_produk',
+            DB::raw('SUM(jumlah) as total_terjual'),
+            DB::raw('SUM(subtotal) as total_omzet')
+        )
             ->whereHas('pesanan', function ($q) use ($awalBulan) {
                 $q->where('status_pesanan', 'selesai')
-                  ->where('created_at', '>=', $awalBulan);
+                    ->where('created_at', '>=', $awalBulan);
             })
             ->groupBy('nama_produk')
             ->orderByDesc('total_terjual')

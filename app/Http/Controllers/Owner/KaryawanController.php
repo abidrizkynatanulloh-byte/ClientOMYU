@@ -17,8 +17,8 @@ class KaryawanController extends Controller
             $cari = $request->cari;
             $query->where(function ($q) use ($cari) {
                 $q->where('nama', 'like', "%{$cari}%")
-                  ->orWhere('email', 'like', "%{$cari}%")
-                  ->orWhere('telepon', 'like', "%{$cari}%");
+                    ->orWhere('email', 'like', "%{$cari}%")
+                    ->orWhere('telepon', 'like', "%{$cari}%");
             });
         }
 
@@ -54,21 +54,21 @@ class KaryawanController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nama'           => ['required', 'string', 'max:100'],
-            'email'          => ['required', 'email', 'max:150', 'unique:pengguna,email'],
-            'password'       => ['required', 'string', 'min:6'],
-            'peran'          => ['required', 'in:admin,karyawan'],
-            'telepon'        => ['nullable', 'string', 'max:20'],
+            'nama' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:150', 'unique:pengguna,email'],
+            'password' => ['required', 'string', 'min:6'],
+            'peran' => ['required', 'in:admin,karyawan'],
+            'telepon' => ['nullable', 'string', 'max:20'],
             'bisa_lihat_hpp' => ['nullable', 'boolean'],
         ]);
 
         Pengguna::create([
-            'nama'           => $data['nama'],
-            'email'          => $data['email'],
-            'password'       => Hash::make($data['password']),
-            'peran'          => $data['peran'],
-            'telepon'        => $data['telepon'] ?? null,
-            'aktif'          => 1,
+            'nama' => $data['nama'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'peran' => $data['peran'],
+            'telepon' => $data['telepon'] ?? null,
+            'aktif' => 1,
             'bisa_lihat_hpp' => $request->boolean('bisa_lihat_hpp'),
         ]);
 
@@ -79,6 +79,7 @@ class KaryawanController extends Controller
     public function edit($id)
     {
         $karyawan = Pengguna::findOrFail($id);
+
         return view('panel.admin.karyawan.edit', compact('karyawan'));
     }
 
@@ -87,26 +88,26 @@ class KaryawanController extends Controller
         $karyawan = Pengguna::findOrFail($id);
 
         $data = $request->validate([
-            'nama'           => ['required', 'string', 'max:100'],
-            'email'          => ['required', 'email', 'max:150', 'unique:pengguna,email,' . $karyawan->id],
-            'password'       => ['nullable', 'string', 'min:6'],
-            'peran'          => ['required', 'in:admin,karyawan'],
-            'telepon'        => ['nullable', 'string', 'max:20'],
-            'aktif'          => ['required', 'boolean'],
+            'nama' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:150', 'unique:pengguna,email,'.$karyawan->id],
+            'password' => ['nullable', 'string', 'min:6'],
+            'peran' => ['required', 'in:admin,karyawan'],
+            'telepon' => ['nullable', 'string', 'max:20'],
+            'aktif' => ['required', 'boolean'],
             'bisa_lihat_hpp' => ['nullable', 'boolean'],
         ]);
 
         $updateData = [
-            'nama'           => $data['nama'],
-            'email'          => $data['email'],
-            'peran'          => $data['peran'],
-            'telepon'        => $data['telepon'] ?? null,
-            'aktif'          => $data['aktif'],
+            'nama' => $data['nama'],
+            'email' => $data['email'],
+            'peran' => $data['peran'],
+            'telepon' => $data['telepon'] ?? null,
+            'aktif' => $data['aktif'],
             'bisa_lihat_hpp' => $request->boolean('bisa_lihat_hpp'),
         ];
 
         // Jika kolom password diisi, update password baru
-        if (!empty($data['password'])) {
+        if (! empty($data['password'])) {
             $updateData['password'] = Hash::make($data['password']);
         }
 
@@ -125,10 +126,11 @@ class KaryawanController extends Controller
             return back()->with('galat', 'Anda tidak bisa menonaktifkan akun Anda sendiri!');
         }
 
-        $karyawan->aktif = !$karyawan->aktif;
+        $karyawan->aktif = ! $karyawan->aktif;
         $karyawan->save();
 
         $statusTeks = $karyawan->aktif ? 'diaktifkan' : 'dinonaktifkan';
+
         return back()->with('sukses', "Akun {$karyawan->nama} berhasil {$statusTeks}!");
     }
 }

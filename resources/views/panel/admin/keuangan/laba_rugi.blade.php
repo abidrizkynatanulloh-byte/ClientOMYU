@@ -6,7 +6,7 @@
 @section('page_subtitle', 'Laporan kinerja keuangan entitas mikro kecil dan menengah (SAK EMKM) OMYU Fresh Juice.')
 
 @section('header_actions')
-    <a href="{{ route('panel.admin.keuangan.buku_kas') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
+    <a href="{{ route('panel.admin.keuangan.buku_kas') }}" class="btn-press inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
         <i class="fa-solid fa-book-bookmark"></i>
         <span>Buku Mutasi Kas</span>
     </a>
@@ -16,7 +16,7 @@
 <div class="max-w-4xl mx-auto space-y-6">
 
     <!-- Filter Periode Bulan & Tahun Card -->
-    <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+    <div class="glass-card rounded-3xl p-5 anim-fade-up delay-1">
         <form method="GET" action="{{ route('panel.admin.keuangan.laba_rugi') }}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             
             <div class="flex items-center gap-3">
@@ -44,7 +44,7 @@
                     @endfor
                 </select>
 
-                <button type="submit" class="px-5 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+                <button type="submit" class="btn-press px-5 py-2 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-xs shadow-xs flex items-center gap-1.5">
                     <i class="fa-solid fa-chart-column text-xs"></i>
                     <span>Tampilkan</span>
                 </button>
@@ -56,24 +56,37 @@
     <!-- 3 Quick KPI Summary Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
         
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+        <div class="glass-card hover-lift rounded-3xl p-5 anim-fade-up delay-2">
             <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Pendapatan (Omzet)</span>
-            <p class="text-2xl font-extrabold text-slate-900 tracking-tight">Rp {{ number_format($penjualan, 0, ',', '.') }}</p>
+            <p class="text-2xl font-extrabold text-slate-900 tracking-tight counter-value"
+               data-counter
+               data-counter-target="{{ $penjualan }}"
+               data-counter-prefix="Rp ">
+               Rp {{ number_format($penjualan, 0, ',', '.') }}
+            </p>
             <span class="text-[11px] text-slate-400">Total pesanan selesai</span>
         </div>
 
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+        <div class="glass-card hover-lift rounded-3xl p-5 anim-fade-up delay-3">
             <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Laba Kotor Usaha</span>
-            <p class="text-2xl font-extrabold text-brand-900 tracking-tight">Rp {{ number_format($labaKotor, 0, ',', '.') }}</p>
+            <p class="text-2xl font-extrabold text-brand-900 tracking-tight counter-value"
+               data-counter
+               data-counter-target="{{ $labaKotor }}"
+               data-counter-prefix="Rp ">
+               Rp {{ number_format($labaKotor, 0, ',', '.') }}
+            </p>
             <div class="flex items-center gap-1.5 mt-1 text-[11px]">
                 <span class="font-bold text-brand-700 bg-brand-50 px-2 py-0.2 rounded-full border border-brand-200">Margin: {{ $marginLabaKotor }}%</span>
                 <span class="text-slate-400">Food Cost: {{ $foodCostRatio }}%</span>
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+        <div class="glass-card hover-lift rounded-3xl p-5 anim-fade-up delay-4">
             <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Laba Bersih Usaha</span>
-            <p class="text-2xl font-extrabold {{ $labaBersih >= 0 ? 'text-emerald-700' : 'text-rose-600' }} tracking-tight">
+            <p class="text-2xl font-extrabold {{ $labaBersih >= 0 ? 'text-emerald-700' : 'text-rose-600' }} tracking-tight counter-value"
+               data-counter
+               data-counter-target="{{ $labaBersih }}"
+               data-counter-prefix="Rp ">
                 Rp {{ number_format($labaBersih, 0, ',', '.') }}
             </p>
             <div class="flex items-center gap-1.5 mt-1 text-[11px]">
@@ -86,7 +99,7 @@
     </div>
 
     <!-- Formal Financial Statement Card (SAK EMKM) -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-card overflow-hidden">
+    <div class="glass-card rounded-3xl border border-slate-100 shadow-card overflow-hidden anim-fade-up delay-5">
         
         <div class="p-6 sm:p-8 bg-gradient-to-b from-brand-50/50 to-transparent border-b border-slate-100 text-center">
             <div class="w-12 h-12 rounded-2xl bg-brand-900 text-white flex items-center justify-center font-black text-xl mx-auto mb-2 shadow-sm">

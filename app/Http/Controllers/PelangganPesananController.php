@@ -30,7 +30,7 @@ class PelangganPesananController extends Controller
         }
 
         if ($request->filled('cari')) {
-            $query->where('nama', 'like', '%' . $request->cari . '%');
+            $query->where('nama', 'like', '%'.$request->cari.'%');
         }
 
         $daftarProduk = $query->orderBy('nama', 'asc')->get();
@@ -45,8 +45,8 @@ class PelangganPesananController extends Controller
     {
         $request->validate([
             'produk_id' => 'required|exists:produk,id',
-            'qty'       => 'required|integer|min:1',
-            'catatan'   => 'nullable|string|max:150',
+            'qty' => 'required|integer|min:1',
+            'catatan' => 'nullable|string|max:150',
         ]);
 
         $produk = Produk::with('varian')->findOrFail($request->produk_id);
@@ -57,24 +57,24 @@ class PelangganPesananController extends Controller
         }
 
         $keranjang = session()->get('keranjang', []);
-        $cartKey = $produk->id . '_' . ($varian?->id ?? '0');
+        $cartKey = $produk->id.'_'.($varian?->id ?? '0');
 
         $harga = $varian && $varian->harga > 0 ? $varian->harga : $produk->harga;
 
         if (isset($keranjang[$cartKey])) {
             $keranjang[$cartKey]['qty'] += $request->qty;
-            if (!empty($request->catatan)) {
+            if (! empty($request->catatan)) {
                 $keranjang[$cartKey]['catatan'] = $request->catatan;
             }
         } else {
             $keranjang[$cartKey] = [
-                'produk_id'    => $produk->id,
-                'varian_id'    => $varian?->id,
-                'nama_produk'  => $produk->nama,
-                'nama_varian'  => $varian?->nama ?? 'Reguler',
-                'harga'        => $harga,
-                'qty'          => (int) $request->qty,
-                'catatan'      => $request->catatan ?? '-',
+                'produk_id' => $produk->id,
+                'varian_id' => $varian?->id,
+                'nama_produk' => $produk->nama,
+                'nama_varian' => $varian?->nama ?? 'Reguler',
+                'harga' => $harga,
+                'qty' => (int) $request->qty,
+                'catatan' => $request->catatan ?? '-',
             ];
         }
 
@@ -105,7 +105,7 @@ class PelangganPesananController extends Controller
     public function updateKeranjang(Request $request)
     {
         $request->validate([
-            'key'  => 'required',
+            'key' => 'required',
             'aksi' => 'required|in:tambah,kurang',
         ]);
 
@@ -168,12 +168,12 @@ class PelangganPesananController extends Controller
     public function prosesCheckout(Request $request)
     {
         $request->validate([
-            'nama_pembeli'    => 'required|string|max:100',
+            'nama_pembeli' => 'required|string|max:100',
             'telepon_pembeli' => 'required|string|max:20',
-            'tanggal_ambil'   => 'required|date|after_or_equal:today',
-            'jam_ambil'       => 'required|string|max:30',
-            'metode_bayar'    => 'required|in:qris,transfer,bayar_ditempat',
-            'catatan'         => 'nullable|string|max:255',
+            'tanggal_ambil' => 'required|date|after_or_equal:today',
+            'jam_ambil' => 'required|string|max:30',
+            'metode_bayar' => 'required|in:qris,transfer,bayar_ditempat',
+            'catatan' => 'nullable|string|max:255',
         ]);
 
         $keranjang = session()->get('keranjang', []);
@@ -189,31 +189,31 @@ class PelangganPesananController extends Controller
         $pesananBaru = null;
 
         DB::transaction(function () use ($request, $keranjang, $subtotal, &$pesananBaru) {
-            $kodePesanan = 'OMYU-ORD-' . date('Ymd') . '-' . strtoupper(Str::random(4));
-            $tokenAkses = hash('sha256', Str::random(40) . uniqid());
+            $kodePesanan = 'OMYU-ORD-'.date('Ymd').'-'.strtoupper(Str::random(4));
+            $tokenAkses = hash('sha256', Str::random(40).uniqid());
 
             $catatanJadwal = "Jadwal Ambil: {$request->tanggal_ambil} pukul {$request->jam_ambil}";
             if ($request->filled('catatan')) {
-                $catatanJadwal .= " | Catatan: " . $request->catatan;
+                $catatanJadwal .= ' | Catatan: '.$request->catatan;
             }
 
             // 1. Simpan Pesanan
             $pesananBaru = Pesanan::create([
-                'kode_pesanan'      => $kodePesanan,
-                'token_akses'       => $tokenAkses,
-                'jenis'             => 'online',
-                'nama_pembeli'      => $request->nama_pembeli,
-                'telepon_pembeli'   => $request->telepon_pembeli,
-                'email_pembeli'     => null,
+                'kode_pesanan' => $kodePesanan,
+                'token_akses' => $tokenAkses,
+                'jenis' => 'online',
+                'nama_pembeli' => $request->nama_pembeli,
+                'telepon_pembeli' => $request->telepon_pembeli,
+                'email_pembeli' => null,
                 'alamat_pengiriman' => 'Ambil Sendiri di Outlet (Self Pickup)',
-                'catatan'           => $catatanJadwal,
-                'subtotal'          => $subtotal,
-                'ongkir'            => 0,
-                'total'             => $subtotal,
-                'metode_bayar'      => $request->metode_bayar,
+                'catatan' => $catatanJadwal,
+                'subtotal' => $subtotal,
+                'ongkir' => 0,
+                'total' => $subtotal,
+                'metode_bayar' => $request->metode_bayar,
                 'status_pembayaran' => 'menunggu',
-                'status_pesanan'    => 'menunggu_pembayaran',
-                'kedaluwarsa_pada'  => now()->addHours(2), // batas bayar 2 jam
+                'status_pesanan' => 'menunggu_pembayaran',
+                'kedaluwarsa_pada' => now()->addHours(2), // batas bayar 2 jam
             ]);
 
             // 2. Simpan Item Pesanan, Hitung HPP & Cadangkan Bahan Baku (Bab 2.9)
@@ -222,8 +222,8 @@ class PelangganPesananController extends Controller
                 $qty = (int) $item['qty'];
 
                 $varian = $item['varian_id'] ? VarianProduk::find($item['varian_id']) : null;
-                $resep = $varian 
-                    ? Resep::with('bahanList')->where('varian_id', $varian->id)->where('aktif', 1)->first() 
+                $resep = $varian
+                    ? Resep::with('bahanList')->where('varian_id', $varian->id)->where('aktif', 1)->first()
                     : null;
 
                 $hppBahan = 0;
@@ -247,16 +247,16 @@ class PelangganPesananController extends Controller
                 }
 
                 ItemPesanan::create([
-                    'pesanan_id'  => $pesananBaru->id,
-                    'produk_id'   => $produk?->id,
-                    'varian_id'   => $varian?->id,
+                    'pesanan_id' => $pesananBaru->id,
+                    'produk_id' => $produk?->id,
+                    'varian_id' => $varian?->id,
                     'nama_produk' => $item['nama_produk'],
                     'nama_varian' => $item['nama_varian'],
-                    'harga'       => $item['harga'],
-                    'jumlah'      => $qty,
-                    'subtotal'    => $item['harga'] * $qty,
-                    'resep_id'    => $resep?->id,
-                    'hpp_bahan'   => round($hppBahan, 2),
+                    'harga' => $item['harga'],
+                    'jumlah' => $qty,
+                    'subtotal' => $item['harga'] * $qty,
+                    'resep_id' => $resep?->id,
+                    'hpp_bahan' => round($hppBahan, 2),
                     'hpp_kemasan' => round($hppKemasan, 2),
                 ]);
 
@@ -269,19 +269,19 @@ class PelangganPesananController extends Controller
             // 3. Buat Catatan Pembayaran Menunggu
             Pembayaran::create([
                 'pesanan_id' => $pesananBaru->id,
-                'gerbang'    => 'manual',
-                'metode'     => $request->metode_bayar,
-                'jumlah'     => $subtotal,
-                'status'     => 'menunggu',
+                'gerbang' => 'manual',
+                'metode' => $request->metode_bayar,
+                'jumlah' => $subtotal,
+                'status' => 'menunggu',
             ]);
 
             // 4. Catat Log Aktivitas Sistem (K-14)
             LogAktivitas::create([
                 'pengguna_id' => null,
-                'aksi'        => 'pesanan_online_baru',
-                'tipe_objek'  => 'pesanan',
-                'id_objek'    => $pesananBaru->id,
-                'deskripsi'   => "Pesanan online baru dibuat: {$kodePesanan} oleh {$request->nama_pembeli} total Rp " . number_format($subtotal, 0, ',', '.'),
+                'aksi' => 'pesanan_online_baru',
+                'tipe_objek' => 'pesanan',
+                'id_objek' => $pesananBaru->id,
+                'deskripsi' => "Pesanan online baru dibuat: {$kodePesanan} oleh {$request->nama_pembeli} total Rp ".number_format($subtotal, 0, ',', '.'),
             ]);
         });
 
@@ -335,10 +335,10 @@ class PelangganPesananController extends Controller
 
             LogAktivitas::create([
                 'pengguna_id' => null,
-                'aksi'        => 'konfirmasi_pembayaran_pembeli',
-                'tipe_objek'  => 'pesanan',
-                'id_objek'    => $pesanan->id,
-                'deskripsi'   => "Pembeli {$pesanan->nama_pembeli} mengonfirmasi pembayaran untuk {$pesanan->kode_pesanan}.",
+                'aksi' => 'konfirmasi_pembayaran_pembeli',
+                'tipe_objek' => 'pesanan',
+                'id_objek' => $pesanan->id,
+                'deskripsi' => "Pembeli {$pesanan->nama_pembeli} mengonfirmasi pembayaran untuk {$pesanan->kode_pesanan}.",
             ]);
         });
 
