@@ -120,6 +120,8 @@
             transition: background .15s;
         }
         .topbar-btn:hover { background: #f1f5f9; }
+        .topbar-avatar { overflow: hidden; background: #e8f5e9; color: #166534; font-size: 14px; font-weight: 900; border: 2px solid #dcfce7; }
+        .topbar-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .notif-dot {
             position: absolute; top: 3px; right: 3px;
             min-width: 16px; height: 16px; padding: 0 4px;
@@ -209,6 +211,9 @@
             padding: 6px 10px 10px; margin-bottom: 4px;
             border-bottom: 1px solid #f1f5f9;
         }
+        .profile-dd-user { display: flex; align-items: center; gap: 10px; }
+        .profile-dd-avatar { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; background: #e8f5e9; color: #166534; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; flex-shrink: 0; border: 1px solid #d7e4dc; }
+        .profile-dd-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .profile-dd-name { font-size: 14px; font-weight: 800; color: var(--b); }
         .profile-dd-sub  { font-size: 11px; color: var(--s); margin-top: 2px; }
         .profile-dd a, .profile-dd button {
@@ -332,6 +337,53 @@
             .notif-scroll { max-height: min(52vh, 380px); }
         }
 
+        .help-fab {
+            position: fixed; left: 14px; bottom: calc(80px + env(safe-area-inset-bottom)); z-index: 65;
+            width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+            border: 1px solid rgba(255,255,255,.35); border-radius: 50%;
+            background: var(--g); color: #fff;
+            box-shadow: 0 6px 18px -6px rgba(25,135,84,.65); cursor: pointer;
+            transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+        }
+        .help-fab:hover { background: var(--gd); box-shadow: 0 8px 22px -6px rgba(25,135,84,.75); }
+        .help-fab:active { transform: scale(.94); }
+        .help-fab svg { width: 20px; height: 20px; }
+        .help-fab::after {
+            content: 'Bantuan'; position: absolute; left: 50%; bottom: calc(100% + 8px);
+            transform: translateX(-50%) translateY(3px);
+            padding: 5px 8px; border-radius: 7px; background: var(--b); color: #fff;
+            font-size: 10px; font-weight: 800; white-space: nowrap;
+            opacity: 0; pointer-events: none; transition: opacity .15s ease, transform .15s ease;
+        }
+        .help-fab:hover::after, .help-fab:focus-visible::after { opacity: 1; transform: translateX(-50%); }
+        .help-panel {
+            display: none; position: fixed; left: 14px;
+            bottom: calc(132px + env(safe-area-inset-bottom)); z-index: 66;
+            width: min(320px, calc(100vw - 28px)); max-height: min(60vh, 440px);
+            overflow: auto; padding: 14px;
+            background: var(--w); border: 1px solid var(--br); border-radius: 14px;
+            box-shadow: 0 18px 44px -14px rgba(15,23,42,.3);
+        }
+        .help-panel.show { display: block; animation: ddIn .15s ease; }
+        .help-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .help-panel-title { display: flex; align-items: center; gap: 9px; }
+        .help-panel-badge { width: 30px; height: 30px; border-radius: 9px; background: var(--gb); color: var(--g); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; }
+        .help-panel-title strong { display: block; font-size: 14px; font-weight: 900; color: var(--b); }
+        .help-panel-title small { display: block; font-size: 10px; color: var(--s); margin-top: 2px; }
+        .help-close { width: 26px; height: 26px; border: 0; border-radius: 8px; background: #f1f5f9; color: var(--s); font-size: 16px; line-height: 1; cursor: pointer; }
+        .help-section-label { margin: 12px 0 6px; font-size: 9px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: #94a3b8; }
+        .help-links { display: grid; gap: 4px; }
+        .help-link { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 9px; background: #f8fafc; color: var(--m); font-size: 12px; font-weight: 700; text-decoration: none; }
+        .help-link:hover { background: var(--gb); color: var(--gd); }
+        .help-faq { display: grid; gap: 4px; }
+        .help-faq details { padding: 7px 9px; border: 1px solid var(--br); border-radius: 9px; font-size: 12px; }
+        .help-faq summary { cursor: pointer; font-weight: 800; color: var(--b); }
+        .help-faq p { margin: 7px 0 0; color: var(--s); line-height: 1.5; }
+        .help-panel-foot { display: flex; gap: 8px; margin-top: 14px; }
+        .help-panel-foot a { flex: 1; text-align: center; padding: 9px 8px; border-radius: 9px; font-size: 11px; font-weight: 900; text-decoration: none; }
+        .help-primary { background: var(--g); color: #fff; }
+        .help-secondary { background: #f1f5f9; color: var(--m); }
+
         /* ===== DESKTOP (>= 768px) ===== */
         @media (min-width: 768px) {
             body { padding-bottom: 0; background: #f1f5f9; }
@@ -385,6 +437,9 @@
 
             /* Hide mobile bottom nav */
             .bottom-nav { display: none; }
+
+            .help-fab { left: calc(var(--sw) + 18px); bottom: 18px; width: 42px; height: 42px; }
+            .help-panel { left: calc(var(--sw) + 18px); bottom: 70px; }
 
             /* Dropdown positional fix */
             .profile-dd { right: 20px; }
@@ -523,18 +578,30 @@
         </button>
 
         {{-- Profil --}}
-        <button type="button" class="topbar-btn" id="profileBtn" onclick="toggleProfile()" title="Profil & Menu">
-            <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-            </svg>
+        <button type="button" class="topbar-btn topbar-avatar" id="profileBtn" onclick="toggleProfile()" title="Profil & Menu">
+            @if(auth()->user()->foto_url)
+                <img src="{{ auth()->user()->foto_url }}" alt="Foto profil {{ auth()->user()->nama }}">
+            @else
+                {{ strtoupper(substr(auth()->user()->nama, 0, 1)) }}
+            @endif
         </button>
 
         {{-- Profile Dropdown --}}
         <div class="dropdown profile-dd" id="profileDd">
             <div class="profile-dd-head">
-                <div class="profile-dd-name">{{ auth()->user()->nama }}</div>
-                <div class="profile-dd-sub">{{ auth()->user()->email }} &middot; {{ ucfirst(auth()->user()->peran) }}</div>
+                <div class="profile-dd-user">
+                    <div class="profile-dd-avatar">
+                        @if(auth()->user()->foto_url)
+                            <img src="{{ auth()->user()->foto_url }}" alt="Foto profil {{ auth()->user()->nama }}">
+                        @else
+                            {{ strtoupper(substr(auth()->user()->nama, 0, 1)) }}
+                        @endif
+                    </div>
+                    <div>
+                        <div class="profile-dd-name">{{ auth()->user()->nama }}</div>
+                        <div class="profile-dd-sub">{{ auth()->user()->email }} &middot; {{ ucfirst(auth()->user()->peran) }}</div>
+                    </div>
+                </div>
             </div>
             <a href="{{ route('panel.staf.profil.index') }}" class="{{ request()->routeIs('panel.staf.profil.*') ? 'dd-active' : '' }}">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
@@ -698,7 +765,61 @@
         </a>
     </nav>
 
+    <button type="button" class="help-fab" id="helpFab" onclick="toggleHelp()" aria-label="Buka pusat bantuan" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M9.6 9a2.6 2.6 0 1 1 3.5 2.5c-.8.3-1.1.9-1.1 1.7"></path><path d="M12 17h.01"></path></svg>
+    </button>
+    <div class="help-panel" id="helpPanel" role="dialog" aria-label="Pusat Bantuan">
+        <div class="help-panel-head">
+            <div class="help-panel-title">
+                <span class="help-panel-badge">?</span>
+                <div>
+                    <strong>Pusat Bantuan</strong>
+                    <small>Bantuan cepat untuk staf</small>
+                </div>
+            </div>
+            <button type="button" class="help-close" onclick="tutupHelp()" aria-label="Tutup bantuan">&times;</button>
+        </div>
+        <div class="help-section-label">Panduan cepat</div>
+        <div class="help-links">
+            <a href="{{ route('panel.staf.kasir.index') }}" class="help-link" onclick="tutupHelp()">Kasir &amp; transaksi baru</a>
+            <a href="{{ route('panel.staf.pesanan.scan') }}" class="help-link" onclick="tutupHelp()">Scan QR pengambilan</a>
+            <a href="{{ route('panel.staf.produksi.index') }}" class="help-link" onclick="tutupHelp()">Antrean produksi</a>
+            <a href="{{ route('panel.staf.stok.index') }}" class="help-link" onclick="tutupHelp()">Cek &amp; catat stok</a>
+            <a href="{{ route('panel.staf.profil.index') }}" class="help-link" onclick="tutupHelp()">Foto &amp; kata sandi akun</a>
+        </div>
+        <div class="help-section-label">Pertanyaan umum</div>
+        <div class="help-faq">
+            <details>
+                <summary>Kamera tidak bisa dibuka?</summary>
+                <p>Gunakan HTTPS, izinkan akses kamera di browser, lalu arahkan ke kamera belakang. Alternatifnya ketik token manual atau pakai USB scanner.</p>
+            </details>
+            <details>
+                <summary>QR pesanan tidak terbaca?</summary>
+                <p>Pastikan QR milik pelanggan masih berlaku dan layar cukup terang. Jika gagal, buka halaman scan lalu masukkan token pengambilan secara manual.</p>
+            </details>
+            <details>
+                <summary>Stok bahan habis?</summary>
+                <p>Buka menu Stok, cek status kritis, lalu catat pasokan masuk. Bahan rusak dicatat lewat form Pembuangan agar muncul di riwayat aktivitas.</p>
+            </details>
+        </div>
+        <div class="help-panel-foot">
+            <a href="{{ route('panel.staf.bantuan.index') }}" class="help-primary" onclick="tutupHelp()">Pusat Bantuan</a>
+            <a href="https://wa.me/6285807106570?text={{ rawurlencode('Halo Admin OMYU, saya butuh bantuan panel staf') }}" target="_blank" rel="noopener" class="help-secondary" onclick="tutupHelp()">Hubungi Admin</a>
+        </div>
+    </div>
+
     <script>
+        function toggleHelp() {
+            const panel = document.getElementById('helpPanel');
+            const fab = document.getElementById('helpFab');
+            const buka = !panel.classList.contains('show');
+            panel.classList.toggle('show', buka);
+            fab.setAttribute('aria-expanded', buka ? 'true' : 'false');
+        }
+        function tutupHelp() {
+            document.getElementById('helpPanel').classList.remove('show');
+            document.getElementById('helpFab').setAttribute('aria-expanded', 'false');
+        }
         function toggleProfile() {
             document.getElementById('notifDd').classList.remove('show');
             document.getElementById('profileDd').classList.toggle('show');
@@ -748,6 +869,15 @@
             if (!e.target.closest('#notifDd') && !e.target.closest('#notifBell')) {
                 document.getElementById('notifDd').classList.remove('show');
             }
+            if (!e.target.closest('#helpPanel') && !e.target.closest('#helpFab')) {
+                tutupHelp();
+            }
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key !== 'Escape') return;
+            tutupHelp();
+            document.getElementById('profileDd').classList.remove('show');
+            document.getElementById('notifDd').classList.remove('show');
         });
     </script>
     @yield('scripts')

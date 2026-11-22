@@ -22,6 +22,11 @@
     .dash-hero-count { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.25); border-radius: 14px; padding: 10px 14px; text-align: center; flex-shrink: 0; }
     .dash-hero-count strong { display: block; font-size: 24px; font-weight: 900; line-height: 1; }
     .dash-hero-count span { display: block; font-size: 10px; font-weight: 800; margin-top: 4px; opacity: .85; }
+    .clock-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #86efac; margin-right: 6px; box-shadow: 0 0 0 3px rgba(134,239,172,.2); }
+    .shift-notif { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: 14px; padding: 12px 14px; font-size: 12px; }
+    .shift-notif strong { font-weight: 900; }
+    .shift-notif span { opacity: .9; }
+    .shift-notif[hidden] { display: none; }
     .dash-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 9px; }
     .dash-head h2 { font-size: 15px; font-weight: 900; color: #0f172a; }
     .dash-head a, .dash-head span { font-size: 11px; font-weight: 800; color: #15803d; text-decoration: none; }
@@ -88,14 +93,19 @@
         <section class="dash-hero">
             <div>
                 <div class="dash-kicker">Shift Berjalan</div>
-                <h1>{{ $shiftInfo }}</h1>
-                <p>{{ auth()->user()->nama }} &middot; Update {{ $waktuUpdate }}</p>
+                <h1 id="labelShift">{{ $shift['label'] }}</h1>
+                <p>{{ auth()->user()->nama }} &middot; <span class="clock-dot"></span><span id="jamRealtime">{{ $waktuUpdate }}</span></p>
             </div>
             <div class="dash-hero-count">
                 <strong>{{ $pesananDiproses }}</strong>
                 <span>Sedang Diracik</span>
             </div>
         </section>
+
+        <div id="notifShiftSelesai" class="shift-notif" role="status" @if(! $shift['selesaiShift']) hidden @endif>
+            <strong>Shift kamu sudah selesai</strong>
+            <span id="notifShiftTeks">Shift berakhir pukul {{ $shift['selesaiPukul'] }} WIB. {{ $shift['berikutnya'] }}.</span>
+        </div>
 
         <section>
             <div class="dash-head">
@@ -248,4 +258,79 @@
         </section>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    const shiftConfig = {{ \Illuminate\Support\Js::from([
+        'waktuServer' => $waktuServer,
+        'jam' => [
+            'mulaiPagi' => \App\Support\Shift::MULAI_PAGI,
+            'mulaiSore' => \App\Support\Shift::MULAI_SORE,
+            'selesai' => \App\Support\Shift::SELESAI,
+        ],
+    ]) }};
+
+    const jamRealtime = document.getElementById('jamRealtime');
+    const labelShift = document.getElementById('labelShift');
+    const notifShift = document.getElementById('notifShiftSelesai');
+    const notifShiftTeks = document.getElementById('notifShiftTeks');
+    const waktuMulai = Date.now();
+    const duaAngka = (nilai) => String(nilai).padStart(2, '0');
+
+    const formatJam = new Intl.DateTimeFormat('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        hourCycle: 'h23',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+    });
+
+    function jamSekarang() {
+        const sekarang = new Date(shiftConfig.waktuServer + (Date.now() - waktuMulai));
+        const bagian = Object.fromEntries(
+            formatJam.formatToParts(sekarang)
+                .filter(({ type }) => type !== 'literal')
+                .map(({ type, value }) => [type, Number(value)])
+        );
+
+        return {
+            teks: duaAngka(bagian.hour) + ':' + duaAngka(bagian.minute) + ':' + duaAngka(bagian.second) + ' WIB',
+            menit: (bagian.hour * 60) + bagian.minute,
+        };
+    }
+
+    function infoShift(menit) {
+        const { mulaiPagi, mulaiSore, selesai } = shiftConfig.jam;
+        const pagi = duaAngka(mulaiPagi) + ':00 - ' + duaAngka(mulaiSore) + ':00';
+        const sore = duaAngka(mulaiSore) + ':00 - ' + duaAngka(selesai) + ':00';
+
+        if (menit >= mulaiPagi * 60 && menit < mulaiSore * 60) {
+            return { label: 'Shift Pagi (' + pagi + ')', selesaiShift: false, berikutnya: 'Shift Sore (' + sore + ')' };
+        }
+
+        if (menit >= mulaiSore * 60 && menit < selesai * 60) {
+            return { label: 'Shift Sore (' + sore + ')', selesaiShift: false, berikutnya: 'Shift Pagi besok (' + pagi + ')' };
+        }
+
+        return {
+            label: 'Shift Selesai',
+            selesaiShift: true,
+            berikutnya: menit < mulaiPagi * 60 ? 'Shift Pagi (' + pagi + ')' : 'Shift Pagi besok (' + pagi + ')',
+        };
+    }
+
+    function perbaruiShift() {
+        const { teks, menit } = jamSekarang();
+        const info = infoShift(menit);
+
+        jamRealtime.textContent = teks;
+        labelShift.textContent = info.label;
+        notifShiftTeks.textContent = 'Shift berakhir pukul ' + duaAngka(shiftConfig.jam.selesai) + ':00 WIB. ' + info.berikutnya + '.';
+        notifShift.hidden = !info.selesaiShift;
+    }
+
+    perbaruiShift();
+    setInterval(perbaruiShift, 1000);
+</script>
 @endsection

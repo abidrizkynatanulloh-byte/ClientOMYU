@@ -10,7 +10,9 @@ use App\Models\Pesanan;
 use App\Models\Produk;
 use App\Models\RiwayatStok;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -69,6 +71,30 @@ class StafPanelTest extends TestCase
         $response->assertSee('Aksi Cepat Barista');
         $response->assertSee('Menerima Pesanan');
         $response->assertSee('bottom-nav');
+    }
+
+    public function test_dashboard_menampilkan_jam_realtime_dan_status_shift_berjalan()
+    {
+        $this->travelTo('2026-11-21 10:00:00');
+
+        $response = $this->actingAs($this->staf)->get(route('panel.beranda'));
+
+        $response->assertOk();
+        $response->assertSee('Shift Pagi (07:00 - 16:00)');
+        $response->assertSee('id="jamRealtime"', false);
+        $response->assertSee('id="notifShiftSelesai"', false);
+    }
+
+    public function test_dashboard_menampilkan_notifikasi_shift_selesai_di_luar_jam_kerja()
+    {
+        $this->travelTo('2026-11-21 22:30:00');
+
+        $response = $this->actingAs($this->staf)->get(route('panel.beranda'));
+
+        $response->assertOk();
+        $response->assertSee('Shift Selesai');
+        $response->assertSee('Shift kamu sudah selesai');
+        $response->assertSee('Shift berakhir pukul 22:00 WIB');
     }
 
     public function test_staf_dapat_melakukan_transaksi_kasir_pos()
@@ -219,6 +245,60 @@ class StafPanelTest extends TestCase
             'jumlah'    => -3,
             'catatan'   => 'Buah melon busuk saat disortir pagi',
         ]);
+    }
+
+    public function test_halaman_profil_staf_menampilkan_form_unggah_foto()
+    {
+        $response = $this->actingAs($this->staf)->get(route('panel.staf.profil.index'));
+
+        $response->assertOk();
+        $response->assertSee('Foto Profil');
+        $response->assertSee('enctype="multipart/form-data"', false);
+    }
+
+    public function test_staf_dapat_mengunggah_foto_profil_dan_menampilkannya_di_navbar()
+    {
+        Storage::fake('public');
+
+        $this->actingAs($this->staf)->post(route('panel.staf.profil.foto'), [
+            'foto' => UploadedFile::fake()->create('foto.jpg', 100, 'image/jpeg'),
+        ])->assertSessionHas('sukses');
+
+        $foto = $this->staf->fresh()->foto;
+        $this->assertNotNull($foto);
+        Storage::disk('public')->assertExists($foto);
+
+        $response = $this->actingAs($this->staf)->get(route('panel.beranda'));
+
+        $response->assertOk();
+        $response->assertSee($this->staf->fresh()->foto_url, false);
+    }
+
+    public function test_staf_dapat_menghapus_foto_profil()
+    {
+        Storage::fake('public');
+
+        $this->actingAs($this->staf)->post(route('panel.staf.profil.foto'), [
+            'foto' => UploadedFile::fake()->create('foto.jpg', 100, 'image/jpeg'),
+        ])->assertSessionHas('sukses');
+
+        $foto = $this->staf->fresh()->foto;
+
+        $this->actingAs($this->staf)->post(route('panel.staf.profil.foto'), [
+            'hapus_foto' => 1,
+        ])->assertSessionHas('sukses');
+
+        $this->assertNull($this->staf->fresh()->foto);
+        Storage::disk('public')->assertMissing($foto);
+    }
+
+    public function test_menolak_foto_profil_yang_bukan_gambar()
+    {
+        $this->actingAs($this->staf)->post(route('panel.staf.profil.foto'), [
+            'foto' => UploadedFile::fake()->create('dokumen.pdf', 100, 'application/pdf'),
+        ])->assertSessionHasErrors('foto');
+
+        $this->assertNull($this->staf->fresh()->foto);
     }
 
     public function test_staf_dapat_mengubah_kata_sandi_akun()
@@ -399,5 +479,25 @@ class StafPanelTest extends TestCase
         $respToggle = $this->actingAs($this->staf)->post(route('panel.staf.stok.toggle-aktif', $bahan->id));
         $respToggle->assertSessionHas('sukses');
         $this->assertEquals(0, $bahan->fresh()->aktif);
+    }
+
+    public function test_tombol_bantuan_tersedia_di_kiri_bawah_panel_staf()
+    {
+        $response = $this->actingAs($this->staf)->get(route('panel.beranda'));
+
+        $response->assertOk();
+        $response->assertSee('id="helpFab"', false);
+        $response->assertSee('id="helpPanel"', false);
+        $response->assertSee(route('panel.staf.bantuan.index'), false);
+    }
+
+    public function test_halaman_pusat_bantuan_staf_dapat_diakses()
+    {
+        $response = $this->actingAs($this->staf)->get(route('panel.staf.bantuan.index'));
+
+        $response->assertOk();
+        $response->assertSee('Pusat Bantuan Staf');
+        $response->assertSee('Kamera tidak bisa dibuka di HP?');
+        $response->assertSee('cariBantuan');
     }
 }

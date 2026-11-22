@@ -228,9 +228,13 @@
             <div class="p-3 border-t border-brand-800/80 bg-brand-950/40">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3 min-w-0">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-400 to-lime-200 text-brand-950 flex items-center justify-center font-extrabold text-base shadow-sm shrink-0">
-                            {{ strtoupper(substr(auth()->user()->nama ?? 'O', 0, 1)) }}
-                        </div>
+                        @if(auth()->user()->foto_url)
+                            <img src="{{ auth()->user()->foto_url }}" alt="Foto profil {{ auth()->user()->nama }}" class="w-10 h-10 rounded-xl object-cover shadow-sm shrink-0">
+                        @else
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-400 to-lime-200 text-brand-950 flex items-center justify-center font-extrabold text-base shadow-sm shrink-0">
+                                {{ strtoupper(substr(auth()->user()->nama ?? 'O', 0, 1)) }}
+                            </div>
+                        @endif
                         <div class="min-w-0">
                             <p class="text-sm font-bold text-white truncate leading-tight">{{ auth()->user()->nama ?? 'Owner OMYU' }}</p>
                             <p class="text-xs text-brand-300/80 truncate">Administrator</p>

@@ -12,7 +12,7 @@ class Pengguna extends Authenticatable
 
     protected $table = 'pengguna';
 
-    protected $fillable = ['nama', 'email', 'password', 'peran', 'aktif','bisa_lihat_hpp',  'telepon'];
+    protected $fillable = ['nama', 'email', 'password', 'peran', 'aktif','bisa_lihat_hpp',  'telepon', 'foto'];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -21,6 +21,11 @@ class Pengguna extends Authenticatable
         'bisa_lihat_hpp'=> 'boolean',
         'password' => 'hashed',
     ];
+
+    public function getFotoUrlAttribute(): ?string
+    {
+        return $this->foto ? asset('storage/'.$this->foto) : null;
+    }
 
     public function adalahAdmin(): bool
     {

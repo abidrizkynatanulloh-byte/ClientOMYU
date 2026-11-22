@@ -148,6 +148,36 @@ function setStatus(pesan, tipe = '') {
     status.className = 'opencam-status' + (tipe ? ' ' + tipe : '');
 }
 
+function kameraTersedia() {
+    return Boolean(window.isSecureContext && navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function');
+}
+
+function pesanErrorKamera(error) {
+    if (!kameraTersedia()) {
+        return 'Kamera hanya dapat dibuka lewat HTTPS. Buka aplikasi dengan alamat https://, izinkan kamera, atau gunakan input manual / USB scanner.';
+    }
+
+    switch (error && error.name) {
+        case 'NotAllowedError':
+        case 'PermissionDeniedError':
+            return 'Izin kamera ditolak. Izinkan akses kamera di browser lalu coba lagi, atau gunakan input manual / USB scanner.';
+        case 'NotFoundError':
+        case 'DevicesNotFoundError':
+        case 'OverconstrainedError':
+        case 'ConstraintNotSatisfiedError':
+            return 'Kamera tidak ditemukan atau tidak sesuai. Gunakan kamera belakang lalu coba lagi, atau pakai input manual / USB scanner.';
+        case 'NotReadableError':
+        case 'TrackStartError':
+            return 'Kamera sedang dipakai aplikasi lain. Tutup aplikasi tersebut lalu coba lagi, atau gunakan input manual / USB scanner.';
+        default:
+            return 'Kamera tidak dapat dibuka. Gunakan input manual / USB scanner.';
+    }
+}
+
+function bisaCobaUlang(error) {
+    return ['NotFoundError', 'DevicesNotFoundError', 'OverconstrainedError', 'ConstraintNotSatisfiedError'].includes(error && error.name);
+}
+
 function stopCamera() {
     if (reader) {
         reader.reset();
@@ -201,31 +231,45 @@ export async function buka(options = {}) {
         modal.querySelector('.opencam-input').focus();
     }
 
+    if (!kameraTersedia()) {
+        setStatus(pesanErrorKamera(), 'error');
+        return;
+    }
+
     const hints = new Map();
     hints.set(DecodeHintType.POSSIBLE_FORMATS, options.formats || barcodeFormats);
 
     try {
         reader = new BrowserMultiFormatReader(hints);
         const devices = await reader.listVideoInputDevices();
-        const pilihan = devices.find((device) => /back|environment|rear/i.test(device.label)) || devices[devices.length - 1];
+        const kameraBelakang = devices.find((device) => device.deviceId && /back|environment|rear/i.test(device.label));
+        const pilihan = kameraBelakang || devices.find((device) => device.deviceId);
 
-        if (!pilihan) {
-            setStatus('Kamera tidak ditemukan. Gunakan input manual / USB scanner.', 'error');
-            return;
-        }
-
-        await reader.decodeFromVideoDevice(pilihan.deviceId, videoElement, (result) => {
-            if (result) {
-                terimaHasil(result.getText());
+        const mulai = (deviceId) => {
+            if (!reader) {
+                return Promise.resolve();
             }
-        });
+
+            return reader.decodeFromVideoDevice(deviceId, videoElement, (result) => {
+                if (result) {
+                    terimaHasil(result.getText());
+                }
+            });
+        };
+
+        try {
+            await mulai(pilihan ? pilihan.deviceId : undefined);
+        } catch (error) {
+            if (!pilihan || !bisaCobaUlang(error)) {
+                throw error;
+            }
+
+            await mulai(undefined);
+        }
 
         setStatus('Arahkan kamera ke kode. Scanner aktif.');
     } catch (error) {
-        const pesan = error && error.name === 'NotAllowedError'
-            ? 'Izin kamera ditolak. Gunakan input manual / USB scanner.'
-            : 'Kamera tidak dapat dibuka. Gunakan input manual / USB scanner.';
-        setStatus(pesan, 'error');
+        setStatus(pesanErrorKamera(error), 'error');
     }
 }
 

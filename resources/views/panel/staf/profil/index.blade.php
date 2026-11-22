@@ -8,7 +8,14 @@
     .profil-heading h1 { font-size: 22px; font-weight: 900; color: #0f172a; }
     .profil-heading p { font-size: 12px; color: #64748b; margin-top: 3px; }
     .profil-hero { background: linear-gradient(135deg,#198754,#0f5132); color: #fff; border-radius: 18px; padding: 19px; display: flex; align-items: center; gap: 14px; }
-    .profil-avatar { width: 58px; height: 58px; border-radius: 18px; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3); display: flex; align-items: center; justify-content: center; font-size: 23px; font-weight: 900; flex-shrink: 0; }
+    .profil-avatar { width: 58px; height: 58px; border-radius: 18px; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3); display: flex; align-items: center; justify-content: center; font-size: 23px; font-weight: 900; flex-shrink: 0; overflow: hidden; }
+    .profil-avatar img, .foto-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block; }
+    .foto-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .foto-preview { width: 64px; height: 64px; border-radius: 16px; background: #e8f5e9; color: #166534; display: flex; align-items: center; justify-content: center; font-size: 23px; font-weight: 900; flex-shrink: 0; overflow: hidden; border: 1px solid #d7e4dc; }
+    .foto-info { flex: 1; min-width: 0; }
+    .foto-info .field { margin-bottom: 4px; }
+    .field input[type="file"] { padding: 10px; background: #f8fafc; font-size: 12px; }
+    .catatan.kiri { text-align: left; margin: 0; }
     .profil-hero h2 { font-size: 18px; font-weight: 900; }
     .profil-hero p { font-size: 12px; opacity: .85; margin-top: 3px; word-break: break-word; }
     .profil-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
@@ -56,7 +63,13 @@
     @endif
 
     <section class="profil-hero">
-        <div class="profil-avatar">{{ strtoupper(substr($pengguna->nama, 0, 1)) }}</div>
+        <div class="profil-avatar">
+            @if($pengguna->foto_url)
+                <img src="{{ $pengguna->foto_url }}" alt="Foto profil {{ $pengguna->nama }}">
+            @else
+                {{ strtoupper(substr($pengguna->nama, 0, 1)) }}
+            @endif
+        </div>
         <div>
             <h2>{{ $pengguna->nama }}</h2>
             <p>{{ $pengguna->email }}</p>
@@ -68,6 +81,37 @@
     </section>
 
     <div class="profil-grid">
+        <section class="card">
+            <h3>Foto Profil</h3>
+            <div class="card-sub">Foto Anda akan tampil di navbar dan menu profil</div>
+            <form method="POST" action="{{ route('panel.staf.profil.foto') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="foto-row">
+                    <div class="foto-preview">
+                        @if($pengguna->foto_url)
+                            <img src="{{ $pengguna->foto_url }}" alt="Foto profil {{ $pengguna->nama }}">
+                        @else
+                            {{ strtoupper(substr($pengguna->nama, 0, 1)) }}
+                        @endif
+                    </div>
+                    <div class="foto-info">
+                        <div class="field">
+                            <label for="foto">Pilih Foto Baru</label>
+                            <input type="file" id="foto" name="foto" accept="image/jpeg,image/png,image/webp">
+                        </div>
+                        <div class="catatan kiri">JPG, PNG, atau WebP &middot; maksimal 2 MB</div>
+                    </div>
+                </div>
+                <button type="submit" class="btn">Simpan Foto Profil</button>
+            </form>
+            @if($pengguna->foto)
+                <form method="POST" action="{{ route('panel.staf.profil.foto') }}">
+                    @csrf
+                    <button type="submit" name="hapus_foto" value="1" class="btn btn-ghost">Hapus Foto</button>
+                </form>
+            @endif
+        </section>
+
         <section class="card">
             <h3>Data Akun</h3>
             <div class="card-sub">Informasi dasar akun yang digunakan saat ini</div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Staf;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pesanan;
+use App\Support\Shift;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -54,9 +55,9 @@ class DashboardController extends Controller
         $namaMenipis = DB::table('produk')->where('aktif', 1)->where('stok', '>', 0)->where('stok', '<=', $ambangStok)->value('nama');
         $namaHabis = DB::table('produk')->where('aktif', 1)->where('stok', '<=', 0)->value('nama');
 
-        $jam = Carbon::now()->hour;
-        $shiftInfo = ($jam >= 7 && $jam < 16) ? 'Shift Pagi (07:00 - 16:00)' : 'Shift Sore (16:00 - 22:00)';
-        $waktuUpdate = Carbon::now()->format('H:i').' WIB';
+        $shift = Shift::info();
+        $waktuUpdate = Carbon::now()->format('H:i:s').' WIB';
+        $waktuServer = Carbon::now()->valueOf();
 
         return view('panel.staf.beranda', compact(
             'pesananBaru',
@@ -71,8 +72,9 @@ class DashboardController extends Controller
             'produkHabis',
             'namaMenipis',
             'namaHabis',
-            'shiftInfo',
+            'shift',
             'waktuUpdate',
+            'waktuServer',
             'ambangStok'
         ));
     }

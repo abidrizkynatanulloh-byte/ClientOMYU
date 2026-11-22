@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Bahan;
 use App\Models\Pesanan;
+use App\Support\Shift;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -99,6 +100,21 @@ class AppServiceProvider extends ServiceProvider
                     'url' => route('panel.staf.stok.index', ['tab' => 'kritis']),
                     'waktu' => $bahan->updated_at,
                 ]);
+            }
+
+            $shift = Shift::info();
+
+            if ($shift['selesaiShift']) {
+                $items->push([
+                    'tone' => 'warning',
+                    'tag' => 'Shift',
+                    'title' => 'Shift kamu sudah selesai',
+                    'teks' => 'Shift berakhir pukul '.$shift['selesaiPukul'].' WIB. '.$shift['berikutnya'].'.',
+                    'url' => route('panel.beranda'),
+                    'waktu' => now(),
+                ]);
+
+                $jumlah++;
             }
 
             $view->with([

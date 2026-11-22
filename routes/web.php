@@ -8,6 +8,7 @@ use App\Http\Controllers\Owner\KeuanganController;
 use App\Http\Controllers\Owner\PenjualanController;
 use App\Http\Controllers\Owner\ResepHppController;
 use App\Http\Controllers\Staf\AktivitasController as StafAktivitasController;
+use App\Http\Controllers\Staf\BantuanController as StafBantuanController;
 use App\Http\Controllers\Staf\DashboardController as StafDashboardController;
 use App\Http\Controllers\Staf\KasirController as StafKasirController;
 use App\Http\Controllers\Staf\PesananController as StafPesananController;
@@ -90,9 +91,12 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
         // K-14: Riwayat Aktivitas Audit Log
         Route::get('/aktivitas', [StafAktivitasController::class, 'index'])->name('staf.aktivitas.index');
 
+        Route::get('/bantuan', [StafBantuanController::class, 'index'])->name('staf.bantuan.index');
+
         // K-01: Profil & Ubah Password
         Route::get('/profil', [StafProfilController::class, 'index'])->name('staf.profil.index');
         Route::post('/profil/password', [StafProfilController::class, 'updatePassword'])->name('staf.profil.password');
+        Route::post('/profil/foto', [StafProfilController::class, 'updateFoto'])->name('staf.profil.foto');
 
         // Khusus Admin (Owner)
         Route::middleware('peran:admin')
