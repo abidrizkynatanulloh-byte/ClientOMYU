@@ -83,12 +83,12 @@
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
     @stack('styles')
 </head>
-<body class="h-full text-slate-800 bg-[#F8FAF6] admin-ambient-bg antialiased selection:bg-brand-300 selection:text-brand-950 overflow-x-hidden lg:overflow-hidden" x-data="{ moreMenuOpen: false }">
+<body class="h-full text-slate-800 bg-[#F8FAF6] admin-ambient-bg antialiased selection:bg-brand-300 selection:text-brand-950 overflow-hidden" x-data="{ moreMenuOpen: false }">
 
     <!-- Page Entrance Reveal Overlay -->
     <div class="admin-page-overlay"></div>
 
-    <div class="min-h-full lg:h-screen lg:overflow-hidden flex flex-col lg:flex-row">
+    <div class="h-full h-screen h-[100dvh] overflow-hidden flex flex-col lg:flex-row">
 
         <!-- Sidebar Navigation (Desktop Only - Disabled on Mobile) -->
         <aside class="hidden lg:flex lg:flex-col w-56 lg:h-screen lg:shrink-0 bg-brand-900 text-white shadow-2xl lg:shadow-none">
@@ -243,10 +243,10 @@
         </aside>
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col h-full min-w-0 overflow-y-auto">
+        <div class="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
 
-            <!-- Top Header Bar -->
-            <header class="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200/80 shadow-xs">
+            <!-- Top Header Bar (Fixed at Top) -->
+            <header class="shrink-0 bg-white/90 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200/80 shadow-xs">
                 <div class="px-3 sm:px-5 lg:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
                     
                     <!-- Left: Brand Logo (Mobile) + Page Heading -->
@@ -299,8 +299,11 @@
                 </div>
             </header>
 
-            <!-- Alert Flash Messages -->
-            <main class="flex-1 p-3 sm:p-4 lg:p-5 pb-24 lg:pb-6">
+            <!-- Scrollable Content Viewport -->
+            <div class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">
+
+                <!-- Alert Flash Messages -->
+                <main class="flex-1 p-3 sm:p-4 lg:p-5 pb-28 lg:pb-6">
 
                 @if(session('sukses'))
                     <div x-data="{ show: true }" x-show="show" x-transition class="mb-6 rounded-2xl bg-emerald-50 border border-emerald-200 p-4 shadow-xs flex items-start justify-between gap-3">
@@ -359,13 +362,15 @@
 
             </main>
 
-            <!-- Footer -->
-            <footer class="bg-white border-t border-slate-200/80 px-6 py-4 pb-24 lg:pb-4 text-center text-xs text-slate-500">
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
-                    <p>© {{ date('Y') }} <strong>OMYU Fresh Juice & Healthy Bar</strong>. Hak Cipta Dilindungi.</p>
-                    <p class="text-slate-400">Modul Eksekutif & Manajemen Bisnis (Owner)</p>
-                </div>
-            </footer>
+                <!-- Footer -->
+                <footer class="bg-white border-t border-slate-200/80 px-6 py-4 pb-28 lg:pb-4 text-center text-xs text-slate-500">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
+                        <p>© {{ date('Y') }} <strong>OMYU Fresh Juice & Healthy Bar</strong>. Hak Cipta Dilindungi.</p>
+                        <p class="text-slate-400">Modul Eksekutif & Manajemen Bisnis (Owner)</p>
+                    </div>
+                </footer>
+
+            </div>
 
         </div>
 
