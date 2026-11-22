@@ -7,7 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="{{ \Illuminate\Support\Facades\Vite::asset('resources/js/staf-scanner.js') }}"></script>
+    @if(file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        <script src="{{ \Illuminate\Support\Facades\Vite::asset('resources/js/staf-scanner.js') }}"></script>
+    @endif
+    <!-- OMYU Staf V35 Interactive Animations -->
+    <link rel="stylesheet" href="{{ asset('css/staf-anim.css') }}?v={{ filemtime(public_path('css/staf-anim.css')) }}">
     <style>
         /* ============================================================
            OMYU STAF LAYOUT  — Mobile-first → Desktop sidebar layout
@@ -30,12 +34,19 @@
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+            max-width: 100%;
+        }
         body {
             font-family: 'Nunito', system-ui, sans-serif;
             background: var(--bg);
             color: var(--b);
             min-height: 100vh;
+            overflow-x: hidden;
+            max-width: 100%;
+            width: 100%;
             /* space for mobile bottom nav */
             padding-bottom: 72px;
         }
@@ -54,6 +65,9 @@
             display: flex; align-items: center;
             padding: 0 16px;
             gap: 12px;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
         .topbar-brand {
             display: flex; align-items: center;
@@ -148,8 +162,18 @@
         .alert-info   { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
 
         /* ===== CONTENT AREA (mobile) ===== */
+        .page-wrapper {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
         .page-content {
             width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
             padding: 16px 14px 20px;
         }
 
@@ -338,7 +362,7 @@
         }
 
         .help-fab {
-            position: fixed; left: 14px; bottom: calc(80px + env(safe-area-inset-bottom)); z-index: 65;
+            position: fixed; right: 14px; left: auto; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 65;
             width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
             border: 1px solid rgba(255,255,255,.35); border-radius: 50%;
             background: var(--g); color: #fff;
@@ -349,16 +373,16 @@
         .help-fab:active { transform: scale(.94); }
         .help-fab svg { width: 20px; height: 20px; }
         .help-fab::after {
-            content: 'Bantuan'; position: absolute; left: 50%; bottom: calc(100% + 8px);
-            transform: translateX(-50%) translateY(3px);
+            content: 'Bantuan'; position: absolute; right: 50%; bottom: calc(100% + 8px);
+            transform: translateX(50%) translateY(3px);
             padding: 5px 8px; border-radius: 7px; background: var(--b); color: #fff;
             font-size: 10px; font-weight: 800; white-space: nowrap;
             opacity: 0; pointer-events: none; transition: opacity .15s ease, transform .15s ease;
         }
-        .help-fab:hover::after, .help-fab:focus-visible::after { opacity: 1; transform: translateX(-50%); }
+        .help-fab:hover::after, .help-fab:focus-visible::after { opacity: 1; transform: translateX(50%); }
         .help-panel {
-            display: none; position: fixed; left: 14px;
-            bottom: calc(132px + env(safe-area-inset-bottom)); z-index: 66;
+            display: none; position: fixed; right: 14px; left: auto;
+            bottom: calc(128px + env(safe-area-inset-bottom)); z-index: 66;
             width: min(320px, calc(100vw - 28px)); max-height: min(60vh, 440px);
             overflow: auto; padding: 14px;
             background: var(--w); border: 1px solid var(--br); border-radius: 14px;
@@ -438,8 +462,8 @@
             /* Hide mobile bottom nav */
             .bottom-nav { display: none; }
 
-            .help-fab { left: calc(var(--sw) + 18px); bottom: 18px; width: 42px; height: 42px; }
-            .help-panel { left: calc(var(--sw) + 18px); bottom: 70px; }
+            .help-fab { left: calc(var(--sw) + 18px); right: auto; bottom: 18px; width: 42px; height: 42px; }
+            .help-panel { left: calc(var(--sw) + 18px); right: auto; bottom: 70px; }
 
             /* Dropdown positional fix */
             .profile-dd { right: 20px; }
@@ -461,6 +485,8 @@
     @stack('styles')
 </head>
 <body>
+    <!-- Page Entrance Reveal Overlay -->
+    <div class="staf-page-overlay"></div>
 
     {{-- ===== DESKTOP SIDEBAR ===== --}}
     <aside class="sidebar">
@@ -880,6 +906,8 @@
             document.getElementById('notifDd').classList.remove('show');
         });
     </script>
+    <!-- OMYU Staf V35 Interactive Scripts -->
+    <script src="{{ asset('js/staf-anim.js') }}?v={{ filemtime(public_path('js/staf-anim.js')) }}"></script>
     @yield('scripts')
     @stack('scripts')
 </body>

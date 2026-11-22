@@ -80,7 +80,7 @@
         }
     </style>
     <!-- OMYU Admin V35 Animations -->
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ filemtime(public_path('css/admin.css')) }}">
     @stack('styles')
 </head>
 <body class="h-full text-slate-800 bg-[#F8FAF6] admin-ambient-bg antialiased selection:bg-brand-300 selection:text-brand-950 overflow-hidden" x-data="{ moreMenuOpen: false }">
@@ -361,15 +361,6 @@
                 @yield('content')
 
             </main>
-
-                <!-- Footer -->
-                <footer class="bg-white border-t border-slate-200/80 px-6 py-4 pb-28 lg:pb-4 text-center text-xs text-slate-500">
-                    <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
-                        <p>© {{ date('Y') }} <strong>OMYU Fresh Juice & Healthy Bar</strong>. Hak Cipta Dilindungi.</p>
-                        <p class="text-slate-400">Modul Eksekutif & Manajemen Bisnis (Owner)</p>
-                    </div>
-                </footer>
-
             </div>
 
         </div>
@@ -550,7 +541,7 @@
     </div>
 
     <!-- OMYU Admin V35 Interactive Scripts -->
-    <script src="{{ asset('js/admin.js') }}"></script>
+    <script src="{{ asset('js/admin.js') }}?v={{ filemtime(public_path('js/admin.js')) }}"></script>
     @stack('scripts')
 </body>
 </html>

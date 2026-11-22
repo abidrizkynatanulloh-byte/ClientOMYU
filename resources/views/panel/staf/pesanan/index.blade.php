@@ -4,7 +4,8 @@
 
 @section('styles')
 <style>
-    .pesanan-page { display: grid; gap: 14px; }
+    .pesanan-page { display: grid; gap: 14px; width: 100%; max-width: 100%; min-width: 0; }
+    .pesanan-page > * { min-width: 0; max-width: 100%; }
     .page-head { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: flex-start; }
     .page-head h1 { font-size: 21px; font-weight: 900; color: #0f172a; }
     .page-head p { font-size: 12px; color: #64748b; margin-top: 3px; }

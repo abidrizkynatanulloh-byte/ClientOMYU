@@ -4,7 +4,8 @@
 
 @section('styles')
 <style>
-    .dash-page { display: grid; gap: 16px; }
+    .dash-page { display: grid; gap: 16px; width: 100%; max-width: 100%; min-width: 0; }
+    .dash-page > * { min-width: 0; max-width: 100%; }
     .dash-hero {
         background: linear-gradient(135deg,#137333,#0f5132);
         color: #fff;

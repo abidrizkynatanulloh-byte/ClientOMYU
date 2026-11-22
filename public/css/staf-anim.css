@@ -1,0 +1,205 @@
+/**
+ * OMYU Staf V35 Interactive Animations
+ * Inspired by OMYU Admin V35 Spring Physics & Micro-interactions
+ */
+
+:root {
+  --staf-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --staf-card-hover-border: rgba(25, 135, 84, 0.45);
+}
+
+/* Page Entrance Reveal Overlay */
+.staf-page-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: radial-gradient(circle at 40px 40px, transparent 0%, rgba(20, 80, 50, 0.04) 100%);
+  animation: stafCircleReveal 0.60s var(--staf-spring) forwards;
+}
+
+@keyframes stafCircleReveal {
+  0% {
+    opacity: 1;
+    clip-path: circle(0% at 30px 30px);
+  }
+  100% {
+    opacity: 0;
+    clip-path: circle(160% at 30px 30px);
+  }
+}
+
+/* Entrance Keyframes */
+@keyframes stafFadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(35px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes stafFadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Apply staggered spring entrance to ALL Staf Cards & Widgets */
+.dash-hero,
+.stat-card,
+.dash-card,
+.quick-link,
+.queue-card,
+.stok-cell,
+.card,
+.bahan-card,
+.order-card,
+.prod-card,
+.metric,
+.metric-card,
+.menu-card,
+.bantuan-card,
+.detail-card,
+.log-card,
+.struk-card,
+.scan-card,
+.staf-anim-card {
+  animation: stafFadeInUp 0.65s var(--staf-spring) forwards;
+  transition: transform 0.28s var(--staf-spring),
+              box-shadow 0.28s var(--staf-spring),
+              border-color 0.25s ease;
+  will-change: transform, box-shadow;
+}
+
+/* Stagger Delays - Dashboard */
+.dash-hero { animation-delay: 0.04s; }
+.stat-card:nth-child(1) { animation-delay: 0.08s; }
+.stat-card:nth-child(2) { animation-delay: 0.14s; }
+.stat-card:nth-child(3) { animation-delay: 0.20s; }
+.stat-card:nth-child(4) { animation-delay: 0.26s; }
+.stat-card:nth-child(5) { animation-delay: 0.32s; }
+.stat-card:nth-child(6) { animation-delay: 0.38s; }
+
+.stok-cell:nth-child(1) { animation-delay: 0.10s; }
+.stok-cell:nth-child(2) { animation-delay: 0.16s; }
+.stok-cell:nth-child(3) { animation-delay: 0.22s; }
+
+.quick-link:nth-child(1) { animation-delay: 0.12s; }
+.quick-link:nth-child(2) { animation-delay: 0.18s; }
+.quick-link:nth-child(3) { animation-delay: 0.24s; }
+.quick-link:nth-child(4) { animation-delay: 0.30s; }
+
+.queue-card:nth-child(1) { animation-delay: 0.10s; }
+.queue-card:nth-child(2) { animation-delay: 0.18s; }
+.queue-card:nth-child(3) { animation-delay: 0.26s; }
+.queue-card:nth-child(4) { animation-delay: 0.34s; }
+.queue-card:nth-child(5) { animation-delay: 0.42s; }
+
+/* Stagger Delays - Manajemen Stok (bahan-card) */
+.bahan-card:nth-child(1) { animation-delay: 0.08s; }
+.bahan-card:nth-child(2) { animation-delay: 0.15s; }
+.bahan-card:nth-child(3) { animation-delay: 0.22s; }
+.bahan-card:nth-child(4) { animation-delay: 0.29s; }
+.bahan-card:nth-child(5) { animation-delay: 0.36s; }
+.bahan-card:nth-child(6) { animation-delay: 0.43s; }
+.bahan-card:nth-child(n+7) { animation-delay: 0.50s; }
+
+/* Stagger Delays - Pesanan Masuk (order-card) */
+.order-card:nth-child(1) { animation-delay: 0.08s; }
+.order-card:nth-child(2) { animation-delay: 0.15s; }
+.order-card:nth-child(3) { animation-delay: 0.22s; }
+.order-card:nth-child(4) { animation-delay: 0.29s; }
+.order-card:nth-child(5) { animation-delay: 0.36s; }
+.order-card:nth-child(n+6) { animation-delay: 0.43s; }
+
+/* Stagger Delays - Produksi Racik (prod-card) */
+.prod-card:nth-child(1) { animation-delay: 0.08s; }
+.prod-card:nth-child(2) { animation-delay: 0.15s; }
+.prod-card:nth-child(3) { animation-delay: 0.22s; }
+.prod-card:nth-child(4) { animation-delay: 0.29s; }
+.prod-card:nth-child(n+5) { animation-delay: 0.36s; }
+
+/* Micro-interactions: Card Hover Lift (whileHover: y: -4) */
+.stat-card:hover,
+.quick-link:hover,
+.queue-card:hover,
+.stok-cell:hover,
+.bahan-card:hover,
+.order-card:hover,
+.prod-card:hover,
+.menu-card:hover,
+.bantuan-card:hover,
+.metric:hover,
+.hover-lift:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 14px 28px -4px rgba(21, 62, 43, 0.12), 0 6px 12px -2px rgba(0, 0, 0, 0.03) !important;
+  border-color: var(--staf-card-hover-border) !important;
+}
+
+/* Micro-interactions: Card Click / Press */
+.stat-card:active,
+.quick-link:active,
+.queue-card:active,
+.bahan-card:active,
+.order-card:active,
+.prod-card:active,
+.menu-card:active,
+.btn:active,
+.btn-mini:active,
+.btn-press:active,
+button:active {
+  transform: translateY(-1px) scale(0.98) !important;
+}
+
+/* Pulsing Status Dot */
+.clock-dot {
+  position: relative;
+}
+
+.clock-dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: inherit;
+  opacity: 0.75;
+  animation: stafPing 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes stafPing {
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* Bottom Navigation Tab Active Pill Interaction */
+.bnav-tab {
+  transition: transform 0.2s var(--staf-spring), color 0.2s ease;
+}
+
+.bnav-tab:active {
+  transform: scale(0.92);
+}
+
+.bnav-tab.active svg {
+  transform: scale(1.12);
+  transition: transform 0.25s var(--staf-spring);
+}
+
+/* Sidebar Link Micro-interactions */
+.snav-link {
+  transition: all 0.22s var(--staf-spring) !important;
+}
+
+.snav-link:hover {
+  transform: translateX(4px);
+}
