@@ -63,13 +63,13 @@
                     data-counter-prefix="Rp ">
                     Rp {{ number_format($omzetHariIni, 0, ',', '.') }}
                 </h3>
-                <div class="flex items-center justify-between mt-2">
-                    <span class="inline-flex items-center gap-1 font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-200 text-[10px]">
-                        <i class="fa-solid fa-receipt text-[9px]"></i>
-                        {{ $jumlahPesananHariIni }} Transaksi
+                <div class="flex items-center justify-between gap-2 mt-2 min-w-0">
+                    <span class="inline-flex items-center gap-1 font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-200 text-[10px] whitespace-nowrap shrink-0">
+                        <i class="fa-solid fa-receipt text-[9px] shrink-0"></i>
+                        <span>{{ $jumlahPesananHariIni }} Transaksi</span>
                     </span>
                     <!-- Sparkline SVG (Trend Visual) -->
-                    <svg class="w-16 h-5 text-brand-500 overflow-visible" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-14 sm:w-16 h-5 text-brand-500 overflow-visible shrink-0" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path class="sparkline-path" d="M2 16L15 12L30 14L45 6L58 4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
@@ -92,13 +92,13 @@
                     data-counter-prefix="Rp ">
                     Rp {{ number_format($omzetBulanIni, 0, ',', '.') }}
                 </h3>
-                <div class="flex items-center justify-between mt-2">
-                    <span class="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 text-[10px]">
-                        <i class="fa-solid fa-check-circle text-[9px]"></i>
-                        {{ $jumlahPesananBulanIni }} Selesai
+                <div class="flex items-center justify-between gap-2 mt-2 min-w-0">
+                    <span class="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 text-[10px] whitespace-nowrap shrink-0">
+                        <i class="fa-solid fa-check-circle text-[9px] shrink-0"></i>
+                        <span>{{ $jumlahPesananBulanIni }} Selesai</span>
                     </span>
                     <!-- Sparkline SVG -->
-                    <svg class="w-16 h-5 text-emerald-500 overflow-visible" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-14 sm:w-16 h-5 text-emerald-500 overflow-visible shrink-0" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path class="sparkline-path" d="M2 18L14 13L28 15L42 7L58 3" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
@@ -123,13 +123,13 @@
                     </span>
                     <span class="text-sm font-bold text-slate-500">Cup</span>
                 </h3>
-                <div class="flex items-center justify-between mt-2">
-                    <span class="inline-flex items-center gap-1 font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 text-[10px]">
-                        <i class="fa-solid fa-glass-water text-[9px]"></i>
-                        Fresh Juices
+                <div class="flex items-center justify-between gap-2 mt-2 min-w-0">
+                    <span class="inline-flex items-center gap-1 font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 text-[10px] whitespace-nowrap shrink-0">
+                        <i class="fa-solid fa-glass-water text-[9px] shrink-0"></i>
+                        <span>Fresh Juices</span>
                     </span>
                     <!-- Sparkline SVG -->
-                    <svg class="w-16 h-5 text-amber-500 overflow-visible" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-14 sm:w-16 h-5 text-amber-500 overflow-visible shrink-0" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path class="sparkline-path" d="M2 15L15 10L30 12L45 5L58 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
@@ -152,13 +152,13 @@
                     data-counter-prefix="Rp ">
                     Rp {{ number_format($labaKotorBulanIni, 0, ',', '.') }}
                 </h3>
-                <div class="flex items-center justify-between mt-2">
-                    <span class="inline-flex items-center gap-1 font-bold text-lime-800 bg-lime-100 px-2 py-0.5 rounded-full border border-lime-300 text-[10px]">
-                        <i class="fa-solid fa-percent text-[9px]"></i>
-                        Margin: {{ $marginLabaKotor }}%
+                <div class="flex items-center justify-between gap-2 mt-2 min-w-0">
+                    <span class="inline-flex items-center gap-1 font-bold text-lime-800 bg-lime-100 px-2 py-0.5 rounded-full border border-lime-300 text-[10px] whitespace-nowrap shrink-0">
+                        <i class="fa-solid fa-percent text-[9px] shrink-0"></i>
+                        <span>Margin: {{ $marginLabaKotor }}%</span>
                     </span>
                     <!-- Sparkline SVG -->
-                    <svg class="w-16 h-5 text-lime-600 overflow-visible" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-14 sm:w-16 h-5 text-lime-600 overflow-visible shrink-0" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path class="sparkline-path" d="M2 16L18 14L32 8L44 10L58 2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
@@ -338,12 +338,12 @@
             <div class="mt-3 pt-3 border-t border-slate-100">
                 <div class="grid grid-cols-2 gap-2 text-center text-xs">
                     <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100">
-                        <span class="text-slate-400 block text-[10px]">Total Transaksi Bulan Ini</span>
-                        <span class="text-sm font-extrabold text-slate-800">{{ $jumlahPesananBulanIni }} Pesanan</span>
+                        <span class="text-slate-400 block text-[10px] leading-tight">Total Transaksi Bulan Ini</span>
+                        <span class="text-sm font-extrabold text-slate-800 whitespace-nowrap">{{ $jumlahPesananBulanIni }} <span class="text-[11px] font-bold text-slate-500">Pesanan</span></span>
                     </div>
                     <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100">
-                        <span class="text-slate-400 block text-[10px]">Rata-rata Penjualan Harian</span>
-                        <span class="text-sm font-extrabold text-brand-800">
+                        <span class="text-slate-400 block text-[10px] leading-tight">Rata-rata Penjualan Harian</span>
+                        <span class="text-sm font-extrabold text-brand-800 whitespace-nowrap">
                             Rp {{ number_format(Carbon\Carbon::now()->day > 0 ? round($omzetBulanIni / Carbon\Carbon::now()->day) : 0, 0, ',', '.') }}
                         </span>
                     </div>

@@ -131,55 +131,80 @@
 }
 
 /* ==========================================================================
-   Staggered Entrance Keyframes (Smooth 0.70s Spring Pop-Up from Bottom)
+   Staggered Entrance Keyframes (Smooth scroll reveal)
    ========================================================================== */
 @keyframes adminFadeInUp {
   0% {
     opacity: 0;
-    transform: translateY(45px) scale(0.96);
+    transform: translate3d(0, 24px, 0);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0);
   }
 }
 
 @keyframes adminFadeInDown {
   0% {
     opacity: 0;
-    transform: translateY(-24px);
+    transform: translate3d(0, -16px, 0);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
 @keyframes adminFadeInScale {
   0% {
     opacity: 0;
-    transform: translateY(35px) scale(0.94);
+    transform: translate3d(0, 20px, 0) scale(0.985);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
-/* Apply animation classes (Instant CSS spring pop-up from bottom) */
+/* Apply animation classes */
 .anim-fade-up {
   opacity: 0;
-  animation: adminFadeInUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: adminFadeInUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
 }
 
 .anim-fade-down {
   opacity: 0;
-  animation: adminFadeInDown 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: adminFadeInDown 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
 }
 
 .anim-fade-scale {
   opacity: 0;
-  animation: adminFadeInScale 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: adminFadeInScale 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
+}
+
+/* Scroll-triggered reveal: pause until element enters viewport */
+.anim-fade-up.reveal-pending,
+.anim-fade-down.reveal-pending,
+.anim-fade-scale.reveal-pending {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-page-overlay,
+  .anim-fade-up,
+  .anim-fade-down,
+  .anim-fade-scale,
+  .sparkline-path,
+  .pulse-badge {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
 }
 
 /* Stagger Delays for child cards */

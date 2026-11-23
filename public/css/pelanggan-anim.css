@@ -1,0 +1,33 @@
+/* OMYU Pelanggan - Scroll Fade-Up Reveal */
+:root {
+  --pelanggan-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes pelangganFadeInUp {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.pelanggan-reveal {
+  opacity: 0;
+  animation: pelangganFadeInUp 0.85s var(--pelanggan-ease) both;
+  will-change: opacity, transform;
+}
+
+.pelanggan-reveal-pending {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pelanggan-reveal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

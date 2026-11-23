@@ -1006,6 +1006,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/pelanggan-anim.css') }}?v={{ filemtime(public_path('css/pelanggan-anim.css')) }}">
 </head>
 <body>
 
@@ -1272,5 +1273,6 @@
         </a>
     </nav>
 
+    <script src="{{ asset('js/pelanggan-anim.js') }}?v={{ filemtime(public_path('js/pelanggan-anim.js')) }}"></script>
 </body>
 </html>

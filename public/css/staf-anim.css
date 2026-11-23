@@ -33,22 +33,22 @@
 @keyframes stafFadeInUp {
   0% {
     opacity: 0;
-    transform: translateY(35px) scale(0.97);
+    transform: translate3d(0, 24px, 0);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0);
   }
 }
 
 @keyframes stafFadeInScale {
   0% {
     opacity: 0;
-    transform: scale(0.95);
+    transform: translate3d(0, 20px, 0) scale(0.985);
   }
   100% {
     opacity: 1;
-    transform: scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
@@ -72,11 +72,17 @@
 .struk-card,
 .scan-card,
 .staf-anim-card {
-  animation: stafFadeInUp 0.65s var(--staf-spring) forwards;
+  opacity: 0;
+  animation: stafFadeInUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
   transition: transform 0.28s var(--staf-spring),
               box-shadow 0.28s var(--staf-spring),
               border-color 0.25s ease;
-  will-change: transform, box-shadow;
+  will-change: opacity, transform, box-shadow;
+}
+
+/* Scroll-triggered reveal: pause until element enters viewport */
+.staf-reveal-pending {
+  animation-play-state: paused !important;
 }
 
 /* Stagger Delays - Dashboard */
@@ -202,4 +208,33 @@ button:active {
 
 .snav-link:hover {
   transform: translateX(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .staf-page-overlay,
+  .dash-hero,
+  .stat-card,
+  .dash-card,
+  .quick-link,
+  .queue-card,
+  .stok-cell,
+  .card,
+  .bahan-card,
+  .order-card,
+  .prod-card,
+  .metric,
+  .metric-card,
+  .menu-card,
+  .bantuan-card,
+  .detail-card,
+  .log-card,
+  .struk-card,
+  .scan-card,
+  .staf-anim-card,
+  .clock-dot::after {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

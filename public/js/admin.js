@@ -4,6 +4,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  initScrollReveal();
   initNumberCounters();
   initStaggerAnimations();
   initSparklineDraw();
@@ -38,7 +39,7 @@ function animateSingleCounter(el) {
 
   const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
-  setTimeout(() => {
+  const timer = setTimeout(() => {
     const startTime = performance.now();
 
     function update(currentTime) {
@@ -49,22 +50,29 @@ function animateSingleCounter(el) {
       el.innerText = `${prefix}${formatIndonesianNumber(currentVal)}${suffix}`;
 
       if (progress < 1) {
-        requestAnimationFrame(update);
+        el.dataset.counterFrame = String(requestAnimationFrame(update));
       } else {
         el.innerText = `${prefix}${formatIndonesianNumber(target)}${suffix}`;
+        delete el.dataset.counterFrame;
       }
     }
 
-    requestAnimationFrame(update);
+    el.dataset.counterFrame = String(requestAnimationFrame(update));
   }, delay);
+  el.dataset.counterTimer = String(timer);
 }
 
 /**
- * Animate all counters on the page
+ * Animate all counters on the page (triggered when visible)
  */
 function initNumberCounters() {
   const counterElements = document.querySelectorAll('[data-counter]');
-  counterElements.forEach(animateSingleCounter);
+  counterElements.forEach((el) => {
+    observeReveal(el, () => animateSingleCounter(el), {
+      threshold: 0.2,
+      onLeave: () => resetCounter(el),
+    });
+  });
 }
 
 /**
@@ -92,10 +100,9 @@ function initStaggerAnimations() {
  * Draw single SVG sparkline
  */
 function drawSingleSparkline(path) {
-  if (path.dataset.sparklineAnimated === 'true') return;
-  path.dataset.sparklineAnimated = 'true';
   try {
     const length = path.getTotalLength();
+    path.style.transition = 'none';
     path.style.strokeDasharray = length;
     path.style.strokeDashoffset = length;
     path.getBoundingClientRect();
@@ -106,12 +113,123 @@ function drawSingleSparkline(path) {
   }
 }
 
+function resetSparkline(path) {
+  try {
+    const length = path.getTotalLength();
+    path.style.transition = 'none';
+    path.style.strokeDasharray = length;
+    path.style.strokeDashoffset = length;
+  } catch (e) {
+    // Fallback
+  }
+}
+
+function resetCounter(el) {
+  if (el.dataset.counterTimer) {
+    clearTimeout(Number(el.dataset.counterTimer));
+    delete el.dataset.counterTimer;
+  }
+  if (el.dataset.counterFrame) {
+    cancelAnimationFrame(Number(el.dataset.counterFrame));
+    delete el.dataset.counterFrame;
+  }
+  el.dataset.counterAnimated = 'false';
+  const prefix = el.getAttribute('data-counter-prefix') || '';
+  const suffix = el.getAttribute('data-counter-suffix') || '';
+  el.innerText = `${prefix}0${suffix}`;
+}
+
+function replayRevealAnimation(el) {
+  el.classList.remove('reveal-pending');
+  // Restart CSS animation so it can replay on re-entry.
+  el.style.animation = 'none';
+  // Force reflow
+  void el.offsetHeight;
+  el.style.animation = '';
+}
+
 /**
- * Draw SVG sparklines dynamically if present
+ * Draw SVG sparklines dynamically if present (triggered when visible)
  */
 function initSparklineDraw() {
   const visibleSparklines = document.querySelectorAll('.sparkline-path');
-  visibleSparklines.forEach(drawSingleSparkline);
+  visibleSparklines.forEach((path) => {
+    const trigger = path.closest('.glass-card, .admin-card, svg') || path;
+    observeReveal(trigger, () => drawSingleSparkline(path), {
+      threshold: 0.15,
+      onLeave: () => resetSparkline(path),
+    });
+  });
+}
+
+/**
+ * Observe an element and run callbacks when it enters/leaves viewport.
+ */
+function observeReveal(el, onEnter, opts = {}) {
+  if (!el || el.dataset.revealBound === 'true') return;
+  el.dataset.revealBound = 'true';
+
+  const threshold = opts.threshold ?? 0.12;
+  const rootMargin = opts.rootMargin ?? '0px 0px -10% 0px';
+  const once = opts.once ?? false;
+  const onLeave = opts.onLeave;
+
+  if (!('IntersectionObserver' in window)) {
+    onEnter(el);
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          onEnter(entry.target);
+          if (once) observer.unobserve(entry.target);
+        } else if (typeof onLeave === 'function') {
+          onLeave(entry.target);
+        }
+      });
+    },
+    { threshold, rootMargin }
+  );
+
+  observer.observe(el);
+}
+
+/**
+ * Reveal fade-up/down/scale animations on scroll.
+ */
+function initScrollReveal() {
+  const selector = '.anim-fade-up, .anim-fade-down, .anim-fade-scale';
+  const elements = document.querySelectorAll(selector);
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  elements.forEach((el) => {
+    if (el.dataset.scrollRevealReady === 'true') return;
+    el.dataset.scrollRevealReady = 'true';
+
+    if (reduceMotion) {
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+      el.style.filter = 'none';
+      el.style.animation = 'none';
+      return;
+    }
+
+    el.classList.add('reveal-pending');
+
+    observeReveal(el, () => {
+      replayRevealAnimation(el);
+      el.classList.add('is-revealed');
+    }, {
+      threshold: 0.08,
+      onLeave: () => {
+        el.classList.add('reveal-pending');
+        el.classList.remove('is-revealed');
+      },
+    });
+  });
 }
 
 /**

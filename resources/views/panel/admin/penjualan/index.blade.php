@@ -175,30 +175,43 @@
     </div>
 
     <!-- Data Table Card -->
-    <div class="glass-card rounded-3xl border border-slate-100 shadow-soft overflow-hidden anim-fade-up delay-5">
+    <div class="glass-card rounded-3xl border border-slate-100 shadow-soft overflow-hidden anim-fade-up delay-5"
+         x-data="{ detailOpen: false, selected: null, openDetail(data) { this.selected = data; this.detailOpen = true; }, closeDetail() { this.detailOpen = false; } }"
+         @keydown.escape.window="closeDetail()">
         
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs sm:text-sm admin-table">
                 <thead>
                     <tr class="bg-slate-50/80 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200/80">
-                        <th class="py-3.5 px-5 font-bold">Kode Pesanan</th>
-                        <th class="py-3.5 px-4 font-bold">Waktu Transaksi</th>
+                        <th class="py-3.5 px-5 font-bold hidden md:table-cell">Kode Pesanan</th>
+                        <th class="py-3.5 px-4 font-bold hidden md:table-cell">Waktu Transaksi</th>
                         <th class="py-3.5 px-4 font-bold">Jenis</th>
                         <th class="py-3.5 px-4 font-bold">Pembeli</th>
-                        <th class="py-3.5 px-4 font-bold">Total Pembayaran</th>
-                        <th class="py-3.5 px-4 font-bold">Metode</th>
+                        <th class="py-3.5 px-4 font-bold hidden md:table-cell">Total Pembayaran</th>
+                        <th class="py-3.5 px-4 font-bold hidden md:table-cell">Metode</th>
                         <th class="py-3.5 px-4 font-bold">Status Pesanan</th>
-                        <th class="py-3.5 px-4 font-bold">Kasir / Penangan</th>
-                        <th class="py-3.5 px-5 font-bold text-center">Aksi</th>
+                        <th class="py-3.5 px-4 font-bold hidden md:table-cell">Kasir / Penangan</th>
+                        <th class="py-3.5 px-5 font-bold text-center">Detail</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse($daftarPesanan as $p)
+                        @php
+                            $statusLabel = $p->status_pesanan === 'selesai'
+                                ? 'Selesai'
+                                : ($p->status_pesanan === 'dibatalkan' ? 'Dibatalkan' : str_replace('_', ' ', $p->status_pesanan));
+                            $statusClass = $p->status_pesanan === 'selesai'
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : ($p->status_pesanan === 'dibatalkan' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-amber-50 text-amber-700 border-amber-200');
+                            $statusIcon = $p->status_pesanan === 'selesai'
+                                ? 'fa-circle-check'
+                                : ($p->status_pesanan === 'dibatalkan' ? 'fa-circle-xmark' : 'fa-clock');
+                        @endphp
                         <tr class="hover:bg-brand-50/30 transition-colors">
-                            <td class="py-3.5 px-5 font-extrabold text-slate-900">
+                            <td class="py-3.5 px-5 font-extrabold text-slate-900 hidden md:table-cell">
                                 #{{ $p->kode_pesanan }}
                             </td>
-                            <td class="py-3.5 px-4 text-slate-600">
+                            <td class="py-3.5 px-4 text-slate-600 hidden md:table-cell">
                                 <span class="font-medium">{{ $p->created_at->format('d/m/Y') }}</span>
                                 <span class="text-xs text-slate-400 block">{{ $p->created_at->format('H:i:s') }}</span>
                             </td>
@@ -211,41 +224,47 @@
                             <td class="py-3.5 px-4">
                                 <span class="font-bold text-slate-800 block">{{ $p->nama_pembeli ?? 'Pelanggan Langsung' }}</span>
                                 @if($p->telepon_pembeli)
-                                    <span class="text-xs text-slate-400">{{ $p->telepon_pembeli }}</span>
+                                    <span class="text-xs text-slate-400 hidden md:block">{{ $p->telepon_pembeli }}</span>
                                 @endif
                             </td>
-                            <td class="py-3.5 px-4 font-extrabold text-slate-900">
+                            <td class="py-3.5 px-4 font-extrabold text-slate-900 hidden md:table-cell">
                                 Rp {{ number_format($p->total, 0, ',', '.') }}
                             </td>
-                            <td class="py-3.5 px-4">
+                            <td class="py-3.5 px-4 hidden md:table-cell">
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-slate-100 text-slate-700 uppercase">
                                     {{ $p->metode_bayar ?? '-' }}
                                 </span>
                             </td>
                             <td class="py-3.5 px-4">
-                                @if($p->status_pesanan === 'selesai')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                        <i class="fa-solid fa-circle-check text-[10px]"></i> Selesai
-                                    </span>
-                                @elseif($p->status_pesanan === 'dibatalkan')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                                        <i class="fa-solid fa-circle-xmark text-[10px]"></i> Dibatalkan
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                        <i class="fa-solid fa-clock text-[10px]"></i> {{ str_replace('_', ' ', $p->status_pesanan) }}
-                                    </span>
-                                @endif
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border {{ $statusClass }}">
+                                    <i class="fa-solid {{ $statusIcon }} text-[10px]"></i> {{ $statusLabel }}
+                                </span>
                             </td>
-                            <td class="py-3.5 px-4 text-slate-600">
+                            <td class="py-3.5 px-4 text-slate-600 hidden md:table-cell">
                                 {{ $p->penangan?->nama ?? '-' }}
                             </td>
                             <td class="py-3.5 px-5 text-center">
-                                <a href="{{ route('panel.admin.penjualan.detail', $p->id) }}" 
-                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-brand-400 hover:text-brand-950 text-slate-700 text-xs font-bold transition-all">
+                                <button type="button"
+                                        @click="openDetail(@js([
+                                            'kode' => $p->kode_pesanan,
+                                            'tanggal' => $p->created_at->format('d/m/Y'),
+                                            'waktu' => $p->created_at->format('H:i:s'),
+                                            'jenis' => ucfirst($p->jenis),
+                                            'jenis_icon' => $p->jenis === 'online' ? 'fa-globe' : 'fa-store',
+                                            'pembeli' => $p->nama_pembeli ?? 'Pelanggan Langsung',
+                                            'telepon' => $p->telepon_pembeli ?? '-',
+                                            'total' => 'Rp ' . number_format($p->total, 0, ',', '.'),
+                                            'metode' => strtoupper($p->metode_bayar ?? '-'),
+                                            'status' => $statusLabel,
+                                            'status_class' => $statusClass,
+                                            'status_icon' => $statusIcon,
+                                            'kasir' => $p->penangan?->nama ?? '-',
+                                            'url' => route('panel.admin.penjualan.detail', $p->id),
+                                        ]))"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-brand-400 hover:text-brand-950 text-slate-700 text-xs font-bold transition-all">
                                     <i class="fa-regular fa-eye"></i>
                                     <span>Detail</span>
-                                </a>
+                                </button>
                             </td>
                         </tr>
                     @empty
@@ -269,6 +288,87 @@
                 {{ $daftarPesanan->links() }}
             </div>
         @endif
+
+        <!-- Detail Pesanan Modal -->
+        <div x-cloak x-show="detailOpen" class="fixed inset-0 z-[70] flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <div x-show="detailOpen"
+                 x-transition:enter="transition-opacity ease-out duration-200"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition-opacity ease-in duration-150"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 @click="closeDetail()"
+                 class="absolute inset-0 bg-slate-900/55 backdrop-blur-sm"></div>
+
+            <div x-show="detailOpen"
+                 x-transition:enter="transition ease-out duration-250"
+                 x-transition:enter-start="opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95"
+                 @click.outside="closeDetail()"
+                 class="relative w-full sm:max-w-lg bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 max-h-[88vh] overflow-y-auto">
+                <div class="sticky top-0 bg-white/95 backdrop-blur px-5 py-4 border-b border-slate-100 flex items-start justify-between gap-3 rounded-t-3xl">
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Detail Pesanan</p>
+                        <h3 class="text-base font-extrabold text-slate-900 mt-0.5" x-text="selected ? '#' + selected.kode : '-'"></h3>
+                    </div>
+                    <button type="button" @click="closeDetail()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors shrink-0">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="p-5 space-y-4" x-show="selected">
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Jenis</p>
+                            <p class="font-bold text-slate-800 mt-1 flex items-center gap-1.5">
+                                <i class="fa-solid text-brand-700" :class="selected?.jenis_icon"></i>
+                                <span x-text="selected?.jenis"></span>
+                            </p>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Status</p>
+                            <div class="mt-1">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border" :class="selected?.status_class">
+                                    <i class="fa-solid text-[10px]" :class="selected?.status_icon"></i>
+                                    <span x-text="selected?.status"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 col-span-2">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Pembeli</p>
+                            <p class="font-bold text-slate-800 mt-1" x-text="selected?.pembeli"></p>
+                            <p class="text-xs text-slate-500 mt-0.5" x-text="selected?.telepon"></p>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Waktu</p>
+                            <p class="font-semibold text-slate-800 mt-1" x-text="selected?.tanggal"></p>
+                            <p class="text-xs text-slate-500" x-text="selected?.waktu"></p>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Kasir</p>
+                            <p class="font-semibold text-slate-800 mt-1" x-text="selected?.kasir"></p>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Metode</p>
+                            <p class="font-bold text-slate-800 mt-1" x-text="selected?.metode"></p>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-brand-50 border border-brand-100">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-brand-700">Total</p>
+                            <p class="font-extrabold text-brand-900 mt-1" x-text="selected?.total"></p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 pt-1">
+                        <button type="button" @click="closeDetail()" class="flex-1 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-colors">Tutup</button>
+                        <a :href="selected?.url" class="flex-1 px-4 py-2.5 rounded-xl bg-brand-400 hover:bg-brand-500 text-brand-950 font-extrabold text-sm text-center transition-colors">Lihat Halaman Detail</a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 
