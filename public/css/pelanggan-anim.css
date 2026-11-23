@@ -24,6 +24,15 @@
   animation-play-state: paused !important;
 }
 
+/* Bottom nav harus selalu terlihat di mobile, jangan ikut animasi reveal */
+.mobile-bottom-nav,
+.mobile-bottom-nav.pelanggan-reveal,
+.mobile-bottom-nav.pelanggan-reveal-pending {
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pelanggan-reveal {
     animation: none !important;

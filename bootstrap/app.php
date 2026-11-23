@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\PastikanPelangganLogin;
 use App\Http\Middleware\PastikanPeran;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,10 +18,16 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'peran' => PastikanPeran::class,
+            'pelanggan.auth' => PastikanPelangganLogin::class,
         ]);
 
-        $middleware->redirectUsersTo(fn (Request $request) => $request->user()?->peran === 'admin' ? '/panel/admin' : '/panel'
-        );
+        $middleware->redirectUsersTo(function (Request $request) {
+            if ($request->is('order/*') || $request->routeIs('pelanggan.*')) {
+                return route('pelanggan.katalog');
+            }
+
+            return $request->user()?->peran === 'admin' ? '/panel/admin' : '/panel';
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -19,8 +19,9 @@
         }
         @media (min-width: 992px) {
             body {
-                height: 100vh;
-                overflow: hidden; /* Pas 1 layar full di desktop tanpa perlu scroll */
+                min-height: 100vh;
+                overflow-x: hidden;
+                overflow-y: auto;
             }
         }
 
@@ -240,11 +241,12 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start;
+            gap: 12px;
         }
         @media (min-width: 992px) {
             .main-wrapper {
-                height: 100vh;
+                min-height: 100vh;
                 padding-bottom: 20px;
             }
         }
@@ -517,6 +519,129 @@
             font-weight: 600;
         }
 
+        /* Promo Banner Slider */
+        .promo-slider {
+            position: relative;
+            overflow: hidden;
+            border-radius: 24px;
+            margin-bottom: 4px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+        .promo-track {
+            display: flex;
+            transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+        .promo-slide {
+            min-width: 100%;
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            align-items: center;
+            gap: 16px;
+            padding: 10px 8px 28px;
+            background: transparent;
+        }
+        .promo-content {
+            padding: 8px 6px;
+        }
+        .promo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.4px;
+            margin-bottom: 8px;
+            background: rgba(255,255,255,0.72);
+            color: #166534;
+            border: 1px solid rgba(255,255,255,0.75);
+        }
+        .promo-title {
+            font-family: 'Fredoka', 'Nunito', sans-serif;
+            font-size: 30px;
+            line-height: 1.1;
+            font-weight: 900;
+            color: #183d12;
+            margin-bottom: 8px;
+        }
+        .promo-desc {
+            font-size: 13px;
+            color: #475569;
+            font-weight: 700;
+            line-height: 1.55;
+            margin-bottom: 14px;
+            max-width: 520px;
+        }
+        .promo-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 900;
+            color: #fff;
+            background: linear-gradient(135deg, #4d8822 0%, #2f620e 100%);
+            box-shadow: 0 6px 16px rgba(47, 98, 14, 0.25);
+        }
+        .promo-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 180px;
+        }
+        .promo-image {
+            width: 100%;
+            max-width: 360px;
+            max-height: 220px;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            filter: drop-shadow(0 10px 22px rgba(25,56,8,0.18));
+        }
+        .promo-dots {
+            position: absolute;
+            left: 50%;
+            bottom: 6px;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 2;
+        }
+        .promo-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            border: none;
+            background: rgba(255,255,255,0.65);
+            cursor: pointer;
+            padding: 0;
+            transition: all .25s ease;
+        }
+        .promo-dot.active {
+            width: 22px;
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+        @media (max-width: 768px) {
+            .promo-slide {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 8px 4px 30px;
+                text-align: center;
+            }
+            .promo-content { padding: 0; }
+            .promo-title { font-size: 22px; }
+            .promo-desc { font-size: 12px; margin: 0 auto 12px; }
+            .promo-visual { min-height: 140px; }
+            .promo-image { max-height: 170px; max-width: 280px; }
+        }
+
         /* Bottom 2-Cards Grid */
         .bottom-cards-grid {
             display: grid;
@@ -699,6 +824,12 @@
         @media (max-width: 768px) {
             html {
                 scroll-behavior: smooth;
+                scroll-padding-top: 76px;
+                scroll-padding-bottom: 90px;
+            }
+            section[id] {
+                scroll-margin-top: 76px;
+                scroll-margin-bottom: 90px;
             }
             .topbar-wrapper {
                 padding: 0 12px;
@@ -744,10 +875,11 @@
                 position: fixed !important;
                 bottom: 14px !important;
                 bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
-                left: 50% !important;
-                transform: translateX(-50%) !important;
-                width: calc(100% - 28px) !important;
+                left: 14px !important;
+                right: 14px !important;
+                width: auto !important;
                 max-width: 420px !important;
+                margin: 0 auto !important;
                 height: 58px !important;
                 background: rgba(255, 255, 255, 0.95) !important;
                 backdrop-filter: blur(20px) !important;
@@ -760,6 +892,7 @@
                 border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
                 z-index: 99999 !important;
                 gap: 4px !important;
+                transform: none !important;
             }
 
             .mobile-nav-item {
@@ -806,7 +939,7 @@
 
             /* Ruang bawah untuk konten utama agar tidak tertutup nav bottom */
             .main-wrapper {
-                padding: 68px 14px 90px;
+                padding: 76px 14px calc(100px + env(safe-area-inset-bottom, 0px));
                 min-height: auto;
                 height: auto;
             }
@@ -1036,6 +1169,9 @@
                 <a href="https://wa.me/6285807106570?text=Halo%20OMYU,%20saya%20ingin%20tanya%20menu" target="_blank" class="nav-item">
                     Kontak
                 </a>
+                <a href="{{ route('pelanggan.lacak') }}" class="nav-item {{ request()->routeIs('pelanggan.lacak') ? 'active' : '' }}">
+                    Lacak Pesanan
+                </a>
             </nav>
 
             <!-- Right Action Items -->
@@ -1066,6 +1202,56 @@
 
     <!-- Main Content Area: Pas 1 Layar Penuh -->
     <main class="main-wrapper">
+
+        <!-- GANTI GAMBAR BANNER (SISI KANAN) DI SINI:
+             1. Taruh file gambar di: public/images/banner/
+                Contoh: banner-1.png, banner-2.png, banner-3.png
+             2. Ganti hanya src pada <img class="promo-image"> di tiap slide.
+             3. Teks kiri tetap, gambar yang diganti hanya sisi kanan. -->
+        <section class="promo-slider" id="promoSlider" aria-label="Promo OMYU">
+            <div class="promo-track" id="promoTrack">
+                <div class="promo-slide">
+                    <div class="promo-content">
+                        <span class="promo-badge">🍊 PROMO SEGAR</span>
+                        <h2 class="promo-title">Segar Setiap Hari, 100% Buah Asli</h2>
+                        <p class="promo-desc">Pilih menu favoritmu dan rasakan jus segar tanpa pemanis buatan. Dibuat saat dipesan, langsung fresh!</p>
+                        <a href="{{ route('pelanggan.katalog') }}" class="promo-cta">Lihat Menu <span>→</span></a>
+                    </div>
+                    <div class="promo-visual">
+                        <img class="promo-image" src="{{ asset('images/es.png') }}" alt="Banner Promo 1">
+                    </div>
+                </div>
+
+                <div class="promo-slide">
+                    <div class="promo-content">
+                        <span class="promo-badge">🔥 FAVORIT PELANGGAN</span>
+                        <h2 class="promo-title">Pesan Langsung, Lebih Cepat!</h2>
+                        <p class="promo-desc">Klik menu, lihat detailnya, lalu pilih <strong>Tambah Keranjang</strong> atau <strong>Pesan Langsung</strong>.</p>
+                        <a href="{{ route('pelanggan.katalog') }}" class="promo-cta">Pesan Sekarang <span>→</span></a>
+                    </div>
+                    <div class="promo-visual">
+                        <img class="promo-image" src="{{ asset('images/banner/banner-2.png') }}" alt="Banner Promo 2">
+                    </div>
+                </div>
+
+                <div class="promo-slide">
+                    <div class="promo-content">
+                        <span class="promo-badge">💚 SEHAT & PRAKTIS</span>
+                        <h2 class="promo-title">Ambil di Outlet, Tanpa Ribet</h2>
+                        <p class="promo-desc">Pesan online, bayar, lalu ambil pesananmu di outlet OMYU. Cocok buat yang aktif dan butuh minuman sehat.</p>
+                        <a href="{{ route('pelanggan.lacak') }}" class="promo-cta">Lacak Pesanan <span>→</span></a>
+                    </div>
+                    <div class="promo-visual">
+                        <img class="promo-image" src="{{ asset('images/banner/banner-3.png') }}" alt="Banner Promo 3">
+                    </div>
+                </div>
+            </div>
+            <div class="promo-dots" id="promoDots" aria-label="Navigasi banner">
+                <button type="button" class="promo-dot active" data-slide="0" aria-label="Banner 1"></button>
+                <button type="button" class="promo-dot" data-slide="1" aria-label="Banner 2"></button>
+                <button type="button" class="promo-dot" data-slide="2" aria-label="Banner 3"></button>
+            </div>
+        </section>
 
         <!-- Hero Section -->
         <section class="hero-grid">
@@ -1265,6 +1451,14 @@
             </svg>
             <span class="mobile-nav-label">Tentang Kami</span>
         </a>
+        <a href="{{ route('pelanggan.lacak') }}" class="mobile-nav-item {{ request()->routeIs('pelanggan.lacak') ? 'active' : '' }}">
+            <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                <path d="M8 11h6"></path>
+            </svg>
+            <span class="mobile-nav-label">Lacak</span>
+        </a>
         <a href="https://wa.me/6285807106570?text=Halo%20OMYU,%20saya%20ingin%20tanya%20menu" target="_blank" class="mobile-nav-item">
             <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
@@ -1274,5 +1468,42 @@
     </nav>
 
     <script src="{{ asset('js/pelanggan-anim.js') }}?v={{ filemtime(public_path('js/pelanggan-anim.js')) }}"></script>
+    <script>
+        (function () {
+            const track = document.getElementById('promoTrack');
+            const slider = document.getElementById('promoSlider');
+            if (!track || !slider) return;
+            const slides = Array.from(track.children);
+            const dots = Array.from(document.querySelectorAll('.promo-dot'));
+            let index = 0;
+            let timer = null;
+
+            function render() {
+                track.style.transform = 'translateX(-' + (index * 100) + '%)';
+                dots.forEach((d, i) => d.classList.toggle('active', i === index));
+            }
+            function goTo(i) {
+                index = (i + slides.length) % slides.length;
+                render();
+            }
+            function start() {
+                stop();
+                timer = setInterval(() => goTo(index + 1), 4000);
+            }
+            function stop() {
+                if (timer) clearInterval(timer);
+                timer = null;
+            }
+
+            dots.forEach((dot) => dot.addEventListener('click', () => { goTo(parseInt(dot.dataset.slide, 10) || 0); start(); }));
+            slider.addEventListener('mouseenter', stop);
+            slider.addEventListener('mouseleave', start);
+            slider.addEventListener('touchstart', stop, { passive: true });
+            slider.addEventListener('touchend', start, { passive: true });
+
+            render();
+            start();
+        })();
+    </script>
 </body>
 </html>

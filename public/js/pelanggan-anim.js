@@ -37,8 +37,7 @@ function initPelangganReveal() {
     '.booth-card',
     '.mutu-card-box',
     '.features-capsule',
-    '.pure-fruit-pill',
-    '.mobile-bottom-nav'
+    '.pure-fruit-pill'
   ].join(', ');
 
   const elements = Array.from(document.querySelectorAll(selector));
@@ -47,6 +46,7 @@ function initPelangganReveal() {
 
   unique.forEach((el, index) => {
     if (el.dataset.pelangganRevealReady === 'true') return;
+    if (el.closest('.mobile-bottom-nav') || el.classList.contains('mobile-bottom-nav')) return;
     el.dataset.pelangganRevealReady = 'true';
     el.classList.add('pelanggan-reveal');
 
@@ -54,6 +54,8 @@ function initPelangganReveal() {
     if (el.classList.contains('product-card') || el.classList.contains('section-card')) {
       const delay = Math.min((index % 6) * 0.06, 0.3);
       el.style.animationDelay = `${delay}s`;
+    } else {
+      el.style.animationDelay = '';
     }
 
     if (reduceMotion) {
@@ -82,7 +84,7 @@ function observePelangganReveal(el) {
       if (entry.isIntersecting) {
         replayPelangganReveal(entry.target);
       } else {
-        entry.target.classList.add('pelanggan-reveal-pending');
+        resetPelangganReveal(entry.target);
       }
     });
   }, { threshold: 0.08, rootMargin: '0px 0px -10% 0px' });
@@ -90,7 +92,17 @@ function observePelangganReveal(el) {
   observer.observe(el);
 }
 
+function resetPelangganReveal(el) {
+  el.classList.add('pelanggan-reveal-pending');
+  el.style.animation = 'none';
+  el.style.opacity = '0';
+  // force reflow so next replay always restarts cleanly
+  void el.offsetHeight;
+  el.style.animation = '';
+}
+
 function replayPelangganReveal(el) {
+  el.style.opacity = '';
   el.classList.remove('pelanggan-reveal-pending');
   el.style.animation = 'none';
   void el.offsetHeight;

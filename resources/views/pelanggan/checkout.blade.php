@@ -36,6 +36,9 @@
                 <a href="{{ url('/#kontak') }}" class="nav-item">
                     Kontak
                 </a>
+                <a href="{{ route('pelanggan.lacak') }}" class="nav-item {{ request()->routeIs('pelanggan.lacak') ? 'active' : '' }}">
+                    Lacak Pesanan
+                </a>
             </nav>
 
             <div class="nav-right">
@@ -54,8 +57,14 @@
     </div>
 
     <main class="checkout-wrapper">
+        @if(($modeCheckout ?? 'keranjang') === 'langsung')
+            <div class="alert-sukses" style="margin-bottom: 14px;">
+                <strong>Mode Pesan Langsung:</strong> pesanan ini hanya berisi item yang kamu pilih. Item di keranjang tetap aman.
+            </div>
+        @endif
         <form method="POST" action="{{ route('pelanggan.checkout.proses') }}" class="checkout-grid">
             @csrf
+            <input type="hidden" name="mode_checkout" value="{{ $modeCheckout ?? 'keranjang' }}">
 
             <!-- Left: Items, Schedule & Buyer Data -->
             <div>
@@ -137,14 +146,32 @@
                         </svg>
                         Data Pemesan & Catatan
                     </div>
-                    <div class="input-pill">
-                        <label>NAMA ANDA</label>
-                        <input type="text" name="nama_pembeli" placeholder="Masukkan nama pemesan..." required>
-                    </div>
-                    <div class="input-pill">
-                        <label>NOMOR WHATSAPP</label>
-                        <input type="text" name="telepon_pembeli" placeholder="Contoh: 085888333445" required>
-                    </div>
+                    @if($pelanggan)
+                        <div style="background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;padding:10px 12px;border-radius:12px;font-size:12px;font-weight:700;margin-bottom:14px;">
+                            Login sebagai {{ $pelanggan->nama }} ({{ $pelanggan->telepon }}). Pesanan akan tersimpan ke akunmu.
+                        </div>
+                        <div class="input-pill">
+                            <label>NAMA ANDA</label>
+                            <input type="text" value="{{ $pelanggan->nama }}" readonly style="background:#f1f5f9;cursor:not-allowed;">
+                        </div>
+                        <div class="input-pill">
+                            <label>NOMOR WHATSAPP</label>
+                            <input type="text" value="{{ $pelanggan->telepon }}" readonly style="background:#f1f5f9;cursor:not-allowed;">
+                            <div style="font-size:11px;color:#64748b;font-weight:700;margin-top:6px;">Nomor HP mengikuti akun login.</div>
+                        </div>
+                    @else
+                        <div style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:10px 12px;border-radius:12px;font-size:12px;font-weight:700;margin-bottom:14px;">
+                            Bisa pesan tanpa login. Pesanan akan tersimpan di perangkat ini. <a href="{{ route('pelanggan.login') }}" style="color:#166534;text-decoration:underline;">Login</a> jika ingin riwayat tersimpan ke akun.
+                        </div>
+                        <div class="input-pill">
+                            <label>NAMA ANDA</label>
+                            <input type="text" name="nama_pembeli" value="{{ old('nama_pembeli') }}" placeholder="Masukkan nama pemesan..." required>
+                        </div>
+                        <div class="input-pill">
+                            <label>NOMOR WHATSAPP</label>
+                            <input type="text" name="telepon_pembeli" value="{{ old('telepon_pembeli') }}" placeholder="Contoh: 085888333445" required inputmode="numeric">
+                        </div>
+                    @endif
                     <div class="input-pill">
                         <label>CATATAN (OPSIONAL)</label>
                         <textarea name="catatan" rows="2" placeholder="Contoh: Es sedikit, jangan terlalu manis..."></textarea>
@@ -163,14 +190,18 @@
                         Metode Pembayaran
                     </div>
 
+                    @if($errors->any())
+                        <div style="background:#fef2f2;color:#991b1b;border:1px solid #fecaca;padding:10px 12px;border-radius:12px;font-size:12px;font-weight:700;margin-bottom:12px;">
+                            {{ $errors->first() }}
+                        </div>
+                    @endif
+
                     <!-- QRIS -->
-                    <label style="cursor: pointer; display:block;">
-                        <input type="radio" name="metode_bayar" value="qris" checked style="display:none;">
+                    <label class="payment-option" style="cursor: pointer; display:block;">
+                        <input type="radio" name="metode_bayar" value="qris" required style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">
                         <div class="payment-card">
                             <div class="payment-left">
-                                <div class="custom-radio" style="background:#4d8822; border-color:#4d8822;">
-                                    <div class="radio-dot" style="display:block;"></div>
-                                </div>
+                                <div class="custom-radio"><div class="radio-dot"></div></div>
                                 <div class="payment-info">
                                     <div class="name">QRIS Instan</div>
                                     <div class="sub">Dana, GoPay, OVO, ShopeePay</div>
@@ -186,13 +217,11 @@
                     </label>
 
                     <!-- Transfer Bank -->
-                    <label style="cursor: pointer; display:block;">
-                        <input type="radio" name="metode_bayar" value="transfer" style="display:none;">
+                    <label class="payment-option" style="cursor: pointer; display:block;">
+                        <input type="radio" name="metode_bayar" value="transfer" required style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">
                         <div class="payment-card">
                             <div class="payment-left">
-                                <div class="custom-radio">
-                                    <div class="radio-dot"></div>
-                                </div>
+                                <div class="custom-radio"><div class="radio-dot"></div></div>
                                 <div class="payment-info">
                                     <div class="name">Transfer Bank</div>
                                     <div class="sub">BCA / Mandiri</div>
@@ -205,7 +234,6 @@
                                 </svg>
                             </div>
                         </div>
-                    </label>
                     </label>
 
                     <!-- Summary -->
@@ -259,6 +287,14 @@
                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
             </svg>
             <span class="mobile-nav-label">Tentang Kami</span>
+        </a>
+        <a href="{{ route('pelanggan.lacak') }}" class="mobile-nav-item {{ request()->routeIs('pelanggan.lacak') ? 'active' : '' }}">
+            <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                <path d="M8 11h6"></path>
+            </svg>
+            <span class="mobile-nav-label">Lacak</span>
         </a>
         <a href="https://wa.me/6285807106570?text=Halo%20OMYU,%20saya%20ingin%20tanya%20menu" target="_blank" class="mobile-nav-item">
             <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">

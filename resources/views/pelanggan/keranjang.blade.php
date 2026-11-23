@@ -36,6 +36,9 @@
                 <a href="{{ url('/#kontak') }}" class="nav-item">
                     Kontak
                 </a>
+                <a href="{{ route('pelanggan.lacak') }}" class="nav-item {{ request()->routeIs('pelanggan.lacak') ? 'active' : '' }}">
+                    Lacak Pesanan
+                </a>
             </nav>
 
             <div class="nav-right">
@@ -183,6 +186,14 @@
                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
             </svg>
             <span class="mobile-nav-label">Tentang Kami</span>
+        </a>
+        <a href="{{ route('pelanggan.lacak') }}" class="mobile-nav-item {{ request()->routeIs('pelanggan.lacak') ? 'active' : '' }}">
+            <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                <path d="M8 11h6"></path>
+            </svg>
+            <span class="mobile-nav-label">Lacak</span>
         </a>
         <a href="https://wa.me/6285807106570?text=Halo%20OMYU,%20saya%20ingin%20tanya%20menu" target="_blank" class="mobile-nav-item">
             <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">

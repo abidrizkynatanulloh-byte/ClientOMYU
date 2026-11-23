@@ -7,6 +7,7 @@ use App\Http\Controllers\Owner\KaryawanController;
 use App\Http\Controllers\Owner\KeuanganController;
 use App\Http\Controllers\Owner\PenjualanController;
 use App\Http\Controllers\Owner\ResepHppController;
+use App\Http\Controllers\PelangganAuthController;
 use App\Http\Controllers\PelangganPesananController;
 use App\Http\Controllers\Staf\AktivitasController as StafAktivitasController;
 use App\Http\Controllers\Staf\BantuanController as StafBantuanController;
@@ -132,16 +133,23 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
 // FITUR SISI PEMBELI (TANPA LOGIN - BAB 3)
 // ==========================================
 Route::prefix('order')->name('pelanggan.')->group(function () {
-    // P-02: Katalog Menu
+    // P-02: Katalog Menu (bisa dilihat tanpa login)
     Route::get('/menu', [PelangganPesananController::class, 'katalog'])->name('katalog');
 
-    // P-04: Keranjang Belanja
+    // Login/daftar pelanggan (nomor HP + password) - opsional
+    Route::get('/login', [PelangganAuthController::class, 'tampilkanLogin'])->name('login');
+    Route::post('/login/cek', [PelangganAuthController::class, 'cekTelepon'])->name('login.cek');
+    Route::post('/login', [PelangganAuthController::class, 'masuk'])->name('login.proses');
+    Route::post('/daftar', [PelangganAuthController::class, 'daftar'])->name('daftar.proses');
+    Route::post('/logout', [PelangganAuthController::class, 'keluar'])->name('logout');
+
+    // P-04: Keranjang Belanja (guest boleh, pakai session/device)
     Route::post('/keranjang/tambah', [PelangganPesananController::class, 'tambahKeranjang'])->name('keranjang.tambah');
     Route::post('/keranjang/update', [PelangganPesananController::class, 'updateKeranjang'])->name('keranjang.update');
     Route::get('/keranjang', [PelangganPesananController::class, 'lihatKeranjang'])->name('keranjang');
     Route::delete('/keranjang/{key}', [PelangganPesananController::class, 'hapusKeranjang'])->name('keranjang.hapus');
 
-    // P-05: Checkout
+    // P-05: Checkout (guest boleh)
     Route::get('/checkout', [PelangganPesananController::class, 'checkout'])->name('checkout');
     Route::post('/checkout', [PelangganPesananController::class, 'prosesCheckout'])->name('checkout.proses');
 
@@ -149,6 +157,6 @@ Route::prefix('order')->name('pelanggan.')->group(function () {
     Route::get('/pembayaran/{kode}', [PelangganPesananController::class, 'halamanPembayaran'])->name('pembayaran');
     Route::post('/pembayaran/{kode}/konfirmasi', [PelangganPesananController::class, 'konfirmasiBayar'])->name('pembayaran.konfirmasi');
 
-    // P-08: Cek Status Pesanan Real-time
+    // P-08: Cek Status Pesanan Real-time (guest by device token, login by akun)
     Route::get('/lacak', [PelangganPesananController::class, 'lacakStatus'])->name('lacak');
 });

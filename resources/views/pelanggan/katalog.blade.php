@@ -36,6 +36,9 @@
                 <a href="{{ url('/#kontak') }}" class="nav-item">
                     Kontak
                 </a>
+                <a href="{{ route('pelanggan.lacak') }}" class="nav-item {{ request()->routeIs('pelanggan.lacak') ? 'active' : '' }}">
+                    Lacak Pesanan
+                </a>
             </nav>
 
             <div class="nav-right">
@@ -48,6 +51,15 @@
                         </svg>
                     </button>
                 </form>
+
+                @if(Auth::guard('pelanggan')->check())
+                    <form method="POST" action="{{ route('pelanggan.logout') }}" style="margin:0;">
+                        @csrf
+                        <button type="submit" class="icon-circle-btn" title="Keluar" style="cursor:pointer;">↪</button>
+                    </form>
+                @else
+                    <a href="{{ route('pelanggan.login') }}" class="icon-circle-btn" title="Login untuk pesan" style="text-decoration:none;font-size:11px;font-weight:800;color:#183d12;">Login</a>
+                @endif
 
                 <a href="{{ route('pelanggan.keranjang') }}" class="icon-circle-btn" title="Keranjang Belanja">
                     <svg class="web-icon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -62,6 +74,11 @@
     </div>
 
     <main class="catalog-wrapper">
+        @if(session('galat'))
+            <div style="background:#fef2f2;color:#991b1b;border:1px solid #fecaca;padding:12px 16px;border-radius:14px;font-size:13px;font-weight:700;margin-bottom:14px;">
+                {{ session('galat') }}
+            </div>
+        @endif
         @if(session('sukses'))
             <div class="alert-sukses">
                 <svg class="web-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
@@ -101,39 +118,59 @@
         <!-- Products Grid -->
         <div class="products-grid">
             @forelse($daftarProduk as $p)
-                <div class="product-card">
+                @php
+                    $namaLower = strtolower($p->nama);
+                    $imgUrl = 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=600&auto=format&fit=crop&q=80';
+                    if (str_contains($namaLower, 'mangga')) {
+                        $imgUrl = 'https://images.unsplash.com/photo-1546173159-315724a31696?w=600&auto=format&fit=crop&q=80';
+                    } elseif (str_contains($namaLower, 'alpukat')) {
+                        $imgUrl = 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=600&auto=format&fit=crop&q=80';
+                    } elseif (str_contains($namaLower, 'tomat')) {
+                        $imgUrl = 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80';
+                    } elseif (str_contains($namaLower, 'seledri') || str_contains($namaLower, 'green')) {
+                        $imgUrl = 'https://images.unsplash.com/photo-1610970881699-44a5587cabec?w=600&auto=format&fit=crop&q=80';
+                    } elseif (str_contains($namaLower, 'kopi') || str_contains($namaLower, 'coffe') || str_contains($namaLower, 'nescafe')) {
+                        $imgUrl = 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=600&auto=format&fit=crop&q=80';
+                    }
+                    $detailProduk = [
+                        'id' => $p->id,
+                        'nama' => $p->nama,
+                        'deskripsi' => $p->deskripsi ?? 'Manis, segar, dan nikmat di setiap tegukan.',
+                        'harga' => $p->harga,
+                        'harga_format' => 'Rp ' . number_format($p->harga, 0, ',', '.'),
+                        'stok' => $p->stok,
+                        'kategori' => $p->kategori?->nama ?? 'Menu OMYU',
+                        'img' => $imgUrl,
+                    ];
+                @endphp
+                <div class="product-card product-open-detail"
+                     role="button"
+                     tabindex="0"
+                     data-produk='@json($detailProduk)'>
                     <div class="product-img-box">
-                        @php
-                            $namaLower = strtolower($p->nama);
-                            $imgUrl = 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=300&auto=format&fit=crop&q=80';
-                            if (str_contains($namaLower, 'mangga')) {
-                                $imgUrl = 'https://images.unsplash.com/photo-1546173159-315724a31696?w=300&auto=format&fit=crop&q=80';
-                            } elseif (str_contains($namaLower, 'alpukat')) {
-                                $imgUrl = 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=300&auto=format&fit=crop&q=80';
-                            } elseif (str_contains($namaLower, 'tomat')) {
-                                $imgUrl = 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=300&auto=format&fit=crop&q=80';
-                            } elseif (str_contains($namaLower, 'seledri') || str_contains($namaLower, 'green')) {
-                                $imgUrl = 'https://images.unsplash.com/photo-1610970881699-44a5587cabec?w=300&auto=format&fit=crop&q=80';
-                            } elseif (str_contains($namaLower, 'kopi') || str_contains($namaLower, 'coffe') || str_contains($namaLower, 'nescafe')) {
-                                $imgUrl = 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=300&auto=format&fit=crop&q=80';
-                            }
-                        @endphp
                         <img src="{{ $imgUrl }}" alt="{{ $p->nama }}">
                     </div>
 
                     <div class="product-title">{{ $p->nama }}</div>
-                    <div class="product-desc">{{ $p->deskripsi ?? 'Manis, segar, dan nikmat di setiap tegukan.' }}</div>
+                    <span class="product-price">Rp {{ number_format($p->harga, 0, ',', '.') }}</span>
 
                     <div class="product-footer">
-                        <span class="product-price">Rp {{ number_format($p->harga, 0, ',', '.') }}</span>
-
                         @if($p->stok > 0)
-                            <form method="POST" action="{{ route('pelanggan.keranjang.tambah') }}">
-                                @csrf
-                                <input type="hidden" name="produk_id" value="{{ $p->id }}">
-                                <input type="hidden" name="qty" value="1">
-                                <button type="submit" class="btn-add-cart">+ Keranjang</button>
-                            </form>
+                            <div class="product-actions" onclick="event.stopPropagation();">
+                                <form method="POST" action="{{ route('pelanggan.keranjang.tambah') }}">
+                                    @csrf
+                                    <input type="hidden" name="produk_id" value="{{ $p->id }}">
+                                    <input type="hidden" name="qty" value="1">
+                                    <button type="submit" class="btn-add-cart">Keranjang</button>
+                                </form>
+                                <form method="POST" action="{{ route('pelanggan.keranjang.tambah') }}">
+                                    @csrf
+                                    <input type="hidden" name="produk_id" value="{{ $p->id }}">
+                                    <input type="hidden" name="qty" value="1">
+                                    <input type="hidden" name="langsung" value="1">
+                                    <button type="submit" class="btn-order-now">Pesan</button>
+                                </form>
+                            </div>
                         @else
                             <span style="font-size: 12px; color: #dc2626; font-weight: 800;">Stok Habis</span>
                         @endif
@@ -172,6 +209,14 @@
             </svg>
             <span class="mobile-nav-label">Tentang Kami</span>
         </a>
+        <a href="{{ route('pelanggan.lacak') }}" class="mobile-nav-item {{ request()->routeIs('pelanggan.lacak') ? 'active' : '' }}">
+            <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                <path d="M8 11h6"></path>
+            </svg>
+            <span class="mobile-nav-label">Lacak</span>
+        </a>
         <a href="{{ url('/#kontak') }}" class="mobile-nav-item">
             <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
@@ -180,6 +225,106 @@
         </a>
     </nav>
 
+    <!-- Product Detail Modal -->
+    <div id="productModal" class="product-modal-overlay" aria-hidden="true">
+        <div class="product-modal" role="dialog" aria-modal="true" aria-labelledby="modalNamaProduk">
+            <button type="button" class="product-modal-close" id="closeProductModal" aria-label="Tutup">&times;</button>
+            <div class="product-modal-body">
+                <div class="product-modal-image">
+                    <img id="modalImgProduk" src="" alt="Detail produk">
+                </div>
+                <div class="product-modal-content">
+                    <span class="product-modal-badge" id="modalKategoriProduk">Menu OMYU</span>
+                    <h3 class="product-modal-title" id="modalNamaProduk"></h3>
+                    <p class="product-modal-desc" id="modalDeskripsiProduk"></p>
+                    <div class="product-modal-price" id="modalHargaProduk"></div>
+                    <div class="product-modal-meta">
+                        <div class="product-modal-meta-item"><strong>Stok tersedia:</strong> <span id="modalStokProduk"></span></div>
+                        <div class="product-modal-meta-item"><strong>Catatan:</strong> Dibuat segar saat pesanan diproses.</div>
+                    </div>
+                    <div class="product-modal-actions">
+                        <form method="POST" action="{{ route('pelanggan.keranjang.tambah') }}">
+                            @csrf
+                            <input type="hidden" name="produk_id" id="modalProdukIdCart">
+                            <input type="hidden" name="qty" value="1">
+                            <button type="submit" class="btn-add-cart">+ Keranjang</button>
+                        </form>
+                        <form method="POST" action="{{ route('pelanggan.keranjang.tambah') }}">
+                            @csrf
+                            <input type="hidden" name="produk_id" id="modalProdukIdOrder">
+                            <input type="hidden" name="qty" value="1">
+                            <input type="hidden" name="langsung" value="1">
+                            <button type="submit" class="btn-order-now">Pesan Langsung</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const modal = document.getElementById('productModal');
+            if (!modal) return;
+            const closeBtn = document.getElementById('closeProductModal');
+            const img = document.getElementById('modalImgProduk');
+            const kategori = document.getElementById('modalKategoriProduk');
+            const nama = document.getElementById('modalNamaProduk');
+            const desk = document.getElementById('modalDeskripsiProduk');
+            const harga = document.getElementById('modalHargaProduk');
+            const stok = document.getElementById('modalStokProduk');
+            const idCart = document.getElementById('modalProdukIdCart');
+            const idOrder = document.getElementById('modalProdukIdOrder');
+
+            function openModal(data) {
+                img.src = data.img || '';
+                img.alt = data.nama || 'Produk OMYU';
+                kategori.textContent = data.kategori || 'Menu OMYU';
+                nama.textContent = data.nama || '';
+                desk.textContent = data.deskripsi || '';
+                harga.textContent = data.harga_format || '';
+                stok.textContent = (data.stok ?? 0) + ' cup';
+                idCart.value = data.id || '';
+                idOrder.value = data.id || '';
+                modal.classList.add('show');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+                document.body.classList.add('product-modal-open');
+            }
+
+            function closeModal() {
+                modal.classList.remove('show');
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+                document.body.classList.remove('product-modal-open');
+            }
+
+            document.querySelectorAll('.product-open-detail').forEach((card) => {
+                card.addEventListener('click', function (e) {
+                    if (e.target.closest('form, button, a, input, select, textarea')) return;
+                    const raw = this.getAttribute('data-produk');
+                    if (!raw) return;
+                    try { openModal(JSON.parse(raw)); } catch (_) {}
+                });
+                card.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        const raw = this.getAttribute('data-produk');
+                        if (!raw) return;
+                        try { openModal(JSON.parse(raw)); } catch (_) {}
+                    }
+                });
+            });
+
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) closeModal();
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && modal.classList.contains('show')) closeModal();
+            });
+        })();
+    </script>
     <script src="{{ asset('js/pelanggan-anim.js') }}?v={{ filemtime(public_path('js/pelanggan-anim.js')) }}"></script>
 </body>
 </html>
