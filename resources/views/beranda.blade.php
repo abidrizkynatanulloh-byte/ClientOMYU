@@ -604,6 +604,7 @@
             display: block;
             filter: drop-shadow(0 10px 22px rgba(25,56,8,0.18));
         }
+        
         .promo-dots {
             position: absolute;
             left: 50%;
@@ -1203,55 +1204,7 @@
     <!-- Main Content Area: Pas 1 Layar Penuh -->
     <main class="main-wrapper">
 
-        <!-- GANTI GAMBAR BANNER (SISI KANAN) DI SINI:
-             1. Taruh file gambar di: public/images/banner/
-                Contoh: banner-1.png, banner-2.png, banner-3.png
-             2. Ganti hanya src pada <img class="promo-image"> di tiap slide.
-             3. Teks kiri tetap, gambar yang diganti hanya sisi kanan. -->
-        <section class="promo-slider" id="promoSlider" aria-label="Promo OMYU">
-            <div class="promo-track" id="promoTrack">
-                <div class="promo-slide">
-                    <div class="promo-content">
-                        <span class="promo-badge">🍊 PROMO SEGAR</span>
-                        <h2 class="promo-title">Segar Setiap Hari, 100% Buah Asli</h2>
-                        <p class="promo-desc">Pilih menu favoritmu dan rasakan jus segar tanpa pemanis buatan. Dibuat saat dipesan, langsung fresh!</p>
-                        <a href="{{ route('pelanggan.katalog') }}" class="promo-cta">Lihat Menu <span>→</span></a>
-                    </div>
-                    <div class="promo-visual">
-                        <img class="promo-image" src="{{ asset('images/es.png') }}" alt="Banner Promo 1">
-                    </div>
-                </div>
 
-                <div class="promo-slide">
-                    <div class="promo-content">
-                        <span class="promo-badge">🔥 FAVORIT PELANGGAN</span>
-                        <h2 class="promo-title">Pesan Langsung, Lebih Cepat!</h2>
-                        <p class="promo-desc">Klik menu, lihat detailnya, lalu pilih <strong>Tambah Keranjang</strong> atau <strong>Pesan Langsung</strong>.</p>
-                        <a href="{{ route('pelanggan.katalog') }}" class="promo-cta">Pesan Sekarang <span>→</span></a>
-                    </div>
-                    <div class="promo-visual">
-                        <img class="promo-image" src="{{ asset('images/banner/banner-2.png') }}" alt="Banner Promo 2">
-                    </div>
-                </div>
-
-                <div class="promo-slide">
-                    <div class="promo-content">
-                        <span class="promo-badge">💚 SEHAT & PRAKTIS</span>
-                        <h2 class="promo-title">Ambil di Outlet, Tanpa Ribet</h2>
-                        <p class="promo-desc">Pesan online, bayar, lalu ambil pesananmu di outlet OMYU. Cocok buat yang aktif dan butuh minuman sehat.</p>
-                        <a href="{{ route('pelanggan.lacak') }}" class="promo-cta">Lacak Pesanan <span>→</span></a>
-                    </div>
-                    <div class="promo-visual">
-                        <img class="promo-image" src="{{ asset('images/banner/banner-3.png') }}" alt="Banner Promo 3">
-                    </div>
-                </div>
-            </div>
-            <div class="promo-dots" id="promoDots" aria-label="Navigasi banner">
-                <button type="button" class="promo-dot active" data-slide="0" aria-label="Banner 1"></button>
-                <button type="button" class="promo-dot" data-slide="1" aria-label="Banner 2"></button>
-                <button type="button" class="promo-dot" data-slide="2" aria-label="Banner 3"></button>
-            </div>
-        </section>
 
         <!-- Hero Section -->
         <section class="hero-grid">
@@ -1310,6 +1263,56 @@
             </div>
         </section>
 
+                <!-- GANTI GAMBAR BANNER (SISI KANAN) DI SINI:
+             1. Taruh file gambar di: public/images/banner/
+                Contoh: banner-1.png, banner-2.png, banner-3.png
+             2. Ganti hanya src pada <img class="promo-image"> di tiap slide.
+             3. Teks kiri tetap, gambar yang diganti hanya sisi kanan. -->
+        <section class="promo-slider" id="promoSlider" aria-label="Promo OMYU">
+            <div class="promo-track" id="promoTrack">
+                <div class="promo-slide">
+                    <div class="promo-content">
+                        <span class="promo-badge">🍊 PROMO SEGAR</span>
+                        <h2 class="promo-title">Segar Setiap Hari, 100% Buah Asli</h2>
+                        <p class="promo-desc">Pilih menu favoritmu dan rasakan jus segar tanpa pemanis buatan. Dibuat saat dipesan, langsung fresh!</p>
+                        <a href="{{ route('pelanggan.katalog') }}" class="promo-cta">Lihat Menu <span>→</span></a>
+                    </div>
+                    <div class="promo-visual">
+                        <img class="promo-image" src="{{ asset('images/banner/banner1.png') }}" alt="Banner Promo 1">
+                    </div>
+                </div>
+
+                <div class="promo-slide">
+                    <div class="promo-content">
+                        <span class="promo-badge">🔥 FAVORIT PELANGGAN</span>
+                        <h2 class="promo-title">Pesan Langsung, Lebih Cepat!</h2>
+                        <p class="promo-desc">Klik menu, lihat detailnya, lalu pilih <strong>Tambah Keranjang</strong> atau <strong>Pesan Langsung</strong>.</p>
+                        <a href="{{ route('pelanggan.katalog') }}" class="promo-cta">Pesan Sekarang <span>→</span></a>
+                    </div>
+                    <div class="promo-visual">
+                        <img class="promo-image" src="{{ asset('images/banner/banner2.png') }}" alt="Banner Promo 2">
+                    </div>
+                </div>
+
+                <div class="promo-slide">
+                    <div class="promo-content">
+                        <span class="promo-badge">💚 SEHAT & PRAKTIS</span>
+                        <h2 class="promo-title">Ambil di Outlet, Tanpa Ribet</h2>
+                        <p class="promo-desc">Pesan online, bayar, lalu ambil pesananmu di outlet OMYU. Cocok buat yang aktif dan butuh minuman sehat.</p>
+                        <a href="{{ route('pelanggan.lacak') }}" class="promo-cta">Lacak Pesanan <span>→</span></a>
+                    </div>
+                    <div class="promo-visual">
+                        <img class="promo-image" src="{{ asset('images/banner/banner3.png') }}" alt="Banner Promo 3">
+                    </div>
+                </div>
+            </div>
+            <div class="promo-dots" id="promoDots" aria-label="Navigasi banner">
+                <button type="button" class="promo-dot active" data-slide="0" aria-label="Banner 1"></button>
+                <button type="button" class="promo-dot" data-slide="1" aria-label="Banner 2"></button>
+                <button type="button" class="promo-dot" data-slide="2" aria-label="Banner 3"></button>
+            </div>
+        </section>
+
         <!-- Features Bar (3 Pills) -->
         <section class="features-capsule">
             <div class="feat-item">
@@ -1351,6 +1354,8 @@
                 </div>
             </div>
         </section>
+
+        
 
         <!-- Bottom 2-Cards Grid -->
         <section class="bottom-cards-grid">
