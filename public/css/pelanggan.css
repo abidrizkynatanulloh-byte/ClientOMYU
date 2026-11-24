@@ -44,7 +44,7 @@
     /* Topbar Dimensions & Styling - 100% PERSIS BERANDA */
     --topbar-height: 52px;
     --topbar-radius: 40px;
-    --topbar-bg: #d1d1d1ba;
+    --topbar-bg: #d1d1d1f2;
     --topbar-border: 1px solid #ffffff00;
     --topbar-shadow: 0 8px 25px rgba(25, 56, 8, 0.1), 0 2px 8px rgba(0, 0, 0, 0.04);
     --topbar-top: 5px;
@@ -1237,7 +1237,7 @@ input[type="radio"]:checked ~ .payment-card .radio-dot {
         padding: 0 12px;
         height: 48px;
         border-radius: 30px;
-        background: rgba(255, 255, 255, 0.88);
+        background: rgba(255, 255, 255, 0.96);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
     }

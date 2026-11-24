@@ -53,7 +53,7 @@
             width: 98%;
             max-width: 1180px;
             height: 52px;
-            background: #d1d1d1ba;
+            background: #d1d1d1f2;
             border-radius: 40px;
             display: flex;
             align-items: center;
@@ -839,7 +839,7 @@
                 height: 48px;
                 padding: 0 12px;
                 border-radius: 30px;
-                background: rgba(255, 255, 255, 0.88);
+                background: rgba(255, 255, 255, 0.96);
                 backdrop-filter: blur(12px);
                 -webkit-backdrop-filter: blur(12px);
                 border: 1px solid rgba(255, 255, 255, 0.6);
@@ -1157,13 +1157,13 @@
 
             <!-- Center Nav Links (Desktop Topbar) -->
             <nav class="nav-center">
-                <a href="/" class="nav-item active">
+                <a href="/" class="nav-item active" data-menu-aktif="beranda">
                     Beranda
                 </a>
                 <a href="{{ route('pelanggan.katalog') }}" class="nav-item">
                     Menu
                 </a>
-                <a href="#tentang-kami" class="nav-item">
+                <a href="#tentang-kami" class="nav-item" data-menu-aktif="tentang-kami">
                     Tentang Kami
                 </a>
                 <a href="https://wa.me/6285807106570?text=Halo%20OMYU,%20saya%20ingin%20tanya%20menu" target="_blank" class="nav-item">
@@ -1428,7 +1428,7 @@
 
     <!-- Floating Bottom Navigation (Mobile Only) -->
     <nav class="mobile-bottom-nav">
-        <a href="/" class="mobile-nav-item active">
+        <a href="/" class="mobile-nav-item active" data-menu-aktif="beranda">
             <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -1443,7 +1443,7 @@
             </svg>
             <span class="mobile-nav-label">Menu</span>
         </a>
-        <a href="#tentang-kami" class="mobile-nav-item">
+        <a href="#tentang-kami" class="mobile-nav-item" data-menu-aktif="tentang-kami">
             <svg class="mobile-nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -1503,6 +1503,80 @@
 
             render();
             start();
+        })();
+
+        (function () {
+            const menuKontekstual = document.querySelectorAll('[data-menu-aktif]');
+            const tautanTentangKami = document.querySelectorAll('a[href="#tentang-kami"]');
+            const bagianTentangKami = document.getElementById('tentang-kami');
+            let penggunaSudahScroll = konteksSaatIni() === 'tentang-kami';
+
+            function terapkanMenuAktif(konteks) {
+                menuKontekstual.forEach((menu) => {
+                    const aktif = menu.dataset.menuAktif === konteks;
+                    menu.classList.toggle('active', aktif);
+
+                    if (aktif) {
+                        menu.setAttribute('aria-current', 'location');
+                    } else {
+                        menu.removeAttribute('aria-current');
+                    }
+                });
+            }
+
+            function konteksSaatIni() {
+                return window.location.hash === '#tentang-kami' ? 'tentang-kami' : 'beranda';
+            }
+
+            function konteksDariPosisiScroll() {
+                const batas = bagianTentangKami.getBoundingClientRect();
+                const terlihat = batas.top < window.innerHeight - 100 && batas.bottom > 80;
+
+                return terlihat ? 'tentang-kami' : 'beranda';
+            }
+
+            terapkanMenuAktif(konteksSaatIni());
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 0) {
+                    penggunaSudahScroll = true;
+                }
+            }, { passive: true });
+
+            window.addEventListener('hashchange', () => {
+                penggunaSudahScroll = true;
+                terapkanMenuAktif(konteksSaatIni());
+            });
+
+            tautanTentangKami.forEach((tautan) => {
+                tautan.addEventListener('click', () => {
+                    penggunaSudahScroll = true;
+                    terapkanMenuAktif('tentang-kami');
+                });
+            });
+
+            if (!bagianTentangKami) {
+                return;
+            }
+
+            if (!('IntersectionObserver' in window)) {
+                window.addEventListener('scroll', () => {
+                    if (penggunaSudahScroll) {
+                        terapkanMenuAktif(konteksDariPosisiScroll());
+                    }
+                }, { passive: true });
+                return;
+            }
+
+            const pengamatBagian = new IntersectionObserver((entries) => {
+                if (!penggunaSudahScroll) {
+                    return;
+                }
+
+                terapkanMenuAktif(entries[0].isIntersecting ? 'tentang-kami' : 'beranda');
+            }, { rootMargin: '-80px 0px -100px 0px', threshold: 0.2 });
+
+            pengamatBagian.observe(bagianTentangKami);
         })();
     </script>
 </body>
