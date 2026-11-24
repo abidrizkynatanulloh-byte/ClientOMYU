@@ -12,10 +12,9 @@
     .pos-layout { display: grid; gap: 16px; align-items: start; }
     .menu-panel, .cart-panel { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 14px; }
 
-    .btn-scan { width: 100%; border: 0; border-radius: 11px; background: #0f5132; color: #ffffff; padding: 11px 14px; font-size: 13px; font-weight: 800; cursor: pointer; }
-    .scan-pesan { min-height: 18px; margin-top: 8px; font-size: 12px; font-weight: 700; color: #64748b; }
-    .scan-pesan.sukses { color: #15803d; }
-    .scan-pesan.error { color: #b91c1c; }
+    .status-pesan { min-height: 18px; margin-top: 8px; font-size: 12px; font-weight: 700; color: #64748b; }
+    .status-pesan.sukses { color: #15803d; }
+    .status-pesan.error { color: #b91c1c; }
 
     .kategori-tabs { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 6px; margin: 12px 0; scrollbar-width: none; }
     .kategori-tabs::-webkit-scrollbar { display: none; }
@@ -33,7 +32,6 @@
     .menu-card:disabled { opacity: .55; cursor: not-allowed; }
     .menu-img { width: 100%; height: 88px; object-fit: cover; border-radius: 9px; margin-bottom: 8px; background: #f1f5f9; }
     .menu-nama { font-size: 13px; font-weight: 800; color: #0f172a; line-height: 1.3; }
-    .menu-barcode { font-size: 10px; color: #94a3b8; margin-top: 2px; word-break: break-all; }
     .menu-harga { font-size: 14px; font-weight: 900; color: #15803d; margin-top: 6px; }
     .menu-stok { font-size: 10px; font-weight: 800; margin-top: 4px; }
     .stok-tersedia { color: #16a34a; }
@@ -89,8 +87,7 @@
 
 <div class="pos-layout">
     <section class="menu-panel">
-        <button type="button" class="btn-scan" id="scanBarcode">Scan Barcode</button>
-        <div class="scan-pesan" id="scanPesan" role="status"></div>
+        <div class="status-pesan" id="statusPesan" role="status"></div>
 
         <div class="kategori-tabs">
             <a href="{{ route('panel.staf.kasir.index') }}" class="kategori-tab {{ ! request('kategori_id') ? 'active' : '' }}">Semua Kategori</a>
@@ -103,7 +100,7 @@
             @if(request('kategori_id'))
                 <input type="hidden" name="kategori_id" value="{{ request('kategori_id') }}">
             @endif
-            <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Cari nama menu atau barcode...">
+            <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Cari nama menu...">
             <button type="submit">Cari</button>
         </form>
 
@@ -113,14 +110,11 @@
                     $stokHabis = $produk->stok <= 0;
                     $kelasStok = $stokHabis ? 'stok-habis' : ($produk->stok <= 5 ? 'stok-menipis' : 'stok-tersedia');
                 @endphp
-                <button type="button" class="menu-card" data-id="{{ $produk->id }}" data-nama="{{ $produk->nama }}" data-harga="{{ $produk->harga }}" data-stok="{{ $produk->stok }}" data-barcode="{{ $produk->barcode }}" {{ $stokHabis ? 'disabled' : '' }}>
+                <button type="button" class="menu-card" data-id="{{ $produk->id }}" data-nama="{{ $produk->nama }}" data-harga="{{ $produk->harga }}" data-stok="{{ $produk->stok }}" {{ $stokHabis ? 'disabled' : '' }}>
                     @if($produk->gambar)
                         <img class="menu-img" src="{{ Storage::url($produk->gambar) }}" alt="{{ $produk->nama }}">
                     @endif
                     <div class="menu-nama">{{ $produk->nama }}</div>
-                    @if($produk->barcode)
-                        <div class="menu-barcode">{{ $produk->barcode }}</div>
-                    @endif
                     <div class="menu-harga">Rp {{ number_format($produk->harga, 0, ',', '.') }}</div>
                     <div class="menu-stok {{ $kelasStok }}">
                         @if($stokHabis)
@@ -145,7 +139,7 @@
             </div>
 
             <div id="cartItemsList">
-                <div class="cart-empty" id="cartEmptyText">Pilih menu atau pindai barcode untuk mulai transaksi.</div>
+                <div class="cart-empty" id="cartEmptyText">Pilih menu untuk mulai transaksi.</div>
             </div>
             <div id="hiddenInputs"></div>
 
@@ -228,7 +222,7 @@
     const uangDiterima = document.getElementById('uangDiterima');
     const referensiBayar = document.getElementById('referensiBayar');
     const formError = document.getElementById('formError');
-    const scanPesan = document.getElementById('scanPesan');
+    const statusPesan = document.getElementById('statusPesan');
 
     function escapeHtml(nilai) {
         return String(nilai).replace(/[&<>"']/g, function (karakter) {
@@ -237,8 +231,8 @@
     }
 
     function tampilPesan(pesan, tipe) {
-        scanPesan.textContent = pesan;
-        scanPesan.className = 'scan-pesan' + (tipe ? ' ' + tipe : '');
+        statusPesan.textContent = pesan;
+        statusPesan.className = 'status-pesan' + (tipe ? ' ' + tipe : '');
     }
 
     function tampilError(pesan) {
@@ -287,7 +281,7 @@
         let index = 0;
 
         if (ids.length === 0) {
-            cartItemsList.innerHTML = '<div class="cart-empty">Pilih menu atau pindai barcode untuk mulai transaksi.</div>';
+            cartItemsList.innerHTML = '<div class="cart-empty">Pilih menu untuk mulai transaksi.</div>';
             hiddenInputs.innerHTML = '';
         } else {
             ids.forEach(function (id) {
@@ -365,43 +359,6 @@
         Object.keys(keranjang).forEach(function (id) { delete keranjang[id]; });
         renderKeranjang();
         tampilPesan('Keranjang dikosongkan.');
-    });
-
-    async function cariBarcode(barcode) {
-        const kode = String(barcode || '').trim();
-        if (!kode) {
-            tampilPesan('Barcode kosong.', 'error');
-            return;
-        }
-
-        tampilPesan('Mencari produk dengan barcode ' + kode + '...');
-
-        try {
-            const response = await fetch('{{ route('panel.staf.kasir.cari-barcode') }}?barcode=' + encodeURIComponent(kode), {
-                method: 'GET',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                }
-            });
-            const hasil = await response.json();
-
-            if (!response.ok || !hasil.found) {
-                tampilPesan(hasil.pesan || 'Produk dengan barcode ' + kode + ' tidak ditemukan.', 'error');
-                return;
-            }
-
-            tambahKeKeranjang(hasil.produk);
-            tampilPesan(hasil.produk.nama + ' ditambahkan ke keranjang.', 'sukses');
-        } catch (error) {
-            tampilPesan('Barcode gagal dicek. Periksa koneksi lalu coba lagi.', 'error');
-        }
-    }
-
-    document.getElementById('scanBarcode').addEventListener('click', function () {
-        window.StafScanner.bukaBarcode({
-            onResult: function (barcode) { cariBarcode(barcode); }
-        });
     });
 
     document.querySelectorAll('.btn-cash').forEach(function (tombol) {

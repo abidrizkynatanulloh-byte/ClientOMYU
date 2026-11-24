@@ -93,7 +93,7 @@
             <article class="prod-card aktif">
                 <div class="prod-card-head">
                     <span class="prod-code">#{{ $sedangDibuat->kode_pesanan }}</span>
-                    <span class="prod-badge diproses">{{ str_replace('_', ' ', $sedangDibuat->status_pesanan) }}</span>
+                    <span class="prod-badge diproses"><span class="pulse-live-dot"></span> {{ str_replace('_', ' ', $sedangDibuat->status_pesanan) }}</span>
                     <span class="prod-durasi">Menunggu {{ (int) $sedangDibuat->durasi_menit }} menit</span>
                 </div>
                 <div class="prod-body">
@@ -193,7 +193,6 @@
             <section>
                 <div class="prod-subhead">
                     <h2>Siap Diambil ({{ $siapDiambil->count() }})</h2>
-                    <a href="{{ route('panel.staf.pesanan.scan') }}">Buka scanner QR &rarr;</a>
                 </div>
                 <div class="pickup-list">
                     @foreach($siapDiambil as $siap)

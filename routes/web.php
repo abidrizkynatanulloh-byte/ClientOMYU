@@ -55,9 +55,6 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
         // K-03, K-04, K-05, K-06, K-12: Manajemen Pesanan Masuk & Verifikasi
         Route::prefix('pesanan')->name('staf.pesanan.')->group(function () {
             Route::get('/', [StafPesananController::class, 'index'])->name('index');
-            Route::get('/scan', [StafPesananController::class, 'scan'])->name('scan');
-            Route::post('/scan/validasi', [StafPesananController::class, 'validasiQr'])->name('scan.validasi');
-            Route::post('/{id}/terima-qr', [StafPesananController::class, 'terimaQr'])->name('terima-qr');
             Route::get('/{id}', [StafPesananController::class, 'detail'])->name('detail');
             Route::post('/{id}/verifikasi-bayar', [StafPesananController::class, 'verifikasiPembayaran'])->name('verifikasi-bayar');
             Route::post('/{id}/status', [StafPesananController::class, 'updateStatus'])->name('update-status');
@@ -75,7 +72,6 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
         // K-07: Penjualan Langsung di Kasir (POS)
         Route::prefix('kasir')->name('staf.kasir.')->group(function () {
             Route::get('/', [StafKasirController::class, 'index'])->name('index');
-            Route::get('/cari-barcode', [StafKasirController::class, 'cariBarcode'])->name('cari-barcode');
             Route::post('/transaksi', [StafKasirController::class, 'simpanTransaksi'])->name('simpan');
             Route::get('/struk/{id}', [StafKasirController::class, 'struk'])->name('struk');
         });

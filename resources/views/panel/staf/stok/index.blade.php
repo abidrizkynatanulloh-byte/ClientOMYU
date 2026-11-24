@@ -505,6 +505,27 @@
             window.StafScanner.renderQr(el, el.dataset.qrValue);
         }
     });
+
+    /* Live Instant Filter Bahan */
+    const inputCari = document.querySelector('.search-form input[name="cari"]');
+    if (inputCari) {
+        inputCari.addEventListener('input', function () {
+            const q = this.value.toLowerCase().trim();
+            document.querySelectorAll('.bahan-card').forEach(function (card) {
+                const nama = card.querySelector('.bahan-top strong')?.textContent.toLowerCase() || '';
+                card.style.display = (!q || nama.includes(q)) ? '' : 'none';
+            });
+        });
+    }
+
+    /* Escape key closing modals */
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.active').forEach(function(m) {
+                m.classList.remove('active');
+            });
+        }
+    });
 })();
 </script>
 @endsection

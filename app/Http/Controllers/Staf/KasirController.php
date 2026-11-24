@@ -31,58 +31,12 @@ class KasirController extends Controller
         }
 
         if ($request->filled('cari')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('nama', 'like', '%'.$request->cari.'%')
-                    ->orWhere('barcode', 'like', '%'.$request->cari.'%');
-            });
+            $query->where('nama', 'like', '%'.$request->cari.'%');
         }
 
         $daftarProduk = $query->orderBy('nama', 'asc')->get();
 
         return view('panel.staf.kasir.index', compact('daftarProduk', 'kategoriList'));
-    }
-
-    public function cariBarcode(Request $request)
-    {
-        $request->validate([
-            'barcode' => 'required|string|max:64',
-        ]);
-
-        $barcode = trim($request->barcode);
-        $produk = Produk::where('barcode', $barcode)->first();
-
-        if (! $produk) {
-            return response()->json([
-                'found' => false,
-                'pesan' => 'Produk dengan barcode '.$barcode.' tidak ditemukan.',
-            ], 404);
-        }
-
-        if (! $produk->aktif) {
-            return response()->json([
-                'found' => false,
-                'pesan' => 'Produk '.$produk->nama.' sedang tidak aktif.',
-            ], 422);
-        }
-
-        if ($produk->stok < 1) {
-            return response()->json([
-                'found' => false,
-                'pesan' => 'Stok '.$produk->nama.' tidak mencukupi.',
-            ], 422);
-        }
-
-        return response()->json([
-            'found' => true,
-            'produk' => [
-                'id' => $produk->id,
-                'nama' => $produk->nama,
-                'harga' => $produk->harga,
-                'stok' => $produk->stok,
-                'barcode' => $produk->barcode,
-                'gambar' => $produk->gambar ? asset('storage/'.$produk->gambar) : null,
-            ],
-        ]);
     }
 
     public function simpanTransaksi(Request $request)

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Staf;
 
 use App\Http\Controllers\Controller;
 use App\Models\LogAktivitas;
+use App\Models\Pembayaran;
 use App\Models\Pesanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -100,98 +101,25 @@ class PesananController extends Controller
     public function detail($id)
     {
         $pesanan = Pesanan::with(['itemPesanan.produk', 'itemPesanan.varian', 'pembayaran.verifikator', 'penangan'])->findOrFail($id);
+        $pembayaranAktif = $this->pembayaranAktif($pesanan);
+        $buktiPembayaranTersedia = $pembayaranAktif?->memilikiBuktiPembayaran() ?? false;
 
-        return view('panel.staf.pesanan.detail', compact('pesanan'));
+        return view('panel.staf.pesanan.detail', compact('pesanan', 'pembayaranAktif', 'buktiPembayaranTersedia'));
     }
 
-    public function scan()
+    private function pembayaranAktif(Pesanan $pesanan): ?Pembayaran
     {
-        $siapDiambil = Pesanan::with(['itemPesanan.produk'])
-            ->where('status_pesanan', 'siap_diambil')
-            ->latest('updated_at')
-            ->take(8)
-            ->get();
-
-        return view('panel.staf.pesanan.scan', compact('siapDiambil'));
-    }
-
-    public function validasiQr(Request $request)
-    {
-        $request->validate([
-            'token' => 'required|string|max:128',
-        ]);
-
-        $hasil = (new Pesanan)->validasiQrPickup($request->token);
-
-        if (! $hasil['valid']) {
-            return response()->json($hasil, 422);
-        }
-
-        $pesanan = $hasil['pesanan'];
-
-        return response()->json([
-            'valid' => true,
-            'pesanan' => [
-                'id' => $pesanan->id,
-                'kode_pesanan' => $pesanan->kode_pesanan,
-                'nama_pembeli' => $pesanan->nama_pembeli,
-                'telepon_pembeli' => $pesanan->telepon_pembeli,
-                'total' => $pesanan->total,
-                'status_pembayaran' => $pesanan->status_pembayaran,
-                'status_pesanan' => $pesanan->status_pesanan,
-                'status_produksi' => 'Selesai diracik',
-                'status_pengambilan' => 'Belum diambil',
-                'items' => $pesanan->itemPesanan->map(function ($item) {
-                    return [
-                        'nama' => $item->nama_produk.($item->nama_varian ? ' ('.$item->nama_varian.')' : ''),
-                        'jumlah' => $item->jumlah,
-                    ];
-                })->values(),
-            ],
-        ]);
-    }
-
-    public function terimaQr(Request $request, $id)
-    {
-        $request->validate([
-            'token' => 'required|string|max:128',
-        ]);
-
-        $pesanan = Pesanan::findOrFail($id);
-        $hasil = $pesanan->konfirmasiPengambilan(auth()->id(), $request->token);
-
-        if (! $hasil['valid']) {
-            return response()->json($hasil, 422);
-        }
-
-        LogAktivitas::create([
-            'pengguna_id' => auth()->id(),
-            'aksi' => 'konfirmasi_pengambilan',
-            'tipe_objek' => 'pesanan',
-            'id_objek' => $pesanan->id,
-            'deskripsi' => 'Staf '.auth()->user()->nama.' mengonfirmasi pengambilan pesanan '.$pesanan->kode_pesanan.' melalui QR.',
-            'alasan' => 'Scan QR pengambilan',
-            'ip_address' => $request->ip(),
-            'nilai_sesudah' => ['status_pesanan' => 'selesai'],
-        ]);
-
-        return response()->json([
-            'valid' => true,
-            'pesanan' => [
-                'kode_pesanan' => $pesanan->kode_pesanan,
-                'status_pesanan' => $pesanan->status_pesanan,
-                'diselesaikan_pada' => optional($pesanan->diselesaikan_pada)->format('d/m/Y H:i'),
-            ],
-        ]);
+        return $pesanan->pembayaran()
+            ->whereIn('status', ['menunggu', 'menunggu_verifikasi'])
+            ->latest()
+            ->first()
+            ?? $pesanan->pembayaran()->latest()->first();
     }
 
     public function verifikasiPembayaran(Request $request, $id)
     {
         $request->validate([
-            'nominal_dibayar' => 'nullable|numeric|min:0',
-            'bukti_bayar' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:2048',
             'catatan_verifikasi' => 'nullable|string|max:255',
-            'konfirmasi_tanpa_bukti' => 'nullable|boolean',
         ]);
 
         $pesanan = Pesanan::with('pembayaran')->findOrFail($id);
@@ -204,11 +132,9 @@ class PesananController extends Controller
             return back()->with('error', 'Pembayaran pesanan ini tidak dapat diverifikasi karena status pesanan tidak memungkinkan.');
         }
 
-        $pembayaran = $pesanan->pembayaran()
-            ->whereIn('status', ['menunggu', 'menunggu_verifikasi'])
-            ->latest()->first() ?? $pesanan->pembayaran()->latest()->first();
+        $pembayaran = $this->pembayaranAktif($pesanan);
 
-        $nominal = $pembayaran?->jumlah ?? $request->nominal_dibayar ?? $pesanan->total;
+        $nominal = $pembayaran?->jumlah ?? $pesanan->total;
 
         if ($nominal === null || (float) $nominal !== (float) $pesanan->total) {
             return back()->with('error', 'Nominal pembayaran tidak sesuai dengan total pesanan (Rp '.number_format($pesanan->total, 0, ',', '.').').');
@@ -216,18 +142,9 @@ class PesananController extends Controller
 
         $catatan = trim((string) $request->catatan_verifikasi);
         $metode = $pesanan->metode_bayar;
-        $buktiReferensi = $pembayaran?->bukti_path
-            || ! empty(data_get($pembayaran?->data_mentah ?? [], 'nama_file'))
-            || ! empty(data_get($pembayaran?->data_mentah ?? [], 'referensi'));
 
-        if (in_array($metode, ['qris', 'transfer'], true)) {
-            if (! $buktiReferensi && ! $request->boolean('konfirmasi_tanpa_bukti')) {
-                return back()->with('error', 'Bukti pembayaran wajib diunggah untuk metode QRIS/transfer, atau centang konfirmasi tanpa bukti dengan alasan.');
-            }
-
-            if (! $buktiReferensi && strlen($catatan) < 10) {
-                return back()->with('error', 'Alasan verifikasi tanpa bukti minimal 10 karakter.');
-            }
+        if (in_array($metode, ['qris', 'transfer'], true) && ! $pembayaran?->memilikiBuktiPembayaran()) {
+            return back()->with('error', 'Bukti pembayaran belum tersedia pada pesanan ini. Minta pembeli mengunggah bukti terlebih dahulu.');
         }
 
         $statusSebelum = [
@@ -236,19 +153,13 @@ class PesananController extends Controller
         ];
 
         DB::transaction(function () use ($request, $pesanan, $pembayaran, $catatan, $metode, $nominal, $statusSebelum) {
-            $buktiPath = $pembayaran?->bukti_path;
-
-            if ($request->hasFile('bukti_bayar')) {
-                $buktiPath = $request->file('bukti_bayar')->store('bukti-pembayaran', 'public');
-            }
-
             $audit = [
                 'status' => 'lunas',
-                'bukti_path' => $buktiPath,
+                'bukti_path' => $pembayaran?->bukti_path,
                 'dibayar_pada' => now(),
                 'diverifikasi_oleh' => auth()->id(),
                 'diverifikasi_pada' => now(),
-                'catatan_verifikasi' => $catatan ?: 'Diverifikasi oleh kasir',
+                'catatan_verifikasi' => $catatan ?: 'Diverifikasi oleh staf',
             ];
 
             if ($pembayaran) {
@@ -285,7 +196,7 @@ class PesananController extends Controller
                 'aksi' => 'verifikasi_pembayaran',
                 'tipe_objek' => 'pesanan',
                 'id_objek' => $pesanan->id,
-                'deskripsi' => 'Kasir '.auth()->user()->nama.' memverifikasi pembayaran pesanan '.$pesanan->kode_pesanan,
+                'deskripsi' => 'Staf '.auth()->user()->nama.' mengonfirmasi pembayaran pesanan '.$pesanan->kode_pesanan,
                 'alasan' => $catatan ?: null,
                 'ip_address' => $request->ip(),
                 'nilai_sebelum' => $statusSebelum,

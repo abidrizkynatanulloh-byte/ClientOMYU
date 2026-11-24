@@ -173,3 +173,20 @@
     @endif
 </div>
 @endsection
+
+@section('scripts')
+<script>
+    (function() {
+        const inputCari = document.querySelector('.filter-form input[name="cari"]');
+        if (inputCari) {
+            inputCari.addEventListener('input', function() {
+                const q = this.value.toLowerCase().trim();
+                document.querySelectorAll('.log-card').forEach(function(card) {
+                    const desc = card.textContent.toLowerCase();
+                    card.style.display = (!q || desc.includes(q)) ? '' : 'none';
+                });
+            });
+        }
+    })();
+</script>
+@endsection

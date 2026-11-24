@@ -46,7 +46,7 @@
         <p>Panduan singkat operasional harian. Cari topik atau buka salah satu panduan di bawah.</p>
         <label class="bantuan-search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
-            <input type="search" id="cariBantuan" placeholder="Cari bantuan, misal: scan QR, stok, kata sandi..." autocomplete="off">
+            <input type="search" id="cariBantuan" placeholder="Cari bantuan, misal: stok, kasir, kata sandi..." autocomplete="off">
         </label>
     </div>
 
@@ -55,10 +55,6 @@
         <a href="{{ route('panel.staf.kasir.index') }}" class="bantuan-card">
             <span class="bantuan-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M2 10h20"></path><path d="M6 15h4"></path></svg></span>
             <span><strong>Kasir POS</strong><span>Input pesanan langsung, cari produk, dan cetak struk transaksi.</span></span>
-        </a>
-        <a href="{{ route('panel.staf.pesanan.scan') }}" class="bantuan-card">
-            <span class="bantuan-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8V4h4"></path><path d="M16 4h4v4"></path><path d="M4 16v4h4"></path><path d="M16 20h4v-4"></path><path d="M4 12h16"></path></svg></span>
-            <span><strong>Scan QR Pengambilan</strong><span>Verifikasi QR pesanan pelanggan saat penyerahan cup.</span></span>
         </a>
         <a href="{{ route('panel.staf.pesanan.index') }}" class="bantuan-card">
             <span class="bantuan-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"></path><path d="M9 7h6"></path><path d="M9 11h6"></path></svg></span>
@@ -87,14 +83,6 @@
         <details open>
             <summary>Transaksi kasir gagal dicatat?</summary>
             <p>Pastikan koneksi internet stabil, stok bahan masih tersedia, dan metode pembayaran sudah dipilih. Jika tetap gagal, jangan ulangi berkali-kali—hubungi admin agar transaksi tidak dobel.</p>
-        </details>
-        <details>
-            <summary>Cara memindai QR pengambilan pesanan?</summary>
-            <p>Buka menu <strong>Scan QR</strong> lalu arahkan kamera ke QR milik pelanggan. Jika kamera tidak tersedia, Anda bisa ketik token pengambilan secara manual pada halaman tersebut.</p>
-        </details>
-        <details>
-            <summary>Kamera tidak bisa dibuka di HP?</summary>
-            <p>Panel harus dibuka melalui <strong>HTTPS</strong> agar browser mengizinkan kamera. Izinkan akses kamera saat diminta, gunakan kamera belakang, atau pakai input manual/USB scanner sebagai cadangan.</p>
         </details>
         <details>
             <summary>Stok bahan menipis atau habis?</summary>

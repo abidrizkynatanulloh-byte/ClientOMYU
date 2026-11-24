@@ -39,8 +39,6 @@
     .detail-form input, .detail-form textarea { width: 100%; border: 1px solid #d7e4dc; border-radius: 10px; padding: 10px; font-size: 13px; outline: none; }
     .detail-form input:focus, .detail-form textarea:focus { border-color: #198754; box-shadow: 0 0 0 3px rgba(25,135,84,.12); }
     .detail-check { display: flex; gap: 8px; align-items: flex-start; margin-top: 10px; font-size: 12px; color: #475569; }
-    .detail-qr { text-align: center; padding: 14px; background: #f6fbf7; border: 1px dashed #86efac; border-radius: 14px; }
-    .detail-qr p { font-size: 12px; color: #15803d; margin-top: 8px; font-weight: 700; }
     .bukti-img { width: 100%; max-height: 220px; object-fit: contain; border-radius: 10px; border: 1px solid #e2e8f0; }
     .detail-divider { border: 0; border-top: 1px solid #e2e8f0; margin: 14px 0; }
     @media (min-width: 900px) { .detail-grid { grid-template-columns: 1.7fr 1fr; } }
@@ -153,34 +151,35 @@
                         <div style="font-size:12px;color:#15803d;margin-top:4px;">{{ $pesanan->dibayar_pada?->format('d/m/Y H:i') }}</div>
                     </div>
                 @else
-                    <form method="POST" action="{{ route('panel.staf.pesanan.verifikasi-bayar', $pesanan->id) }}" enctype="multipart/form-data" class="detail-form">
+                    @php
+                        $perluBukti = in_array(strtolower($pesanan->metode_bayar ?? ''), ['qris', 'transfer'], true);
+                    @endphp
+                    <form method="POST" action="{{ route('panel.staf.pesanan.verifikasi-bayar', $pesanan->id) }}" class="detail-form">
                         @csrf
-                        <p style="font-size:12px;color:#64748b;">Periksa bukti dan nominal sebelum verifikasi. Nominal wajib sesuai total pesanan.</p>
-                        <label>Nominal dibayar</label>
-                        <input type="number" name="nominal_dibayar" min="0" step="1" value="{{ $pesanan->pembayaran->first()?->jumlah ?? $pesanan->total }}">
-                        <label>Bukti pembayaran (QRIS/transfer)</label>
-                        <input type="file" name="bukti_bayar" accept="image/jpeg,image/png,image/webp">
-                        <label>Catatan verifikasi</label>
-                        <textarea name="catatan_verifikasi" rows="2" maxlength="255" placeholder="Contoh: Cocok dengan mutasi BCA 17/11 10:24"></textarea>
-                        <label class="detail-check">
-                            <input type="checkbox" name="konfirmasi_tanpa_bukti" value="1" style="width:auto;margin-top:2px;">
-                            <span>Verifikasi tanpa bukti (khusus data lama, wajib isi catatan minimal 10 karakter)</span>
-                        </label>
-                        <button type="submit" class="btn-action btn-primary" style="margin-top:12px;">Verifikasi Pembayaran Lunas</button>
+                        <p style="font-size:12px;color:#64748b;">Periksa bukti dan nominal sebelum mengonfirmasi. Nominal tercatat wajib sesuai total pesanan.</p>
+                        <div class="detail-info" style="margin-bottom:10px;">
+                            <div><span class="detail-label">Metode pembayaran</span><div class="detail-value">{{ strtoupper($pesanan->metode_bayar ?? '-') }}</div></div>
+                            <div><span class="detail-label">Total pesanan</span><div class="detail-value">Rp {{ number_format($pesanan->total, 0, ',', '.') }}</div></div>
+                            <div><span class="detail-label">Nominal tercatat</span><div class="detail-value">Rp {{ number_format($pembayaranAktif?->jumlah ?? $pesanan->total, 0, ',', '.') }}</div></div>
+                        </div>
+
+                        @if($perluBukti && ! $buktiPembayaranTersedia)
+                            <div class="detail-note" style="background:#fffbeb;border-color:#fef3c7;color:#78350f;">Bukti pembayaran belum tersedia. Konfirmasi menunggu pembeli mengunggah bukti.</div>
+                            <button type="button" class="btn-action btn-primary" style="margin-top:12px;opacity:.5;cursor:not-allowed;" disabled>Menunggu Bukti Pembeli</button>
+                        @else
+                            @if($buktiPembayaranTersedia)
+                                <div style="background:#f0fdf4;border:1px solid #bbf7d0;padding:10px;border-radius:10px;font-size:12px;color:#166534;font-weight:700;">Bukti/referensi pembayaran sudah tersedia (diunggah pembeli).</div>
+                                @if($pembayaranAktif?->bukti_path)
+                                    <a href="{{ Storage::url($pembayaranAktif->bukti_path) }}" onclick="event.preventDefault(); bukaLightbox('{{ Storage::url($pembayaranAktif->bukti_path) }}', 'Bukti Pembayaran #{{ $pesanan->kode_pesanan }}')" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-size:12px;font-weight:800;color:#15803d;">Lihat bukti pembayaran</a>
+                                @endif
+                            @endif
+                            <label>Catatan verifikasi (opsional)</label>
+                            <textarea name="catatan_verifikasi" rows="2" maxlength="255" placeholder="Contoh: Cocok dengan mutasi BCA 17/11 10:24"></textarea>
+                            <button type="submit" class="btn-action btn-primary" style="margin-top:12px;">Konfirmasi Pembayaran &amp; Pesanan</button>
+                        @endif
                     </form>
                 @endif
             </section>
-
-            @if($pesanan->qrDapatDiterbitkan())
-                <section class="detail-card" style="margin-top:16px;">
-                    <h3>QR Pengambilan Pesanan</h3>
-                    <div class="detail-qr">
-                        <div id="qrPesanan"></div>
-                        <p>Tunjukkan QR ini kepada staf saat pengambilan</p>
-                    </div>
-                    <a href="{{ route('panel.staf.pesanan.scan') }}" class="btn-action btn-indigo" style="display:block;text-decoration:none;margin-top:10px;">Buka Scanner QR Pengambilan</a>
-                </section>
-            @endif
 
             <section class="detail-card" style="margin-top:16px;">
                 <h3>Alur Status Pesanan</h3>
@@ -227,12 +226,4 @@
         </div>
     </div>
 </div>
-@endsection
-
-@section('scripts')
-@if($pesanan->qrDapatDiterbitkan())
-<script>
-    window.StafScanner.renderQr(document.getElementById('qrPesanan'), '{{ $pesanan->token_akses }}');
-</script>
-@endif
 @endsection

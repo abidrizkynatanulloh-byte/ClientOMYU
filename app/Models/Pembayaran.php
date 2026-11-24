@@ -35,4 +35,11 @@ class Pembayaran extends Model
     {
         return $this->belongsTo(Pengguna::class, 'diverifikasi_oleh');
     }
+
+    public function memilikiBuktiPembayaran(): bool
+    {
+        return filled($this->bukti_path)
+            || filled(data_get($this->data_mentah, 'nama_file'))
+            || filled(data_get($this->data_mentah, 'referensi'));
+    }
 }

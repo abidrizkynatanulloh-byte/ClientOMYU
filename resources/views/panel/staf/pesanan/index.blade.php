@@ -10,7 +10,6 @@
     .page-head h1 { font-size: 21px; font-weight: 900; color: #0f172a; }
     .page-head p { font-size: 12px; color: #64748b; margin-top: 3px; }
     .page-head p strong { color: #15803d; }
-    .btn-scan-link { text-decoration: none; background: #0f5132; color: #ffffff; border-radius: 11px; padding: 10px 14px; font-size: 12px; font-weight: 800; }
 
     .metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .metric-card { border-radius: 14px; padding: 10px 8px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -42,7 +41,10 @@
 
     .oc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .oc-ident { display: grid; gap: 2px; min-width: 0; }
-    .oc-code { font-size: 11px; font-weight: 900; color: #15803d; word-break: break-all; }
+    .oc-code { font-size: 11px; font-weight: 900; color: #15803d; word-break: break-all; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-copy-code { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; border-radius: 6px; padding: 2px 6px; font-size: 10px; cursor: pointer; transition: all 0.15s; }
+    .btn-copy-code:hover { background: #dcfce7; transform: scale(1.08); }
+    .btn-copy-code:active { transform: scale(0.92); }
     .oc-ident strong { font-size: 14px; color: #0f172a; }
     .badge { border-radius: 999px; padding: 4px 9px; font-size: 10px; font-weight: 800; white-space: nowrap; background: #e2e8f0; color: #334155; }
     .badge-lunas, .badge-selesai, .badge-siap_diambil { background: #dcfce7; color: #166534; }
@@ -71,7 +73,6 @@
     .oc-actions, .oc-flow { display: flex; flex-wrap: wrap; gap: 7px; }
     .btn { display: inline-flex; justify-content: center; align-items: center; text-align: center; text-decoration: none; border: 0; border-radius: 10px; padding: 9px 12px; font-family: inherit; font-size: 11px; font-weight: 800; cursor: pointer; flex: 1; }
     .btn-detail { background: #eaf8ef; color: #166534; }
-    .btn-scan { background: #4f46e5; color: #ffffff; }
     .btn-muted { background: #f1f5f9; color: #334155; }
     .btn-primary { background: #198754; color: #ffffff; }
     .btn-danger { background: #fee2e2; color: #b91c1c; }
@@ -110,7 +111,6 @@
             <h1>Pesanan Masuk</h1>
             <p>Antrean order masuk {{ $antreanOrderMasuk }} &middot; selesai hari ini <strong>{{ $selesaiHariIniCount }}</strong></p>
         </div>
-        <a href="{{ route('panel.staf.pesanan.scan') }}" class="btn-scan-link">Scan QR Pengambilan</a>
     </section>
 
     <div class="metrics-row">
@@ -176,7 +176,12 @@
         <article class="order-card {{ $borderClass }}">
             <div class="oc-head">
                 <div class="oc-ident">
-                    <span class="oc-code">#{{ $pesanan->kode_pesanan }}</span>
+                    <span class="oc-code">
+                        #{{ $pesanan->kode_pesanan }}
+                        <button type="button" class="btn-copy-code" title="Salin Kode Pesanan" onclick="salinTeks('{{ $pesanan->kode_pesanan }}', 'Kode #{{ $pesanan->kode_pesanan }} disalin!')">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </span>
                     <strong>{{ $pesanan->nama_pembeli }}</strong>
                 </div>
                 <span class="badge badge-{{ $statusPesanan }}">{{ $labelStatus[$statusPesanan] ?? strtoupper(str_replace('_', ' ', $statusPesanan)) }}</span>
@@ -219,16 +224,13 @@
             </div>
 
             @if($pembayaran && $pembayaran->bukti_path)
-                <a class="oc-proof" href="{{ Storage::url($pembayaran->bukti_path) }}" target="_blank" rel="noopener">Lihat bukti pembayaran</a>
+                <a class="oc-proof" href="{{ Storage::url($pembayaran->bukti_path) }}" onclick="event.preventDefault(); bukaLightbox('{{ Storage::url($pembayaran->bukti_path) }}', 'Bukti Pembayaran #{{ $pesanan->kode_pesanan }}')" target="_blank" rel="noopener">🔍 Lihat bukti pembayaran</a>
             @elseif($referensiPembayaran)
                 <div class="oc-proof-static">Referensi pembayaran: {{ $referensiPembayaran }}</div>
             @endif
 
             <div class="oc-actions">
                 <a href="{{ route('panel.staf.pesanan.detail', $pesanan->id) }}" class="btn btn-detail">Detail Pesanan</a>
-                @if($statusPesanan === 'siap_diambil')
-                    <a href="{{ route('panel.staf.pesanan.scan') }}" class="btn btn-scan">Scan QR Ambil</a>
-                @endif
                 @if($pesanan->jenis === 'langsung')
                     <a href="{{ route('panel.staf.kasir.struk', $pesanan->id) }}" class="btn btn-muted">Struk Fisik</a>
                 @endif
@@ -244,8 +246,7 @@
                         </form>
                         <form method="POST" action="{{ route('panel.staf.pesanan.verifikasi-bayar', $pesanan->id) }}">
                             @csrf
-                            <input type="hidden" name="nominal_dibayar" value="{{ $pembayaran?->jumlah ?? $pesanan->total }}">
-                            <button type="submit" class="btn btn-primary">Verifikasi Bayar</button>
+                            <button type="submit" class="btn btn-primary">Konfirmasi Bayar</button>
                         </form>
                     @elseif($statusPesanan === 'dikonfirmasi')
                         <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
@@ -281,4 +282,22 @@
 @endsection
 
 @section('scripts')
+<script>
+    (function() {
+        const inputCari = document.querySelector('.cari-input');
+        if (inputCari) {
+            inputCari.addEventListener('input', function() {
+                const keyword = this.value.toLowerCase().trim();
+                const cards = document.querySelectorAll('.order-card');
+                let matches = 0;
+                cards.forEach(card => {
+                    const text = card.textContent.toLowerCase();
+                    const isMatch = !keyword || text.includes(keyword);
+                    card.style.display = isMatch ? '' : 'none';
+                    if (isMatch) matches++;
+                });
+            });
+        }
+    })();
+</script>
 @endsection

@@ -79,13 +79,6 @@ class Pesanan extends Model
         return $token;
     }
 
-    public function qrDapatDiterbitkan(): bool
-    {
-        return $this->status_pembayaran === 'lunas'
-            && ! in_array($this->status_pesanan, ['dibatalkan', 'kedaluwarsa'], true)
-            && filled($this->token_akses);
-    }
-
     public function catatPenguranganStokProduksi(int $stafId): bool
     {
         $stokProdukDicatat = $this->riwayatStok()->where('jenis', 'keluar_pesanan')->exists();
@@ -270,76 +263,5 @@ class Pesanan extends Model
         });
 
         return true;
-    }
-
-    public function validasiQrPickup(string $token): array
-    {
-        $token = trim($token);
-
-        if ($token === '') {
-            return ['valid' => false, 'alasan' => 'Token QR belum terbaca.'];
-        }
-
-        $pesanan = static::where('token_akses', $token)->first();
-
-        if (! $pesanan) {
-            return ['valid' => false, 'alasan' => 'Token QR tidak ditemukan.'];
-        }
-
-        if ($pesanan->status_pembayaran !== 'lunas') {
-            return ['valid' => false, 'alasan' => 'Pembayaran pesanan belum dikonfirmasi.'];
-        }
-
-        if (in_array($pesanan->status_pesanan, ['dibatalkan', 'kedaluwarsa'], true)) {
-            return ['valid' => false, 'alasan' => 'Pesanan sudah dibatalkan atau kedaluwarsa.'];
-        }
-
-        if ($pesanan->status_pesanan === 'selesai' || filled($pesanan->diselesaikan_pada)) {
-            return ['valid' => false, 'alasan' => 'Pesanan ini sudah diambil.'];
-        }
-
-        if ($pesanan->status_pesanan !== 'siap_diambil') {
-            return ['valid' => false, 'alasan' => 'Pesanan belum siap diambil.'];
-        }
-
-        if ($pesanan->kedaluwarsa_pada && $pesanan->kedaluwarsa_pada->isPast()) {
-            return ['valid' => false, 'alasan' => 'Token QR sudah kedaluwarsa.'];
-        }
-
-        if ($pesanan->jadwal_ambil_selesai && $pesanan->jadwal_ambil_selesai->isPast()) {
-            return ['valid' => false, 'alasan' => 'Jadwal pengambilan pesanan sudah berakhir.'];
-        }
-
-        return [
-            'valid' => true,
-            'pesanan' => $pesanan->loadMissing(['itemPesanan.produk', 'pembayaran']),
-        ];
-    }
-
-    public function konfirmasiPengambilan(int $stafId, string $token): array
-    {
-        return DB::transaction(function () use ($stafId, $token) {
-            $pesanan = static::whereKey($this->id)->lockForUpdate()->firstOrFail();
-            $validasi = $pesanan->validasiQrPickup($token);
-
-            if (! $validasi['valid']) {
-                return $validasi;
-            }
-
-            if ($validasi['pesanan']->getKey() !== $pesanan->getKey()) {
-                return ['valid' => false, 'alasan' => 'Token QR bukan milik pesanan ini.'];
-            }
-
-            $pesanan->status_pesanan = 'selesai';
-            $pesanan->diselesaikan_pada = now();
-            $pesanan->ditangani_oleh = $stafId;
-            $pesanan->terbitkanTokenAkses();
-            $pesanan->save();
-
-            return [
-                'valid' => true,
-                'pesanan' => $pesanan->loadMissing(['itemPesanan.produk', 'pembayaran']),
-            ];
-        });
     }
 }

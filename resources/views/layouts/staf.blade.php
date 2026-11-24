@@ -197,27 +197,41 @@
         .bnav-tab.active { color: var(--g); }
         .bnav-tab svg { width: 22px; height: 22px; stroke-width: 2; }
 
-        /* Center scan tab */
-        .bnav-scan {
-            flex: 1; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; gap: 2px;
-            padding: 4px 2px;
-            font-size: 9.5px; font-weight: 700; color: var(--s);
-            border: 0; background: none; cursor: pointer;
-            transition: color .15s ease;
+        /* Menu Lainnya sheet */
+        .more-backdrop {
+            position: fixed; inset: 0; z-index: 55;
+            background: rgba(15,23,42,.32);
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transition: opacity .18s ease, visibility .18s ease;
         }
-        .bnav-scan.active { color: var(--g); }
-        .bnav-scan-icon {
-            display: flex; align-items: center; justify-content: center;
-            width: 46px; height: 46px; margin-top: -20px;
-            border-radius: 50%;
-            background: var(--g); color: #fff;
-            border: 3px solid var(--w);
-            box-shadow: 0 6px 16px -4px rgba(25,135,84,.6);
-            transition: transform .15s ease, box-shadow .2s ease;
+        .more-backdrop.show { opacity: 1; visibility: visible; pointer-events: auto; }
+        .more-sheet {
+            position: fixed; left: 10px; right: 10px;
+            bottom: calc(64px + env(safe-area-inset-bottom));
+            z-index: 61; padding: 10px;
+            background: var(--w); border: 1px solid var(--br);
+            border-radius: 16px;
+            box-shadow: 0 18px 42px -14px rgba(15,23,42,.34);
+            opacity: 0; visibility: hidden; transform: translateY(8px) scale(.98);
+            transform-origin: bottom right;
+            transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
         }
-        .bnav-scan:active .bnav-scan-icon { transform: scale(.9); }
-        .bnav-scan svg { width: 23px; height: 23px; stroke-width: 2; }
+        .more-sheet.show { opacity: 1; visibility: visible; transform: none; }
+        .more-sheet-head {
+            padding: 3px 9px 8px;
+            font-size: 10.5px; font-weight: 900; color: var(--s);
+            letter-spacing: .08em; text-transform: uppercase;
+        }
+        .more-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 9px; border-radius: 11px;
+            color: var(--b); text-decoration: none;
+            font-size: 13px; font-weight: 800;
+        }
+        .more-item.active { background: var(--gb); color: var(--g); }
+        .more-item svg { width: 18px; height: 18px; stroke-width: 2; flex: none; }
+        .more-label { flex: 1; }
+        .more-chev { width: 14px !important; height: 14px !important; color: var(--s); }
 
         /* ===== DROPDOWN (profile + notif) ===== */
         .dropdown {
@@ -452,15 +466,39 @@
                 font-size: 10.5px; font-weight: 700; color: #94a3b8;
             }
 
+            body {
+                padding-bottom: 0;
+                padding-left: var(--sw);
+                background: #f1f5f9;
+                box-sizing: border-box;
+            }
+
             /* Topbar offset */
-            .topbar { margin-left: var(--sw); padding: 0 24px; }
+            .topbar {
+                margin-left: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0 24px;
+                box-sizing: border-box;
+            }
 
             /* Main content offset */
-            .page-wrapper { margin-left: var(--sw); }
-            .page-content { max-width: 1200px; padding: 28px 32px 48px; }
+            .page-wrapper {
+                margin-left: 0;
+                width: 100%;
+                max-width: 100%;
+                min-width: 0;
+                box-sizing: border-box;
+            }
+            .page-content {
+                max-width: 1300px;
+                padding: 24px 28px 48px;
+                width: 100%;
+                box-sizing: border-box;
+            }
 
             /* Hide mobile bottom nav */
-            .bottom-nav { display: none; }
+            .bottom-nav, .more-backdrop, .more-sheet { display: none !important; }
 
             .help-fab { left: calc(var(--sw) + 18px); right: auto; bottom: 18px; width: 42px; height: 42px; }
             .help-panel { left: calc(var(--sw) + 18px); right: auto; bottom: 70px; }
@@ -480,6 +518,192 @@
         /* Mobile topbar — hide sidebar brand on mobile */
         .sidebar { display: none; }
         @media (min-width: 768px) { .sidebar { display: flex; } }
+
+        /* ===== MODERN INTERACTIVE UI ENHANCEMENTS ===== */
+        .btn, .btn-primary, .btn-hijau, .btn-selesai, .btn-mulai, .btn-scan, .btn-mini, .quick-link, .stat-card, .metric, .metric-card, .order-card, .prod-card, .bahan-card, .bnav-tab, .filter-chip, .filter-pills a {
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease !important;
+        }
+
+        /* Card interactive hover lift & soft glow */
+        .stat-card:hover, .quick-link:hover, .order-card:hover, .prod-card:hover, .bahan-card:hover, .metric-card:hover, .metric:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -8px rgba(25, 135, 84, 0.18), 0 3px 8px rgba(0,0,0,0.04) !important;
+        }
+
+        /* Tactile button press feedback */
+        .btn:active, .quick-link:active, .stat-card:active, .metric:active, .metric-card:active, .bnav-tab:active {
+            transform: scale(0.97) !important;
+        }
+
+        /* Button hover sheen */
+        .btn:hover, .btn-primary:hover, .btn-hijau:hover, .btn-selesai:hover, .btn-mulai:hover {
+            filter: brightness(1.05);
+            box-shadow: 0 6px 18px -4px rgba(25, 135, 84, 0.42);
+        }
+
+        /* Form input interactive glow */
+        input:focus, select:focus, textarea:focus {
+            outline: none !important;
+            border-color: var(--g) !important;
+            box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.18) !important;
+        }
+
+        /* Modals: backdrop blur & spring entrance */
+        .modal-overlay {
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            background: rgba(15, 23, 42, 0.65) !important;
+            transition: opacity 0.22s ease, visibility 0.22s ease;
+        }
+        .modal-card {
+            transition: transform 0.28s cubic-bezier(0.34, 1.45, 0.64, 1), opacity 0.22s ease;
+            transform: scale(0.93) translateY(16px);
+        }
+        .modal-overlay.active .modal-card {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Live pulsating status dot */
+        .pulse-live-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            animation: pulseLiveRing 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        @keyframes pulseLiveRing {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        /* Toast notifications container */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .omyu-toast {
+            pointer-events: auto;
+            min-width: 250px;
+            max-width: 380px;
+            padding: 12px 18px;
+            background: #0f172a;
+            color: #ffffff;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 16px 36px -10px rgba(0,0,0,0.35);
+            animation: toastSlideIn 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.25s ease;
+        }
+        .omyu-toast.sukses { background: #0f5132; border: 1.5px solid #22c55e; }
+        .omyu-toast.error  { background: #991b1b; border: 1.5px solid #f87171; }
+        .omyu-toast.info   { background: #1e3a8a; border: 1.5px solid #60a5fa; }
+        .omyu-toast.fade-out { opacity: 0; transform: translateY(-10px) scale(0.95); }
+        @keyframes toastSlideIn {
+            from { opacity: 0; transform: translateY(-14px) scale(0.95); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Button loading state */
+        .btn.btn-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.85;
+            cursor: wait !important;
+        }
+        .spinner-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spinCircle 0.6s linear infinite;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        @keyframes spinCircle {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Lightbox Image Preview Modal */
+        .lightbox-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 99998;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.22s ease;
+        }
+        .lightbox-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        .lightbox-box {
+            position: relative;
+            max-width: 90vw;
+            max-height: 85vh;
+            background: #ffffff;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px -15px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            animation: zoomModalIn 0.25s cubic-bezier(0.34, 1.4, 0.64, 1);
+        }
+        .lightbox-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 18px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+        .lightbox-close {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #64748b;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 8px;
+            transition: background 0.15s;
+        }
+        .lightbox-close:hover { background: #fee2e2; color: #dc2626; }
+        .lightbox-img {
+            max-width: 85vw;
+            max-height: 72vh;
+            object-fit: contain;
+            display: block;
+            background: #f1f5f9;
+        }
+        @keyframes zoomModalIn {
+            from { transform: scale(0.92); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
     </style>
     @yield('styles')
     @stack('styles')
@@ -747,6 +971,35 @@
         </main>
     </div>
 
+    {{-- ===== MOBILE MENU LAINNYA ===== --}}
+    <div class="more-backdrop" id="moreBackdrop"></div>
+    <div class="more-sheet" id="moreSheet" role="menu" aria-label="Menu Lainnya">
+        <div class="more-sheet-head">Menu Lainnya</div>
+        <a href="{{ route('panel.staf.kasir.index') }}" class="more-item {{ request()->routeIs('panel.staf.kasir.*') ? 'active' : '' }}" role="menuitem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="3" y="4" width="18" height="14" rx="2"></rect>
+                <path d="M7 8h10"></path><path d="M7 12h4"></path><path d="M8 18v2"></path><path d="M16 18v2"></path>
+            </svg>
+            <span class="more-label">Kasir POS</span>
+            <svg class="more-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 6 15 12 9 18"></polyline></svg>
+        </a>
+        <a href="{{ route('panel.staf.aktivitas.index') }}" class="more-item {{ request()->routeIs('panel.staf.aktivitas.*') ? 'active' : '' }}" role="menuitem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>
+            </svg>
+            <span class="more-label">Riwayat Aktivitas</span>
+            <svg class="more-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 6 15 12 9 18"></polyline></svg>
+        </a>
+        <a href="{{ route('panel.staf.stok.index') }}" class="more-item {{ request()->routeIs('panel.staf.stok.*') ? 'active' : '' }}" role="menuitem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+                <path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path>
+            </svg>
+            <span class="more-label">Stok</span>
+            <svg class="more-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 6 15 12 9 18"></polyline></svg>
+        </a>
+    </div>
+
     {{-- ===== MOBILE BOTTOM NAV ===== --}}
     <nav class="bottom-nav">
         <a href="{{ route('panel.beranda') }}" class="bnav-tab {{ request()->routeIs('panel.beranda') ? 'active' : '' }}">
@@ -763,18 +1016,6 @@
             </svg>
             <span>Pesanan</span>
         </a>
-        <button type="button" class="bnav-scan {{ request()->routeIs('panel.staf.pesanan.scan') ? 'active' : '' }}" onclick="bukaScanQrCepat()" aria-label="Scan QR">
-            <span class="bnav-scan-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M4 8V6a2 2 0 0 1 2-2h2"></path>
-                    <path d="M16 4h2a2 2 0 0 1 2 2v2"></path>
-                    <path d="M20 16v2a2 2 0 0 1-2 2h-2"></path>
-                    <path d="M8 20H6a2 2 0 0 1-2-2v-2"></path>
-                    <path d="M8 8h8v8H8z"></path>
-                </svg>
-            </span>
-            <span>Scan</span>
-        </button>
         <a href="{{ route('panel.staf.produksi.index') }}" class="bnav-tab {{ request()->routeIs('panel.staf.produksi.*') ? 'active' : '' }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M7 2h10l-2 11a4 4 0 0 1-4 3h0a4 4 0 0 1-4-3L5 2z"></path>
@@ -782,13 +1023,12 @@
             </svg>
             <span>Produksi</span>
         </a>
-        <a href="{{ route('panel.staf.stok.index') }}" class="bnav-tab {{ request()->routeIs('panel.staf.stok.*') ? 'active' : '' }}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
-                <path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path>
+        <button type="button" id="moreBtn" class="bnav-tab {{ request()->routeIs('panel.staf.kasir.*', 'panel.staf.aktivitas.*', 'panel.staf.stok.*') ? 'active' : '' }}" onclick="toggleMenuLainnya()" aria-controls="moreSheet" aria-expanded="false" aria-haspopup="menu" aria-label="Menu Lainnya">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                <circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle>
             </svg>
-            <span>Stok</span>
-        </a>
+            <span>Lainnya</span>
+        </button>
     </nav>
 
     <button type="button" class="help-fab" id="helpFab" onclick="toggleHelp()" aria-label="Buka pusat bantuan" aria-expanded="false">
@@ -808,21 +1048,12 @@
         <div class="help-section-label">Panduan cepat</div>
         <div class="help-links">
             <a href="{{ route('panel.staf.kasir.index') }}" class="help-link" onclick="tutupHelp()">Kasir &amp; transaksi baru</a>
-            <a href="{{ route('panel.staf.pesanan.scan') }}" class="help-link" onclick="tutupHelp()">Scan QR pengambilan</a>
             <a href="{{ route('panel.staf.produksi.index') }}" class="help-link" onclick="tutupHelp()">Antrean produksi</a>
             <a href="{{ route('panel.staf.stok.index') }}" class="help-link" onclick="tutupHelp()">Cek &amp; catat stok</a>
             <a href="{{ route('panel.staf.profil.index') }}" class="help-link" onclick="tutupHelp()">Foto &amp; kata sandi akun</a>
         </div>
         <div class="help-section-label">Pertanyaan umum</div>
         <div class="help-faq">
-            <details>
-                <summary>Kamera tidak bisa dibuka?</summary>
-                <p>Gunakan HTTPS, izinkan akses kamera di browser, lalu arahkan ke kamera belakang. Alternatifnya ketik token manual atau pakai USB scanner.</p>
-            </details>
-            <details>
-                <summary>QR pesanan tidak terbaca?</summary>
-                <p>Pastikan QR milik pelanggan masih berlaku dan layar cukup terang. Jika gagal, buka halaman scan lalu masukkan token pengambilan secara manual.</p>
-            </details>
             <details>
                 <summary>Stok bahan habis?</summary>
                 <p>Buka menu Stok, cek status kritis, lalu catat pasokan masuk. Bahan rusak dicatat lewat form Pembuangan agar muncul di riwayat aktivitas.</p>
@@ -846,6 +1077,27 @@
             document.getElementById('helpPanel').classList.remove('show');
             document.getElementById('helpFab').setAttribute('aria-expanded', 'false');
         }
+        function toggleMenuLainnya() {
+            const sheet = document.getElementById('moreSheet');
+            const backdrop = document.getElementById('moreBackdrop');
+            const button = document.getElementById('moreBtn');
+            const buka = !sheet.classList.contains('show');
+
+            sheet.classList.toggle('show', buka);
+            backdrop.classList.toggle('show', buka);
+            button.setAttribute('aria-expanded', buka ? 'true' : 'false');
+
+            if (buka) {
+                document.getElementById('profileDd').classList.remove('show');
+                document.getElementById('notifDd').classList.remove('show');
+                tutupHelp();
+            }
+        }
+        function tutupMenuLainnya() {
+            document.getElementById('moreSheet').classList.remove('show');
+            document.getElementById('moreBackdrop').classList.remove('show');
+            document.getElementById('moreBtn').setAttribute('aria-expanded', 'false');
+        }
         function toggleProfile() {
             document.getElementById('notifDd').classList.remove('show');
             document.getElementById('profileDd').classList.toggle('show');
@@ -853,20 +1105,6 @@
         function toggleNotif() {
             document.getElementById('profileDd').classList.remove('show');
             document.getElementById('notifDd').classList.toggle('show');
-        }
-        function bukaScanQrCepat() {
-            const tujuan = '{{ route('panel.staf.pesanan.scan') }}';
-            if (!window.StafScanner || typeof window.StafScanner.bukaQr !== 'function') {
-                window.location.href = tujuan;
-                return;
-            }
-            window.StafScanner.bukaQr({
-                judul: 'Scan QR Pengambilan',
-                pesanAwal: 'Arahkan kamera ke QR pengambilan pesanan...',
-                onResult: function (token) {
-                    window.location.href = tujuan + '?token=' + encodeURIComponent(token);
-                }
-            });
         }
         function markAllRead() {
             document.querySelectorAll('#notifDd .notif-row').forEach(r => {
@@ -898,14 +1136,99 @@
             if (!e.target.closest('#helpPanel') && !e.target.closest('#helpFab')) {
                 tutupHelp();
             }
+            if (!e.target.closest('#moreSheet') && !e.target.closest('#moreBtn')) {
+                tutupMenuLainnya();
+            }
         });
         document.addEventListener('keydown', function (e) {
             if (e.key !== 'Escape') return;
             tutupHelp();
+            tutupLightbox();
+            tutupMenuLainnya();
             document.getElementById('profileDd').classList.remove('show');
             document.getElementById('notifDd').classList.remove('show');
         });
+
+        /* Global Toast Helper */
+        window.tampilkanToast = function(pesan, tipe = 'sukses', durasi = 3200) {
+            const container = document.getElementById('omyuToastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'omyu-toast ' + tipe;
+            const icon = tipe === 'sukses' ? '✓' : (tipe === 'error' ? '⚠' : 'ℹ');
+            toast.innerHTML = `<span style="font-size:16px;">${icon}</span> <span>${pesan}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 250);
+            }, durasi);
+        };
+
+        /* Copy to clipboard helper */
+        window.salinTeks = function(teks, label = 'Teks berhasil disalin!') {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(teks).then(() => tampilkanToast(label, 'sukses'));
+            } else {
+                const t = document.createElement('textarea');
+                t.value = teks;
+                t.style.position = 'fixed';
+                t.style.opacity = '0';
+                document.body.appendChild(t);
+                t.select();
+                try {
+                    document.execCommand('copy');
+                    tampilkanToast(label, 'sukses');
+                } catch(err) {}
+                t.remove();
+            }
+        };
+
+        /* Lightbox Preview */
+        window.bukaLightbox = function(src, title = 'Bukti Pembayaran') {
+            const modal = document.getElementById('omyuLightboxModal');
+            const img = document.getElementById('omyuLightboxImg');
+            const headTitle = document.getElementById('omyuLightboxTitle');
+            if (!modal || !img) return;
+            img.src = src;
+            if (headTitle) headTitle.textContent = title;
+            modal.classList.add('active');
+        };
+
+        window.tutupLightbox = function() {
+            const modal = document.getElementById('omyuLightboxModal');
+            if (modal) modal.classList.remove('active');
+        };
+
+        /* Button tactile submit feedback */
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (form.dataset.submitting === 'true') return;
+            const btn = form.querySelector('button[type="submit"]:not([data-no-loading])');
+            if (btn && !form.target && form.method.toLowerCase() === 'post') {
+                const oldHtml = btn.innerHTML;
+                btn.classList.add('btn-loading');
+                btn.innerHTML = '<span class="spinner-dot"></span> ' + (btn.dataset.loadingText || 'Memproses...');
+                setTimeout(() => {
+                    btn.innerHTML = oldHtml;
+                    btn.classList.remove('btn-loading');
+                }, 8000);
+            }
+        });
     </script>
+
+    <!-- Interactive Toast Container -->
+    <div id="omyuToastContainer" class="toast-container" aria-live="polite"></div>
+
+    <!-- Image Lightbox Modal -->
+    <div id="omyuLightboxModal" class="lightbox-modal" onclick="if(event.target === this) tutupLightbox()">
+        <div class="lightbox-box">
+            <div class="lightbox-head">
+                <span id="omyuLightboxTitle">Lihat Gambar</span>
+                <button type="button" class="lightbox-close" onclick="tutupLightbox()">&times;</button>
+            </div>
+            <img id="omyuLightboxImg" src="" alt="Pratinjau" class="lightbox-img">
+        </div>
+    </div>
     <!-- OMYU Staf V35 Interactive Scripts -->
     <script src="{{ asset('js/staf-anim.js') }}?v={{ filemtime(public_path('js/staf-anim.js')) }}"></script>
     @yield('scripts')

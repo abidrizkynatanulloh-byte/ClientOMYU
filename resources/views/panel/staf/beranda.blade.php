@@ -82,8 +82,20 @@
     .queue-actions form { flex: 1; display: flex; }
     .queue-actions form .btn { width: 100%; }
     .dash-empty { background: #fff; border: 1px dashed #cbd5e1; border-radius: 16px; padding: 30px 16px; text-align: center; color: #64748b; font-size: 13px; }
-    @media (min-width: 900px) {
-        .desktop-split-layout { grid-template-columns: 1fr 1fr; align-items: start; }
+    .desktop-split-layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+    @media (min-width: 992px) {
+        .desktop-split-layout {
+            grid-template-columns: 1.15fr 1fr;
+            gap: 22px;
+            align-items: start;
+        }
     }
 </style>
 @endsection
@@ -125,7 +137,7 @@
                     <div class="stat-label">Perlu Verifikasi</div>
                 </a>
                 <a href="{{ route('panel.staf.pesanan.index', ['tab' => 'diproses']) }}" class="stat-card">
-                    <div class="stat-top"><span class="stat-tag tag-proses">Live</span></div>
+                    <div class="stat-top"><span class="stat-tag tag-proses"><span class="pulse-live-dot" style="width:6px;height:6px;margin-right:3px;"></span>Live</span></div>
                     <div class="stat-num">{{ $pesananDiproses }}</div>
                     <div class="stat-label">Sedang Diracik</div>
                 </a>
@@ -174,10 +186,6 @@
                     <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 2h10l-2 11a4 4 0 0 1-8 0L5 2z"></path><path d="M10 16v4"></path><path d="M7 20h10"></path></svg></span>
                     <span><strong>Produksi</strong><small>Antrean racik jus</small></span>
                 </a>
-                <a href="{{ route('panel.staf.pesanan.scan') }}" class="quick-link">
-                    <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><path d="M14 14h3v3h-3zM19 19h2v2h-2z"></path></svg></span>
-                    <span><strong>Scan QR</strong><small>Validasi pengambilan</small></span>
-                </a>
                 <a href="{{ route('panel.staf.kasir.index') }}" class="quick-link">
                     <span class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M6 8h12M6 12h4v4H6zM14 12h4M14 16h4"></path></svg></span>
                     <span><strong>Kasir POS</strong><small>Menerima Pesanan & transaksi langsung</small></span>
@@ -208,7 +216,10 @@
                 @forelse($antreanPesanan as $pesanan)
                     <article class="queue-card">
                         <div class="queue-top">
-                            <span class="queue-code">#{{ $pesanan->kode_pesanan }}</span>
+                            <span class="queue-code" style="display:inline-flex;align-items:center;gap:6px;">
+                                #{{ $pesanan->kode_pesanan }}
+                                <button type="button" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;border-radius:6px;padding:2px 5px;cursor:pointer;font-size:10px;line-height:1;" title="Salin kode" onclick="salinTeks('{{ $pesanan->kode_pesanan }}', 'Kode #{{ $pesanan->kode_pesanan }} disalin!')">📋</button>
+                            </span>
                             <span class="badge badge-{{ $pesanan->status_pesanan }}">{{ str_replace('_', ' ', $pesanan->status_pesanan) }}</span>
                         </div>
                         <div class="queue-meta">{{ $pesanan->nama_pembeli }} &middot; {{ $pesanan->created_at->format('H:i') }} ({{ $pesanan->created_at->diffForHumans() }})</div>

@@ -73,6 +73,103 @@ class StafPanelTest extends TestCase
         $response->assertSee('bottom-nav');
     }
 
+    public function test_bottom_nav_mobile_mengganti_tab_stok_dengan_menu_lainnya()
+    {
+        $response = $this->actingAs($this->staf)->get(route('panel.beranda'));
+
+        $response->assertOk();
+        $response->assertSee('id="moreBtn"', false);
+        $response->assertSee('Menu Lainnya');
+        $response->assertSee('class="more-label">Kasir POS</span>', false);
+        $response->assertSee('class="more-label">Riwayat Aktivitas</span>', false);
+        $response->assertSee('class="more-label">Stok</span>', false);
+        $response->assertDontSee('<span>Stok</span>', false);
+    }
+
+    public function test_tab_menu_lainnya_aktif_untuk_rute_kasir_aktivitas_dan_stok()
+    {
+        $rutes = [
+            route('panel.staf.kasir.index'),
+            route('panel.staf.aktivitas.index'),
+            route('panel.staf.stok.index'),
+        ];
+
+        foreach ($rutes as $rute) {
+            $response = $this->actingAs($this->staf)->get($rute);
+
+            $response->assertOk();
+            $response->assertSee('id="moreBtn" class="bnav-tab active"', false);
+        }
+    }
+
+    public function test_rute_scan_qr_pengambilan_staf_tidak_tersedia()
+    {
+        $this->actingAs($this->staf)->get('/panel/pesanan/scan')->assertNotFound();
+        $this->actingAs($this->staf)->post('/panel/pesanan/scan/validasi', ['token' => 'token-qr'])->assertNotFound();
+        $this->actingAs($this->staf)->post('/panel/pesanan/1/terima-qr', ['token' => 'token-qr'])->assertNotFound();
+    }
+
+    public function test_panel_staf_tidak_menampilkan_menu_qr_pengambilan()
+    {
+        $pesanan = Pesanan::create([
+            'kode_pesanan' => 'OMYU-TEST-'.Str::random(5),
+            'token_akses' => hash('sha256', Str::random(30)),
+            'nama_pembeli' => 'Siti Pembeli',
+            'telepon_pembeli' => '08987654321',
+            'jenis' => 'online',
+            'metode_bayar' => 'bayar_ditempat',
+            'subtotal' => 18000,
+            'ongkir' => 0,
+            'total' => 18000,
+            'status_pembayaran' => 'lunas',
+            'status_pesanan' => 'siap_diambil',
+            'kedaluwarsa_pada' => now()->addHours(2),
+        ]);
+
+        $dashboard = $this->actingAs($this->staf)->get(route('panel.beranda'));
+        $dashboard->assertDontSee('Scan QR');
+        $dashboard->assertDontSee('bukaScanQrCepat');
+        $dashboard->assertDontSee('bnav-scan');
+
+        $index = $this->actingAs($this->staf)->get(route('panel.staf.pesanan.index'));
+        $index->assertDontSee('Scan QR Pengambilan');
+        $index->assertDontSee('Scan QR Ambil');
+
+        $detail = $this->actingAs($this->staf)->get(route('panel.staf.pesanan.detail', $pesanan->id));
+        $detail->assertOk();
+        $detail->assertDontSee('QR Pengambilan Pesanan');
+        $detail->assertDontSee('Buka Scanner QR Pengambilan');
+        $detail->assertDontSee('qrPesanan');
+    }
+
+    public function test_qr_pengambilan_tetap_tersedia_di_halaman_lacak_pembeli()
+    {
+        $deviceToken = hash('sha256', 'perangkat-pembeli-qr');
+
+        Pesanan::create([
+            'kode_pesanan' => 'OMYU-TEST-'.Str::random(5),
+            'token_akses' => hash('sha256', Str::random(30)),
+            'device_token' => $deviceToken,
+            'nama_pembeli' => 'Pembeli QR',
+            'telepon_pembeli' => '081234567890',
+            'jenis' => 'online',
+            'metode_bayar' => 'bayar_ditempat',
+            'subtotal' => 12000,
+            'ongkir' => 0,
+            'total' => 12000,
+            'status_pembayaran' => 'lunas',
+            'status_pesanan' => 'siap_diambil',
+            'kedaluwarsa_pada' => now()->addHours(2),
+        ]);
+
+        $response = $this->withCookie('omyu_device_token', $deviceToken)
+            ->get(route('pelanggan.lacak'));
+
+        $response->assertOk();
+        $response->assertSee('Tunjukkan QR ini saat ambil pesanan.');
+        $response->assertSee('api.qrserver.com/v1/create-qr-code', false);
+    }
+
     public function test_dashboard_menampilkan_jam_realtime_dan_status_shift_berjalan()
     {
         $this->travelTo('2026-11-21 10:00:00');
@@ -139,14 +236,45 @@ class StafPanelTest extends TestCase
         ]);
     }
 
-    public function test_staf_dapat_memverifikasi_pembayaran_pesanan()
+    public function test_halaman_kasir_pos_tidak_menampilkan_scan_barcode()
     {
+        $response = $this->actingAs($this->staf)->get(route('panel.staf.kasir.index'));
+
+        $response->assertOk();
+        $response->assertDontSee('Scan Barcode');
+        $response->assertDontSee('cari-barcode');
+        $response->assertSee('Cari nama menu');
+    }
+
+    public function test_endpoint_cari_barcode_kasir_tidak_tersedia()
+    {
+        $response = $this->actingAs($this->staf)->get('/panel/kasir/cari-barcode?barcode=8990000000000');
+
+        $response->assertNotFound();
+    }
+
+    public function test_pencarian_kasir_hanya_menggunakan_nama_menu()
+    {
+        $this->produk->update(['barcode' => '8990000000001']);
+
+        $response = $this->actingAs($this->staf)->get(route('panel.staf.kasir.index', ['cari' => '8990000000001']));
+
+        $response->assertOk();
+        $response->assertSee('Tidak ada menu yang sesuai dengan pencarian atau kategori ini.');
+    }
+
+    public function test_staf_mengonfirmasi_pesanan_qris_menggunakan_bukti_yang_diunggah_pembeli()
+    {
+        Storage::fake('public');
+
         $pesanan = Pesanan::create([
             'kode_pesanan' => 'OMYU-TEST-'.Str::random(5),
             'token_akses' => hash('sha256', Str::random(30)),
             'nama_pembeli' => 'Siti Pembeli',
             'telepon_pembeli' => '08987654321',
             'alamat_pengiriman' => 'Outlet OMYU',
+            'jenis' => 'online',
+            'metode_bayar' => 'qris',
             'subtotal' => 24000,
             'ongkir' => 0,
             'total' => 24000,
@@ -155,11 +283,116 @@ class StafPanelTest extends TestCase
             'kedaluwarsa_pada' => now()->addHours(2),
         ]);
 
-        $response = $this->actingAs($this->staf)->post(route('panel.staf.pesanan.verifikasi-bayar', $pesanan->id));
+        $pembayaran = $pesanan->pembayaran()->create([
+            'gerbang' => 'manual',
+            'referensi_gerbang' => 'QRIS-OMYU-TEST',
+            'metode' => 'qris',
+            'jumlah' => 24000,
+            'status' => 'menunggu_verifikasi',
+            'bukti_path' => 'bukti_bayar/bukti-qris.jpg',
+        ]);
+
+        $response = $this->actingAs($this->staf)->post(route('panel.staf.pesanan.verifikasi-bayar', $pesanan->id), [
+            'catatan_verifikasi' => 'Bukti QRIS sesuai mutasi',
+            'bukti_bayar' => UploadedFile::fake()->create('bukti-staf.jpg', 100, 'image/jpeg'),
+        ]);
+
         $response->assertSessionHas('sukses');
 
-        $this->assertEquals('lunas', $pesanan->fresh()->status_pembayaran);
-        $this->assertNotNull($pesanan->fresh()->dibayar_pada);
+        $pesanan->refresh();
+        $this->assertSame('lunas', $pesanan->status_pembayaran);
+        $this->assertSame('dikonfirmasi', $pesanan->status_pesanan);
+        $this->assertSame($this->staf->id, $pesanan->ditangani_oleh);
+        $this->assertNotNull($pesanan->dibayar_pada);
+
+        $pembayaran->refresh();
+        $this->assertSame('lunas', $pembayaran->status);
+        $this->assertSame('bukti_bayar/bukti-qris.jpg', $pembayaran->bukti_path);
+        $this->assertSame($this->staf->id, $pembayaran->diverifikasi_oleh);
+
+        $this->assertDatabaseHas('log_aktivitas', [
+            'aksi' => 'verifikasi_pembayaran',
+            'id_objek' => $pesanan->id,
+            'pengguna_id' => $this->staf->id,
+        ]);
+    }
+
+    public function test_staf_menolak_konfirmasi_qris_tanpa_bukti_pembayaran()
+    {
+        $pesanan = Pesanan::create([
+            'kode_pesanan' => 'OMYU-TEST-'.Str::random(5),
+            'token_akses' => hash('sha256', Str::random(30)),
+            'nama_pembeli' => 'Rudi Pembeli',
+            'telepon_pembeli' => '08987654322',
+            'alamat_pengiriman' => 'Outlet OMYU',
+            'jenis' => 'online',
+            'metode_bayar' => 'qris',
+            'subtotal' => 18000,
+            'ongkir' => 0,
+            'total' => 18000,
+            'status_pembayaran' => 'menunggu',
+            'status_pesanan' => 'menunggu_verifikasi',
+            'kedaluwarsa_pada' => now()->addHours(2),
+        ]);
+
+        $pembayaran = $pesanan->pembayaran()->create([
+            'gerbang' => 'manual',
+            'referensi_gerbang' => 'QRIS-OMYU-TANPA-BUKTI',
+            'metode' => 'qris',
+            'jumlah' => 18000,
+            'status' => 'menunggu_verifikasi',
+        ]);
+
+        $response = $this->actingAs($this->staf)->post(route('panel.staf.pesanan.verifikasi-bayar', $pesanan->id), [
+            'konfirmasi_tanpa_bukti' => 1,
+            'catatan_verifikasi' => 'Sudah dicek manual lewat WhatsApp',
+        ]);
+
+        $response->assertSessionHas('error', 'Bukti pembayaran belum tersedia pada pesanan ini. Minta pembeli mengunggah bukti terlebih dahulu.');
+
+        $pesanan->refresh();
+        $this->assertSame('menunggu', $pesanan->status_pembayaran);
+        $this->assertSame('menunggu_verifikasi', $pesanan->status_pesanan);
+
+        $pembayaran->refresh();
+        $this->assertSame('menunggu_verifikasi', $pembayaran->status);
+        $this->assertNull($pembayaran->diverifikasi_oleh);
+    }
+
+    public function test_detail_pesanan_belum_lunas_tidak_menampilkan_form_unggah_bukti_staf()
+    {
+        $pesanan = Pesanan::create([
+            'kode_pesanan' => 'OMYU-TEST-'.Str::random(5),
+            'token_akses' => hash('sha256', Str::random(30)),
+            'nama_pembeli' => 'Ani Pembeli',
+            'telepon_pembeli' => '08987654323',
+            'alamat_pengiriman' => 'Outlet OMYU',
+            'jenis' => 'online',
+            'metode_bayar' => 'qris',
+            'subtotal' => 15000,
+            'ongkir' => 0,
+            'total' => 15000,
+            'status_pembayaran' => 'menunggu',
+            'status_pesanan' => 'menunggu_verifikasi',
+            'kedaluwarsa_pada' => now()->addHours(2),
+        ]);
+
+        $pesanan->pembayaran()->create([
+            'gerbang' => 'manual',
+            'referensi_gerbang' => 'QRIS-OMYU-DETAIL',
+            'metode' => 'qris',
+            'jumlah' => 15000,
+            'status' => 'menunggu_verifikasi',
+            'bukti_path' => 'bukti_bayar/bukti-qris-detail.jpg',
+        ]);
+
+        $response = $this->actingAs($this->staf)->get(route('panel.staf.pesanan.detail', $pesanan->id));
+
+        $response->assertOk();
+        $response->assertSee('Konfirmasi Pembayaran &amp; Pesanan', false);
+        $response->assertSee('Bukti/referensi pembayaran sudah tersedia', false);
+        $response->assertDontSee('name="bukti_bayar"', false);
+        $response->assertDontSee('konfirmasi_tanpa_bukti', false);
     }
 
     public function test_staf_dapat_memproses_dan_menyelesaikan_pesanan()
@@ -497,7 +730,8 @@ class StafPanelTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Pusat Bantuan Staf');
-        $response->assertSee('Kamera tidak bisa dibuka di HP?');
+        $response->assertSee('Transaksi kasir gagal dicatat?');
+        $response->assertDontSee('Cara memindai QR pengambilan pesanan?');
         $response->assertSee('cariBantuan');
     }
 }
