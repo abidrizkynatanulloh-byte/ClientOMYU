@@ -49,6 +49,14 @@ class Bahan extends Model
         return $this->stok_tersedia <= (float) $this->batas_minimum;
     }
 
+    // Harga beli per satuan beli (kg, pack, dll.) untuk ditampilkan kembali di form.
+    public function getHargaBeliAttribute(): float
+    {
+        $konversi = max(1.0, (float) $this->konversi);
+
+        return round((float) $this->biaya_rata_rata * $konversi, 4);
+    }
+
     // Relasi ke riwayat pembelian bahan
     public function pembelian()
     {

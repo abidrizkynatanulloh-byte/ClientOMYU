@@ -140,7 +140,7 @@ class Pesanan extends Model
                 $biayaDibutuhkan = [];
 
                 foreach ($resep->bahanList as $bahanResep) {
-                    $bahan = Bahan::whereKey($bahanResep->bahan_id)->lockForUpdate()->first();
+                    $bahan = Bahan::whereKey($bahanResep->id)->lockForUpdate()->first();
 
                     if (! $bahan) {
                         continue;
@@ -191,6 +191,10 @@ class Pesanan extends Model
                     'hpp_bahan' => round($hppBahan, 2),
                     'hpp_kemasan' => round($hppKemasan, 2),
                 ]);
+            }
+
+            if (! $stokBahanDicatat) {
+                CadanganBahan::lepasPesanan($this->id, 'terpakai');
             }
         });
 
@@ -260,6 +264,8 @@ class Pesanan extends Model
                     'alasan' => 'Pembatalan pesanan '.$this->kode_pesanan,
                 ]);
             }
+
+            CadanganBahan::lepasPesanan($this->id, 'dilepas');
         });
 
         return true;

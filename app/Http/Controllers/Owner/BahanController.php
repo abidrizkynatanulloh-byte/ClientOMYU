@@ -63,8 +63,13 @@ class BahanController extends Controller
             'rendemen_standar' => ['required', 'numeric', 'min:1', 'max:100'],
             'batas_minimum' => ['required', 'numeric', 'min:0'],
             'stok_awal' => ['nullable', 'numeric', 'min:0'],
-            'biaya_rata_rata' => ['nullable', 'numeric', 'min:0'],
+            'harga_beli' => ['nullable', 'numeric', 'min:0'],
+        ], [
+            'harga_beli.numeric' => 'Biaya beli harus berupa angka.',
+            'harga_beli.min' => 'Biaya beli tidak boleh negatif.',
         ]);
+
+        $konversi = max(1.0, (float) $data['konversi']);
 
         Bahan::create([
             'nama' => $data['nama'],
@@ -76,7 +81,7 @@ class BahanController extends Controller
             'batas_minimum' => $data['batas_minimum'],
             'stok' => $data['stok_awal'] ?? 0,
             'stok_dicadangkan' => 0,
-            'biaya_rata_rata' => $data['biaya_rata_rata'] ?? 0,
+            'biaya_rata_rata' => ((float) ($data['harga_beli'] ?? 0)) / $konversi,
             'aktif' => 1,
         ]);
 
@@ -104,7 +109,18 @@ class BahanController extends Controller
             'rendemen_standar' => ['required', 'numeric', 'min:1', 'max:100'],
             'batas_minimum' => ['required', 'numeric', 'min:0'],
             'aktif' => ['required', 'boolean'],
+            'harga_beli' => ['nullable', 'numeric', 'min:0'],
+        ], [
+            'harga_beli.numeric' => 'Biaya beli harus berupa angka.',
+            'harga_beli.min' => 'Biaya beli tidak boleh negatif.',
         ]);
+
+        if (array_key_exists('harga_beli', $data)) {
+            $konversi = max(1.0, (float) $data['konversi']);
+            $data['biaya_rata_rata'] = ((float) ($data['harga_beli'] ?? 0)) / $konversi;
+        }
+
+        unset($data['harga_beli']);
 
         $bahan->update($data);
 

@@ -32,6 +32,8 @@ class VarianProduk extends Model
     // Mengambil resep yang sedang aktif untuk varian ini
     public function resepAktif()
     {
-        return $this->hasOne(Resep::class, 'varian_id')->where('aktif', 1);
+        return $this->hasOne(Resep::class, 'varian_id')
+            ->where('aktif', 1)
+            ->orderByDesc('versi');
     }
 }

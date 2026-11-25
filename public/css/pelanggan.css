@@ -70,24 +70,46 @@
     font-family: var(--font-family-base);
 }
 
+html {
+    background: var(--bg-page);
+}
+
 body {
-    background: var(--bg-page) url("../images/background.png") no-repeat center top fixed;
-    background-size: cover;
+    background: transparent;
     color: var(--color-text-main);
     min-height: 100vh;
     overflow-x: hidden;
 }
 
-/* Top Scroll Shield (Persis seperti beranda: height: 12px) */
+/* BACKGROUND BLUR (sedikit) - ubah angka blur(5px) di bawah ini sesuai selera.
+   0 = tanpa blur | 1-2px = sangat halus | 4px+ = makin blur.
+   Gambar background dipindah ke ::before supaya konten tetap tajam. */
+body::before {
+    content: "";
+    position: fixed;
+    inset: -15px;
+    z-index: -1;
+    background: var(--bg-page) url("../images/background.png") no-repeat center top;
+    background-size: cover;
+    filter: blur(5px);
+    -webkit-filter: blur(5px);
+    pointer-events: none;
+}
+
+/* Top Scroll Shield (tinggi terlihat 12px, tapi diperbesar 15px ke atas/samping
+   supaya blur tidak memudar di pinggir) */
 .top-scroll-shield {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 12px;
+    top: -15px;
+    left: -15px;
+    right: -15px;
+    height: 27px;
     z-index: 999;
     background: var(--bg-page) url("../images/background.png") no-repeat center top fixed;
     background-size: cover;
+    filter: blur(5px);
+    -webkit-filter: blur(5px);
+    pointer-events: none;
 }
 
 /* --------------------------------------------------------------------------

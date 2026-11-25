@@ -6,6 +6,7 @@ use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 use App\Http\Controllers\Owner\KaryawanController;
 use App\Http\Controllers\Owner\KeuanganController;
 use App\Http\Controllers\Owner\PenjualanController;
+use App\Http\Controllers\Owner\ProdukController;
 use App\Http\Controllers\Owner\ResepHppController;
 use App\Http\Controllers\PelangganAuthController;
 use App\Http\Controllers\PelangganPesananController;
@@ -21,9 +22,18 @@ use App\Models\Produk;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    $daftarProduk = Produk::where('aktif', 1)->take(8)->get();
+    // Menu favorit dihitung dari total cup pada pesanan yang sudah selesai.
+    $menuFavorit = Produk::where('aktif', 1)
+        ->withSum(['itemPesanan as jumlah_terjual' => function ($query) {
+            $query->whereHas('pesanan', function ($pesanan) {
+                $pesanan->where('status_pesanan', 'selesai');
+            });
+        }], 'jumlah')
+        ->orderByDesc('jumlah_terjual')
+        ->take(4)
+        ->get();
 
-    return view('beranda', compact('daftarProduk'));
+    return view('beranda', compact('menuFavorit'));
 });
 
 // Otentikasi Staf & Admin
@@ -106,6 +116,14 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
                 // O-03: Modul Produk, Resep & HPP per Cup
                 Route::get('/resep', [ResepHppController::class, 'index'])->name('resep.index');
                 Route::get('/resep/{varianId}', [ResepHppController::class, 'detail'])->name('resep.detail');
+                // O-03: Kelola Menu/Produk & Upload Gambar (otomatis terkompres maks. 100 KB)
+                Route::get('/menu', [ProdukController::class, 'index'])->name('menu.index');
+                Route::get('/menu/tambah', [ProdukController::class, 'create'])->name('menu.create');
+                Route::post('/menu', [ProdukController::class, 'store'])->name('menu.store');
+                Route::get('/menu/{id}/edit', [ProdukController::class, 'edit'])->name('menu.edit');
+                Route::put('/menu/{id}', [ProdukController::class, 'update'])->name('menu.update');
+                Route::delete('/menu/{id}', [ProdukController::class, 'destroy'])->name('menu.destroy');
+                Route::post('/menu/hitung-ulang', [ProdukController::class, 'hitungUlang'])->name('menu.hitung-ulang');
                 Route::get('/bahan', [BahanController::class, 'index'])->name('bahan.index');
                 Route::get('/bahan/tambah', [BahanController::class, 'create'])->name('bahan.create');
                 Route::post('/bahan', [BahanController::class, 'store'])->name('bahan.store');

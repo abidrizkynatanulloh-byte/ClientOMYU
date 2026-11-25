@@ -10,12 +10,30 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; }
         
+        html {
+            background: #eef7e5;
+        }
+
         body {
-            background: #eef7e5 url("{{ asset('images/background.png') }}") no-repeat center top fixed;
-            background-size: cover;
+            background: transparent;
             color: #1e293b;
             min-height: 100vh;
             overflow-x: hidden;
+        }
+
+        /* BACKGROUND BLUR (sedikit) - ubah angka blur(5px) di bawah ini sesuai selera.
+           0 = tanpa blur | 1-2px = sangat halus | 4px+ = makin blur.
+           Gambar background dipindah ke ::before supaya konten tetap tajam. */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: -15px;
+            z-index: -1;
+            background: #eef7e5 url("{{ asset('images/background.png') }}") no-repeat center top;
+            background-size: cover;
+            filter: blur(5px);
+            -webkit-filter: blur(5px);
+            pointer-events: none;
         }
         @media (min-width: 992px) {
             body {
@@ -25,16 +43,20 @@
             }
         }
 
-        /* Top Scroll Shield */
+        /* Top Scroll Shield (tinggi terlihat 12px, tapi diperbesar 15px ke atas/samping
+           supaya blur tidak memudar di pinggir) */
         .top-scroll-shield {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 12px;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            height: 27px;
             z-index: 999;
             background: #eef7e5 url("{{ asset('images/background.png') }}") no-repeat center top fixed;
             background-size: cover;
+            filter: blur(5px);
+            -webkit-filter: blur(5px);
+            pointer-events: none;
         }
 
         /* Floating Capsule Topbar (Lebih Compact & Elegan) */
@@ -525,7 +547,9 @@
             overflow: hidden;
             border-radius: 24px;
             margin-bottom: 4px;
-            background: transparent;
+            /* BACKGROUND BANNER - putih semi transparan. Ubah 0.45 sesuai selera:
+               0 = transparan penuh, 1 = putih solid. */
+            background: rgba(255, 255, 255, 0.59);
             border: none;
             box-shadow: none;
         }
@@ -565,7 +589,7 @@
             font-size: 30px;
             line-height: 1.1;
             font-weight: 900;
-            color: #183d12;
+            color: #000000;
             margin-bottom: 8px;
         }
         .promo-desc {
@@ -641,6 +665,150 @@
             .promo-desc { font-size: 12px; margin: 0 auto 12px; }
             .promo-visual { min-height: 140px; }
             .promo-image { max-height: 170px; max-width: 280px; }
+        }
+
+        /* Menu Favorit (Paling Banyak Dipesan) */
+        .favorit-section {
+            margin-top: 22px;
+            padding: 18px 20px 22px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            box-shadow: 0 8px 30px rgba(25, 56, 8, 0.06);
+        }
+        .favorit-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .favorit-badge {
+            display: inline-block;
+            padding: 4px 11px;
+            border-radius: 999px;
+            background: rgba(223, 242, 200, 0.9);
+            color: #166534;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+        .favorit-title {
+            font-family: 'Fredoka', 'Nunito', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            color: #183d12;
+            line-height: 1.15;
+        }
+        .favorit-subtitle {
+            margin-top: 3px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+        }
+        .favorit-lihat {
+            flex-shrink: 0;
+            font-size: 12px;
+            font-weight: 900;
+            color: #4d8822;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .favorit-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+        }
+        .favorit-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            border-radius: 18px;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(223, 242, 200, 0.9);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+        .favorit-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 26px rgba(25, 56, 8, 0.12);
+        }
+        .favorit-img-box {
+            height: 110px;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #eef7e5;
+        }
+        .favorit-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .favorit-rank {
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            padding: 4px 9px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #4d8822 0%, #2f620e 100%);
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 0.3px;
+        }
+        .favorit-nama {
+            margin-top: 10px;
+            min-height: 34px;
+            font-size: 13px;
+            font-weight: 900;
+            line-height: 1.3;
+            color: #0f172a;
+        }
+        .favorit-harga {
+            margin-top: 3px;
+            font-size: 13px;
+            font-weight: 900;
+            color: #4d8822;
+        }
+        .favorit-meta {
+            margin-top: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            color: #64748b;
+        }
+        .favorit-pesan {
+            padding: 4px 9px;
+            border-radius: 999px;
+            background: #dff2c8;
+            color: #183d12;
+            white-space: nowrap;
+        }
+        .favorit-kosong {
+            grid-column: 1 / -1;
+            padding: 28px 16px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+        }
+        @media (max-width: 900px) {
+            .favorit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 520px) {
+            .favorit-section { padding: 16px 12px 18px; }
+            .favorit-grid { gap: 10px; }
+            .favorit-img-box { height: 90px; }
+            .favorit-title { font-size: 20px; }
         }
 
         /* Bottom 2-Cards Grid */
@@ -787,6 +955,41 @@
         }
         .mutu-item-row strong {
             color: #143507;
+        }
+        .mutu-sosmed {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .mutu-sosmed-label {
+            width: 100%;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.3px;
+            color: #193808;
+        }
+        .sosmed-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.75);
+            border: 1px solid #d4ebba;
+            color: #2f4f16;
+            font-size: 10px;
+            font-weight: 800;
+            text-decoration: none;
+            transition: transform .18s ease, background .18s ease;
+        }
+        .sosmed-link:hover {
+            background: #ffffff;
+            transform: translateY(-2px);
+        }
+        .sosmed-link svg {
+            flex-shrink: 0;
         }
 
         .seal-badge-box {
@@ -1092,6 +1295,14 @@
                 width: 13px;
                 height: 13px;
             }
+            .mutu-sosmed {
+                gap: 6px;
+                margin-top: 10px;
+            }
+            .sosmed-link {
+                padding: 5px 8px;
+                font-size: 9px;
+            }
             .seal-badge-box {
                 margin-left: 0;
             }
@@ -1243,16 +1454,7 @@
                     </span>
                 </p>
 
-                <div class="hero-actions">
-                    <a href="{{ route('pelanggan.katalog') }}" class="btn-order-glow">
-                        <svg class="web-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="9" cy="21" r="1"></circle>
-                            <circle cx="20" cy="21" r="1"></circle>
-                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                        </svg>
-                        Pesan Sekarang &rarr;
-                    </a>
-                </div>
+                
             </div>
 
             <div class="hero-right">
@@ -1262,6 +1464,48 @@
                 </div>
             </div>
         </section>
+
+        <section class="features-capsule">
+            <div class="feat-item">
+                <div class="feat-circle bg-red-pill">
+                    <svg class="web-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"></path>
+                        <path d="M10 2c1 .5 2 2 2 5"></path>
+                    </svg>
+                </div>
+                <div class="feat-text">
+                    <h4>100% Buah Segar</h4>
+                    <p>Tanpa esens sintetis</p>
+                </div>
+            </div>
+
+            <div class="feat-item">
+                <div class="feat-circle bg-orange-pill">
+                    <svg class="web-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#f97316" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6l-2 14H8L6 6h12z"></path>
+                        <line x1="4" y1="6" x2="20" y2="6"></line>
+                        <line x1="10" y1="2" x2="14" y2="6"></line>
+                    </svg>
+                </div>
+                <div class="feat-text">
+                    <h4>Atur Manismu</h4>
+                    <p>0%, 25%, 50%, Normal</p>
+                </div>
+            </div>
+
+            <div class="feat-item">
+                <div class="feat-circle bg-yellow-pill">
+                    <svg class="web-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#ca8a04" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                </div>
+                <div class="feat-text">
+                    <h4>Ambil Kilat</h4>
+                    <p>Tanpa antre & ribet</p>
+                </div>
+            </div>
+        </section>
+
 
                 <!-- GANTI GAMBAR BANNER (SISI KANAN) DI SINI:
              1. Taruh file gambar di: public/images/banner/
@@ -1313,48 +1557,61 @@
             </div>
         </section>
 
-        <!-- Features Bar (3 Pills) -->
-        <section class="features-capsule">
-            <div class="feat-item">
-                <div class="feat-circle bg-red-pill">
-                    <svg class="web-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"></path>
-                        <path d="M10 2c1 .5 2 2 2 5"></path>
-                    </svg>
+        <!-- Menu Favorit: diurutkan dari jumlah cup pesanan selesai terbanyak -->
+        <section class="favorit-section" id="menu-favorit">
+            <div class="favorit-header">
+                <div>
+                    <span class="favorit-badge">🔥 PALING BANYAK DIPESAN</span>
+                    <h2 class="favorit-title">Menu Favorit Pelanggan</h2>
+                    <p class="favorit-subtitle">Pilihan terlaris dari pesanan yang sudah selesai. Langsung pesan favoritmu!</p>
                 </div>
-                <div class="feat-text">
-                    <h4>100% Buah Segar</h4>
-                    <p>Tanpa esens sintetis</p>
-                </div>
+                <a href="{{ route('pelanggan.katalog') }}" class="favorit-lihat">Lihat semua menu &rarr;</a>
             </div>
 
-            <div class="feat-item">
-                <div class="feat-circle bg-orange-pill">
-                    <svg class="web-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#f97316" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 6l-2 14H8L6 6h12z"></path>
-                        <line x1="4" y1="6" x2="20" y2="6"></line>
-                        <line x1="10" y1="2" x2="14" y2="6"></line>
-                    </svg>
-                </div>
-                <div class="feat-text">
-                    <h4>Atur Manismu</h4>
-                    <p>0%, 25%, 50%, Normal</p>
-                </div>
-            </div>
-
-            <div class="feat-item">
-                <div class="feat-circle bg-yellow-pill">
-                    <svg class="web-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#ca8a04" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                    </svg>
-                </div>
-                <div class="feat-text">
-                    <h4>Ambil Kilat</h4>
-                    <p>Tanpa antre & ribet</p>
-                </div>
+            <div class="favorit-grid">
+                @forelse($menuFavorit as $menu)
+                    @php
+                        $namaLower = strtolower($menu->nama);
+                        $gambarUrl = 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=600&auto=format&fit=crop&q=80';
+                        if ($menu->gambar) {
+                            $gambarUrl = str_starts_with($menu->gambar, 'http')
+                                ? $menu->gambar
+                                : asset('storage/'.$menu->gambar);
+                        } elseif (str_contains($namaLower, 'mangga')) {
+                            $gambarUrl = 'https://images.unsplash.com/photo-1546173159-315724a31696?w=600&auto=format&fit=crop&q=80';
+                        } elseif (str_contains($namaLower, 'alpukat')) {
+                            $gambarUrl = 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=600&auto=format&fit=crop&q=80';
+                        } elseif (str_contains($namaLower, 'tomat')) {
+                            $gambarUrl = 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80';
+                        } elseif (str_contains($namaLower, 'seledri') || str_contains($namaLower, 'green')) {
+                            $gambarUrl = 'https://images.unsplash.com/photo-1610970881699-44a5587cabec?w=600&auto=format&fit=crop&q=80';
+                        } elseif (str_contains($namaLower, 'kopi') || str_contains($namaLower, 'coffe')) {
+                            $gambarUrl = 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=600&auto=format&fit=crop&q=80';
+                        }
+                        $terjual = (int) ($menu->jumlah_terjual ?? 0);
+                    @endphp
+                    <a href="{{ route('pelanggan.katalog') }}" class="favorit-card">
+                        @if($loop->first && $terjual > 0)
+                            <span class="favorit-rank">#1 TERLARIS</span>
+                        @endif
+                        <div class="favorit-img-box">
+                            <img src="{{ $gambarUrl }}" alt="{{ $menu->nama }}" loading="lazy">
+                        </div>
+                        <div class="favorit-nama">{{ $menu->nama }}</div>
+                        <div class="favorit-harga">Rp {{ number_format($menu->harga, 0, ',', '.') }}</div>
+                        <div class="favorit-meta">
+                            <span>{{ $terjual > 0 ? $terjual.'x dipesan' : 'Menu pilihan' }}</span>
+                            <span class="favorit-pesan">Pesan</span>
+                        </div>
+                    </a>
+                @empty
+                    <div class="favorit-kosong">Belum ada menu favorit untuk ditampilkan.</div>
+                @endforelse
             </div>
         </section>
 
+        <!-- Features Bar (3 Pills) -->
+        
         
 
         <!-- Bottom 2-Cards Grid -->
@@ -1415,6 +1672,23 @@
                                 <strong>Kesegaran Terjamin:</strong> Disajikan langsung dengan bahan berkualitas terbaik.
                             </div>
                         </div>
+                    </div>
+
+                    <!-- SOSIAL MEDIA - GANTI href DAN @handle DI BAWAH INI SESUAI AKUN OMYU -->
+                    <div class="mutu-sosmed">
+                        <span class="mutu-sosmed-label">IKUTI KAMI:</span>
+                        <a href="https://www.instagram.com/omyu.official/" target="_blank" rel="noopener noreferrer" class="sosmed-link">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#d9466a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="#d9466a" stroke="none"></circle></svg>
+                            &#64;omyu.official
+                        </a>
+                        <a href="https://www.facebook.com/omyu.official/" target="_blank" rel="noopener noreferrer" class="sosmed-link">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="#1877f2"><path d="M13 22v-9h3l.5-3.5H13V7.2c0-1 .3-1.7 1.8-1.7H17V2.3c-.3 0-1.4-.1-2.6-.1-2.6 0-4.4 1.6-4.4 4.5V9.5H7V13h3v9z"></path></svg>
+                            OMYU Official
+                        </a>
+                        <a href="https://www.tiktok.com/@omyu.official" target="_blank" rel="noopener noreferrer" class="sosmed-link">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="#111827"><path d="M16.5 2c.3 2.2 1.6 3.6 3.8 3.9v3c-1.5.1-2.9-.4-4.1-1.2v6.6c0 4.2-3.4 7.6-7.6 7.6S1 18.5 1 14.3s3.4-7.6 7.6-7.6c.5 0 1 0 1.5.1v3.1c-.5-.2-1-.3-1.5-.3-2.6 0-4.6 2.1-4.6 4.7s2 4.7 4.6 4.7 4.6-2.1 4.6-4.7V2h3.8z"></path></svg>
+                            &#64;omyu.official
+                        </a>
                     </div>
                 </div>
 

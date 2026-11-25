@@ -8,12 +8,15 @@ use App\Models\LogAktivitas;
 use App\Models\Pesanan;
 use App\Models\Produk;
 use App\Models\RiwayatStok;
+use App\Support\KapasitasMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 class ProduksiController extends Controller
 {
+    public function __construct(private KapasitasMenu $kapasitasMenu) {}
+
     public function index(Request $request)
     {
         $mode = in_array($request->get('mode'), ['kartu', 'kds'], true) ? $request->get('mode') : 'kartu';
@@ -222,6 +225,10 @@ class ProduksiController extends Controller
             });
         } catch (RuntimeException $exception) {
             return back()->with('error', $exception->getMessage());
+        }
+
+        if ($request->tipe_item === 'bahan') {
+            $this->kapasitasMenu->sinkronkan();
         }
 
         return back()->with('sukses', 'Laporan bahan tumpah/gagal racik berhasil disimpan dan stok otomatis disesuaikan.');

@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Bahan;
+use App\Models\CadanganBahan;
 use App\Models\ItemPesanan;
 use App\Models\Kategori;
 use App\Models\LogAktivitas;
+use App\Models\Pelanggan;
 use App\Models\Pembayaran;
 use App\Models\Pesanan;
 use App\Models\Produk;
 use App\Models\Resep;
+use App\Models\RiwayatStok;
 use App\Models\VarianProduk;
+use App\Support\KapasitasMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
@@ -19,11 +22,13 @@ use Illuminate\Support\Str;
 
 class PelangganPesananController extends Controller
 {
-    private function pelangganAktif(): ?\App\Models\Pelanggan
+    public function __construct(private KapasitasMenu $kapasitasMenu) {}
+
+    private function pelangganAktif(): ?Pelanggan
     {
         $pelanggan = Auth::guard('pelanggan')->user();
 
-        return $pelanggan instanceof \App\Models\Pelanggan ? $pelanggan : null;
+        return $pelanggan instanceof Pelanggan ? $pelanggan : null;
     }
 
     private function deviceToken(Request $request): string
@@ -46,6 +51,7 @@ class PelangganPesananController extends Controller
 
         return $token;
     }
+
     /**
      * P-02: Katalog Menu untuk Pembeli
      */
@@ -300,6 +306,7 @@ class PelangganPesananController extends Controller
 
                 $hppBahan = 0;
                 $hppKemasan = 0;
+                $kebutuhanCadangan = [];
 
                 if ($resep && $resep->bahanList->isNotEmpty()) {
                     foreach ($resep->bahanList as $bahan) {
@@ -312,11 +319,12 @@ class PelangganPesananController extends Controller
                             $hppBahan += $biaya;
                         }
 
-                        // Cadangkan bahan agar tidak terjual ke orang lain (Bab 2.9)
-                        $kebutuhanCadangan = $takaran * $qty;
-                        Bahan::where('id', $bahan->id)->increment('stok_dicadangkan', $kebutuhanCadangan);
+                        $bahanId = (int) $bahan->id;
+                        $kebutuhanCadangan[$bahanId] = ($kebutuhanCadangan[$bahanId] ?? 0) + $takaran * $qty;
                     }
                 }
+
+                CadanganBahan::catatPesanan($pesananBaru->id, $kebutuhanCadangan);
 
                 ItemPesanan::create([
                     'pesanan_id' => $pesananBaru->id,
@@ -332,9 +340,18 @@ class PelangganPesananController extends Controller
                     'hpp_kemasan' => round($hppKemasan, 2),
                 ]);
 
-                // Kurangi stok display produk
+                // Kurangi stok display produk dan catat agar tidak dipotong dua kali saat produksi
                 if ($produk) {
-                    Produk::where('id', $produk->id)->decrement('stok', $qty);
+                    $stokSesudah = max(0, (int) $produk->stok - $qty);
+                    Produk::whereKey($produk->id)->update(['stok' => $stokSesudah]);
+                    RiwayatStok::create([
+                        'produk_id' => $produk->id,
+                        'pesanan_id' => $pesananBaru->id,
+                        'jenis' => 'keluar_pesanan',
+                        'jumlah' => -$qty,
+                        'stok_setelah' => $stokSesudah,
+                        'catatan' => 'Pesanan online '.$kodePesanan,
+                    ]);
                 }
             }
 
@@ -356,6 +373,8 @@ class PelangganPesananController extends Controller
                 'deskripsi' => "Pesanan online baru dibuat: {$kodePesanan} oleh {$namaPembeli} total Rp ".number_format($subtotal, 0, ',', '.'),
             ]);
         });
+
+        $this->kapasitasMenu->sinkronkan();
 
         // Bersihkan session sesuai mode checkout
         if ($modeCheckout === 'langsung') {

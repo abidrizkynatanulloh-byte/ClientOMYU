@@ -7,12 +7,15 @@ use App\Models\Bahan;
 use App\Models\LogAktivitas;
 use App\Models\Produk;
 use App\Models\RiwayatStok;
+use App\Support\KapasitasMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class StokController extends Controller
 {
     private const SATUAN_INPUT = ['kg', 'g', 'pcs', 'pack', 'ml', 'liter', 'gr'];
+
+    public function __construct(private KapasitasMenu $kapasitasMenu) {}
 
     public function index(Request $request)
     {
@@ -129,6 +132,8 @@ class StokController extends Controller
             ]);
         });
 
+        $this->kapasitasMenu->sinkronkan();
+
         return back()->with('sukses', "Pasokan {$bahan->nama} sebanyak {$jumlahInput} {$request->satuan_input} berhasil ditambahkan ke stok.");
     }
 
@@ -167,6 +172,8 @@ class StokController extends Controller
                 'ip_address' => $request->ip(),
             ]);
         });
+
+        $this->kapasitasMenu->sinkronkan();
 
         return back()->with('sukses', "Pencatatan pembuangan {$bahan->nama} ({$jumlahInput} {$request->satuan_input}) berhasil disimpan.");
     }
@@ -233,6 +240,8 @@ class StokController extends Controller
                 'nilai_sesudah' => ['stok' => $stokFisikDasar, 'selisih' => $selisih],
             ]);
         });
+
+        $this->kapasitasMenu->sinkronkan();
 
         return back()->with('sukses', "Audit opname {$bahan->nama} berhasil. Stok diperbarui ke {$request->stok_fisik} {$request->satuan_input}.");
     }

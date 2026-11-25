@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\LogAktivitas;
 use App\Models\Pembayaran;
 use App\Models\Pesanan;
+use App\Support\KapasitasMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -19,6 +20,8 @@ class PesananController extends Controller
         'diproses' => ['siap_diambil', 'selesai', 'dibatalkan'],
         'siap_diambil' => ['selesai', 'dibatalkan'],
     ];
+
+    public function __construct(private KapasitasMenu $kapasitasMenu) {}
 
     public function index(Request $request)
     {
@@ -259,6 +262,10 @@ class PesananController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
+        if ($statusBaru === 'selesai') {
+            $this->kapasitasMenu->sinkronkan();
+        }
+
         return back()->with('sukses', 'Status pesanan '.$pesanan->kode_pesanan.' berhasil diubah menjadi '.$statusBaru.'.');
     }
 
@@ -299,6 +306,8 @@ class PesananController extends Controller
         } catch (RuntimeException $exception) {
             return back()->with('error', $exception->getMessage());
         }
+
+        $this->kapasitasMenu->sinkronkan();
 
         return back()->with('sukses', 'Pesanan '.$pesanan->kode_pesanan.' telah ditolak / dibatalkan.');
     }

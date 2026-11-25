@@ -94,15 +94,63 @@
         .desktop-split-layout {
             grid-template-columns: 1.15fr 1fr;
             gap: 22px;
-            align-items: start;
+            align-items: stretch;
+            /* dikurangi topbar (--th) + padding atas 24px dan bawah 48px dari layout staf */
+            height: calc(100vh - var(--th) - 72px);
+            min-height: 0;
         }
+        .dash-page--tetap,
+        .dash-page--antrean {
+            height: 100%;
+            min-height: 0;
+            overscroll-behavior: contain;
+        }
+        .dash-page--tetap {
+            position: sticky;
+            top: calc(var(--th) + 24px);
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+        .dash-page--tetap::-webkit-scrollbar { display: none; }
+        .dash-page--antrean {
+            overflow-y: auto;
+            padding-right: 6px;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+        .dash-page--antrean::-webkit-scrollbar { width: 6px; }
+        .dash-page--antrean::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+        .dash-page--antrean .dash-head {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            padding: 2px 0 8px;
+            background: #f1f5f9;
+        }
+
+        /* Ringkas panel kiri agar seluruh ringkasan muat dalam satu layar */
+        .dash-page--tetap { gap: 12px; }
+        .dash-page--tetap .dash-hero { padding: 14px 16px; border-radius: 14px; }
+        .dash-page--tetap .dash-hero h1 { font-size: 17px; }
+        .dash-page--tetap .stat-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+        .dash-page--tetap .stat-card { padding: 10px; border-radius: 12px; }
+        .dash-page--tetap .stat-num { font-size: 23px; margin: 6px 0 2px; }
+        .dash-page--tetap .dash-card { padding: 12px; }
+        .dash-page--tetap .stok-cell { padding: 8px 6px; }
+        .dash-page--tetap .stok-cell strong { font-size: 18px; }
+        .dash-page--tetap .quick-link { padding: 9px; }
+        .dash-page--tetap .quick-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+        .queue-note { overflow-wrap: anywhere; }
+    }
+    @media (min-width: 1200px) {
+        .dash-page--tetap .quick-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
     }
 </style>
 @endsection
 
 @section('content')
 <div class="desktop-split-layout">
-    <div class="dash-page">
+    <div class="dash-page dash-page--tetap">
         <section class="dash-hero">
             <div>
                 <div class="dash-kicker">Shift Berjalan</div>
@@ -206,7 +254,7 @@
         </section>
     </div>
 
-    <div class="dash-page">
+    <div class="dash-page dash-page--antrean">
         <section>
             <div class="dash-head">
                 <h2>Antrean Prioritas Cepat</h2>

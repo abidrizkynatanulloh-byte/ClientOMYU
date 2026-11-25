@@ -156,6 +156,15 @@
                             <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded-md font-bold {{ request()->routeIs('panel.admin.penjualan.*') ? 'bg-brand-950/20 text-brand-950' : 'bg-white/10 text-white/70' }}">O-02</span>
                         </a>
 
+                        <a href="{{ route('panel.admin.menu.index') }}"
+                           class="admin-sidebar-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('panel.admin.menu.*') ? 'active-pill bg-brand-400 text-brand-950 shadow-md font-bold' : 'text-slate-200 hover:bg-white/10 hover:text-white' }}">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center {{ request()->routeIs('panel.admin.menu.*') ? 'bg-brand-950/20 text-brand-950' : 'bg-white/5 text-brand-300' }}">
+                                <i class="fa-solid fa-glass-water text-sm"></i>
+                            </div>
+                            <span>Daftar Menu</span>
+                            <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded-md font-bold {{ request()->routeIs('panel.admin.menu.*') ? 'bg-brand-950/20 text-brand-950' : 'bg-white/10 text-white/70' }}">O-03A</span>
+                        </a>
+
                         <a href="{{ route('panel.admin.resep.index') }}"
                            class="admin-sidebar-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('panel.admin.resep.*') ? 'active-pill bg-brand-400 text-brand-950 shadow-md font-bold' : 'text-slate-200 hover:bg-white/10 hover:text-white' }}">
                             <div class="w-8 h-8 rounded-lg flex items-center justify-center {{ request()->routeIs('panel.admin.resep.*') ? 'bg-brand-950/20 text-brand-950' : 'bg-white/5 text-brand-300' }}">

@@ -132,6 +132,11 @@
                     } elseif (str_contains($namaLower, 'kopi') || str_contains($namaLower, 'coffe') || str_contains($namaLower, 'nescafe')) {
                         $imgUrl = 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=600&auto=format&fit=crop&q=80';
                     }
+                    if ($p->gambar) {
+                        $imgUrl = str_starts_with($p->gambar, 'http')
+                            ? $p->gambar
+                            : asset('storage/'.$p->gambar);
+                    }
                     $detailProduk = [
                         'id' => $p->id,
                         'nama' => $p->nama,

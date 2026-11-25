@@ -12,6 +12,7 @@ use App\Models\Pesanan;
 use App\Models\Produk;
 use App\Models\Resep;
 use App\Models\RiwayatStok;
+use App\Support\KapasitasMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -20,6 +21,8 @@ use RuntimeException;
 
 class KasirController extends Controller
 {
+    public function __construct(private KapasitasMenu $kapasitasMenu) {}
+
     public function index(Request $request)
     {
         $kategoriList = Kategori::where('aktif', 1)->get();
@@ -171,7 +174,7 @@ class KasirController extends Controller
 
                     if ($resep && $resep->bahanList->isNotEmpty()) {
                         foreach ($resep->bahanList as $bahanResep) {
-                            $bahan = Bahan::whereKey($bahanResep->bahan_id)->lockForUpdate()->first();
+                            $bahan = Bahan::whereKey($bahanResep->id)->lockForUpdate()->first();
 
                             if (! $bahan) {
                                 continue;
@@ -277,6 +280,8 @@ class KasirController extends Controller
 
             return back()->with('error', $exception->getMessage())->withInput();
         }
+
+        $this->kapasitasMenu->sinkronkan();
 
         return redirect()->route('panel.staf.kasir.struk', $pesananId)
             ->with('sukses', 'Transaksi kasir berhasil disimpan!')

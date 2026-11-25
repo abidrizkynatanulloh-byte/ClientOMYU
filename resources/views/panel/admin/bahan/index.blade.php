@@ -136,7 +136,7 @@
                         <th class="py-3.5 px-4 font-bold text-center">Rendemen</th>
                         <th class="py-3.5 px-4 font-bold text-center">Stok Siap Pakai</th>
                         <th class="py-3.5 px-4 font-bold text-center">Batas Minimum</th>
-                        <th class="py-3.5 px-4 font-bold text-right">Biaya Rata-rata</th>
+                        <th class="py-3.5 px-4 font-bold text-right">Biaya per Satuan Beli</th>
                         <th class="py-3.5 px-4 font-bold text-right">Nilai Persediaan</th>
                         <th class="py-3.5 px-4 font-bold text-center">Status</th>
                         <th class="py-3.5 px-6 font-bold text-center">Aksi</th>
@@ -174,7 +174,10 @@
                                 {{ (float) $b->batas_minimum }} {{ $b->satuan_dasar }}
                             </td>
                             <td class="py-4 px-4 text-right text-slate-600 text-xs">
-                                Rp {{ number_format($b->biaya_rata_rata, 2, ',', '.') }} <span class="text-[10px] text-slate-400">/{{ $b->satuan_dasar }}</span>
+                                Rp {{ number_format($b->harga_beli, 2, ',', '.') }} <span class="text-[10px] text-slate-400">/{{ $b->satuan_beli }}</span>
+                                <span class="block text-[10px] text-slate-400 mt-0.5">
+                                    {{ number_format($b->biaya_rata_rata, 2, ',', '.') }}/{{ $b->satuan_dasar }}
+                                </span>
                             </td>
                             <td class="py-4 px-4 text-right font-extrabold text-slate-900">
                                 Rp {{ number_format((float) $b->stok * (float) $b->biaya_rata_rata, 0, ',', '.') }}

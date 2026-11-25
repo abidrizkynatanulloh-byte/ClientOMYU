@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Owner;
 use App\Http\Controllers\Controller;
 use App\Models\Produk;
 use App\Models\VarianProduk;
+use App\Support\KapasitasMenu;
 use Illuminate\Http\Request;
 
 class ResepHppController extends Controller
 {
+    public function __construct(private KapasitasMenu $kapasitasMenu) {}
+
     public function index(Request $request)
     {
         // 1. Ambil data produk beserta varian, resep aktif, dan daftar bahannya
@@ -20,6 +23,7 @@ class ResepHppController extends Controller
         }
 
         $daftarProduk = $query->get();
+        $kapasitasMenu = $this->kapasitasMenu->hitung()['kapasitas'];
 
         // 2. Hitung HPP dan Kapasitas Cup per Varian Menu
         $menuAnalisis = [];
@@ -51,6 +55,11 @@ class ResepHppController extends Controller
 
                     // Kapasitas menu adalah nilai terkecil dari semua bahan (Bab 2.5)
                     $kapasitasCup = ! empty($kapasitasPerBahan) ? min($kapasitasPerBahan) : 0;
+                }
+
+                // Pakai kapasitas hasil pembagian bahan bersama agar sama dengan stok katalog
+                if (array_key_exists($produk->id, $kapasitasMenu)) {
+                    $kapasitasCup = $kapasitasMenu[$produk->id];
                 }
 
                 $hargaJual = $varian->harga > 0 ? $varian->harga : $produk->harga;

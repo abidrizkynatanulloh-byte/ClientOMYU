@@ -61,14 +61,14 @@
                     <label class="block text-xs font-bold text-slate-700 mb-1.5">
                         Satuan Beli di Toko/Pasar <span class="text-rose-500">*</span>
                     </label>
-                    <input type="text" name="satuan_beli" value="{{ old('satuan_beli', $bahan->satuan_beli) }}" required
+                    <input type="text" id="satuan-beli" name="satuan_beli" value="{{ old('satuan_beli', $bahan->satuan_beli) }}" required
                            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/40 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1.5">
                         Satuan Dasar di Gudang / Resep <span class="text-rose-500">*</span>
                     </label>
-                    <select name="satuan_dasar" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/40 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+                    <select id="satuan-dasar" name="satuan_dasar" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/40 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
                         <option value="g" {{ old('satuan_dasar', $bahan->satuan_dasar) == 'g' ? 'selected' : '' }}>Gram (g)</option>
                         <option value="ml" {{ old('satuan_dasar', $bahan->satuan_dasar) == 'ml' ? 'selected' : '' }}>Mililiter (ml)</option>
                         <option value="pcs" {{ old('satuan_dasar', $bahan->satuan_dasar) == 'pcs' ? 'selected' : '' }}>Pcs</option>
@@ -81,8 +81,23 @@
                 <label class="block text-xs font-bold text-slate-700 mb-1.5">
                     Nilai Konversi Satuan Beli ke Dasar <span class="text-rose-500">*</span>
                 </label>
-                <input type="number" step="any" name="konversi" value="{{ old('konversi', (float) $bahan->konversi) }}" required
+                <input type="number" step="any" min="1" id="konversi" name="konversi" value="{{ old('konversi', (float) $bahan->konversi) }}" required
                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/40 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+            </div>
+
+            <!-- Harga Beli per Satuan Beli -->
+            <div class="rounded-2xl bg-brand-50/70 border border-brand-200 p-4">
+                <label class="block text-xs font-extrabold text-brand-900 mb-1.5">
+                    Biaya per <span id="label-satuan-beli">{{ old('satuan_beli', $bahan->satuan_beli) }}</span> (Rp)
+                </label>
+                <input type="number" step="0.0001" min="0" id="harga-beli" name="harga_beli"
+                       value="{{ old('harga_beli', $bahan->harga_beli) }}"
+                       class="w-full px-4 py-2.5 rounded-xl border border-brand-300 bg-white text-xs sm:text-sm font-bold focus:outline-none focus:ring-2 focus:ring-brand-400">
+                <p class="text-[11px] text-brand-800 mt-1.5 leading-relaxed">
+                    Bisa diubah kapan saja saat harga pasar naik/turun. Sistem menyimpan biaya per satuan dasar otomatis.
+                </p>
+                <span id="ringkasan-biaya" class="text-[11px] text-brand-700 mt-1 block font-semibold"></span>
+                @error('harga_beli') <p class="text-xs text-rose-600 mt-1 font-semibold">{{ $message }}</p> @enderror
             </div>
 
             <!-- Rendemen Card -->
@@ -129,4 +144,32 @@
     </div>
 
 </div>
+@push('scripts')
+<script>
+    const satuanBeliInput = document.getElementById('satuan-beli');
+    const konversiInput = document.getElementById('konversi');
+    const satuanDasarInput = document.getElementById('satuan-dasar');
+    const hargaBeliInput = document.getElementById('harga-beli');
+    const labelSatuanBeli = document.getElementById('label-satuan-beli');
+    const ringkasanBiaya = document.getElementById('ringkasan-biaya');
+
+    function perbaruiRingkasanBiaya() {
+        const satuanBeli = satuanBeliInput.value.trim() || 'satuan beli';
+        const satuanDasar = satuanDasarInput.value;
+        const konversi = Math.max(1, Number(konversiInput.value) || 1);
+        const harga = Number(hargaBeliInput.value) || 0;
+        const perDasar = harga / konversi;
+
+        labelSatuanBeli.textContent = satuanBeli;
+        ringkasanBiaya.textContent = `Disimpan sebagai Rp ${perDasar.toLocaleString('id-ID', { maximumFractionDigits: 4 })}/${satuanDasar}.`;
+    }
+
+    [satuanBeliInput, konversiInput, satuanDasarInput, hargaBeliInput].forEach(function (elemen) {
+        elemen.addEventListener('input', perbaruiRingkasanBiaya);
+        elemen.addEventListener('change', perbaruiRingkasanBiaya);
+    });
+
+    perbaruiRingkasanBiaya();
+</script>
+@endpush
 @endsection
