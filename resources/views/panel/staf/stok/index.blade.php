@@ -170,7 +170,11 @@
                     <div class="bahan-actions">
                         <form method="POST" action="{{ route('panel.staf.stok.toggle-aktif', $bahan->id) }}">
                             @csrf
-                            <button type="submit" class="btn-mini">{{ $bahan->aktif ? 'Tutup' : 'Aktifkan' }}</button>
+                            <button type="submit" class="btn-mini"
+                                    data-confirm="Apakah Anda yakin ingin {{ $bahan->aktif ? 'menutup' : 'mengaktifkan' }} bahan {{ $bahan->nama }}?"
+                                    data-confirm-title="{{ $bahan->aktif ? 'Tutup' : 'Aktifkan' }} Bahan?"
+                                    data-confirm-btn="{{ $bahan->aktif ? 'Ya, Tutup' : 'Ya, Aktifkan' }}"
+                                    data-confirm-type="{{ $bahan->aktif ? 'danger' : 'success' }}">{{ $bahan->aktif ? 'Tutup' : 'Aktifkan' }}</button>
                         </form>
                         <span class="toggle-label">{{ $bahan->aktif ? 'Tersedia' : 'Ditutup' }}</span>
                         <button type="button" class="btn-mini" data-pasokan="{{ $bahan->id }}" data-nama="{{ $bahan->nama }}" data-satuan="{{ $bahan->satuan_beli ?: $satuan }}">Pasokan</button>
@@ -219,7 +223,11 @@
                         </div>
                         <label for="alasan-{{ $produk->id }}">Alasan</label>
                         <input type="text" id="alasan-{{ $produk->id }}" name="alasan" minlength="3" maxlength="255" placeholder="Contoh: stok opname cup" required>
-                        <button type="submit" class="btn btn-hijau" style="margin-top:9px;">Simpan Penyesuaian</button>
+                        <button type="submit" class="btn btn-hijau" style="margin-top:9px;"
+                                data-confirm="Simpan penyesuaian stok {{ $produk->nama }} sesuai tipe dan jumlah yang diisi?"
+                                data-confirm-title="Simpan Penyesuaian Stok?"
+                                data-confirm-btn="Ya, Simpan"
+                                data-confirm-type="warning">Simpan Penyesuaian</button>
                     </form>
                 </div>
             </details>
@@ -331,11 +339,18 @@
                     </select>
                 </div>
             </div>
+            <label class="form-label" for="totalHargaPasokan">Uang Keluar (Rp)</label>
+            <input class="form-input" type="number" id="totalHargaPasokan" name="total_harga" min="0" step="1" placeholder="Isi harga beli sebenarnya">
+            <p class="text-xs text-slate-500 mt-1">Isi total tagihan pembelian sebenarnya. Harga rata-rata bahan dan HPP per cup akan menyesuaikan otomatis, dan nominalnya muncul di Buku Mutasi Kas. Kosongkan untuk memakai harga rata-rata saat ini.</p>
             <label class="form-label" for="catatanPasokan">Catatan / Supplier</label>
             <input class="form-input" type="text" id="catatanPasokan" name="catatan" maxlength="255" placeholder="Contoh: pasokan supplier hari ini">
             <div class="modal-actions">
                 <button type="button" class="btn btn-abu" data-tutup="modalPasokan">Batal</button>
-                <button type="submit" class="btn btn-hijau">Simpan Pasokan</button>
+                <button type="submit" class="btn btn-hijau"
+                        data-confirm="Simpan pasokan masuk ini ke gudang dan catat uang keluar kas?"
+                        data-confirm-title="Simpan Pasokan?"
+                        data-confirm-btn="Ya, Simpan Pasokan"
+                        data-confirm-type="success">Simpan Pasokan</button>
             </div>
         </form>
     </div>
@@ -374,7 +389,11 @@
             <input class="form-input" type="text" id="alasanBuang" name="alasan" minlength="3" maxlength="255" placeholder="Contoh: buah berjamur saat sortiran" required>
             <div class="modal-actions">
                 <button type="button" class="btn btn-abu" data-tutup="modalPembuangan">Batal</button>
-                <button type="submit" class="btn btn-merah">Catat Pembuangan</button>
+                <button type="submit" class="btn btn-merah"
+                        data-confirm="Catat pembuangan bahan ini dan kurangi stok gudang?"
+                        data-confirm-title="Catat Pembuangan?"
+                        data-confirm-btn="Ya, Catat"
+                        data-confirm-type="danger">Catat Pembuangan</button>
             </div>
         </form>
     </div>
@@ -408,7 +427,11 @@
             <input class="form-input" type="text" id="auditCatatan" name="catatan" minlength="3" maxlength="255" placeholder="Contoh: opname pagi" required>
             <div class="modal-actions">
                 <button type="button" class="btn btn-abu" data-tutup="modalAudit">Batal</button>
-                <button type="submit" class="btn btn-hijau">Simpan Audit</button>
+                <button type="submit" class="btn btn-hijau"
+                        data-confirm="Simpan hasil audit stok fisik ini?"
+                        data-confirm-title="Simpan Audit Stok?"
+                        data-confirm-btn="Ya, Simpan Audit"
+                        data-confirm-type="warning">Simpan Audit</button>
             </div>
         </form>
     </div>

@@ -92,15 +92,7 @@
 
                     @foreach($keranjang as $key => $item)
                         @php
-                            $namaLower = strtolower($item['nama_produk']);
-                            $imgUrl = 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=200&auto=format&fit=crop&q=80';
-                            if (str_contains($namaLower, 'kentang')) {
-                                $imgUrl = 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=200&auto=format&fit=crop&q=80';
-                            } elseif (str_contains($namaLower, 'mangga')) {
-                                $imgUrl = 'https://images.unsplash.com/photo-1546173159-315724a31696?w=200&auto=format&fit=crop&q=80';
-                            } elseif (str_contains($namaLower, 'alpukat')) {
-                                $imgUrl = 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=200&auto=format&fit=crop&q=80';
-                            }
+                            $imgUrl = $item['gambar_url'] ?? asset('images/logo_omyu.png');
                         @endphp
 
                         <div class="cart-item-row">
@@ -204,5 +196,6 @@
     </nav>
 
     <script src="{{ asset('js/pelanggan-anim.js') }}?v={{ filemtime(public_path('js/pelanggan-anim.js')) }}"></script>
+    <script src="{{ asset('js/soft-refresh.js') }}?v={{ filemtime(public_path('js/soft-refresh.js')) }}"></script>
 </body>
 </html>

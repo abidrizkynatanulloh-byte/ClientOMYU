@@ -394,3 +394,249 @@
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
 }
+
+/* ==========================================================================
+   OMYU Modern Confirmation Modal (Admin)
+   ========================================================================== */
+.omyu-confirm-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.22s var(--admin-spring), visibility 0.22s;
+}
+.omyu-confirm-modal.active {
+  display: flex;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.omyu-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.omyu-confirm-box {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  background: #ffffff;
+  border-radius: 26px;
+  padding: 28px 24px 22px;
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.38), 0 0 0 1px rgba(226, 232, 240, 0.85);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  pointer-events: auto;
+  transform: scale(0.9) translateY(14px);
+  transition: transform 0.28s cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+.omyu-confirm-modal.active .omyu-confirm-box {
+  transform: scale(1) translateY(0);
+}
+.omyu-confirm-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  font-size: 20px;
+  line-height: 1;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.omyu-confirm-close:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  transform: rotate(90deg);
+}
+.omyu-confirm-icon-wrapper {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.omyu-confirm-icon-glow {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  opacity: 0.35;
+  filter: blur(12px);
+  animation: omyuAdminModalGlow 2.4s ease-in-out infinite;
+}
+@keyframes omyuAdminModalGlow {
+  0%, 100% { transform: scale(0.94); opacity: 0.3; }
+  50% { transform: scale(1.12); opacity: 0.55; }
+}
+.omyu-confirm-icon-circle {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px -5px rgba(0, 0, 0, 0.16);
+  transition: transform 0.2s ease;
+}
+.omyu-confirm-svg {
+  width: 36px;
+  height: 36px;
+  stroke-width: 2.5;
+}
+
+/* Modal Themes */
+.omyu-confirm-modal.theme-success .omyu-confirm-icon-circle {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+}
+.omyu-confirm-modal.theme-success .omyu-confirm-icon-glow {
+  background: #10b981;
+}
+.omyu-confirm-modal.theme-success .omyu-confirm-btn-submit {
+  background: linear-gradient(135deg, #198754, #15803d);
+  color: #ffffff;
+  box-shadow: 0 6px 20px -3px rgba(21, 128, 61, 0.45);
+}
+.omyu-confirm-modal.theme-success .omyu-confirm-btn-submit:hover {
+  background: linear-gradient(135deg, #15803d, #0f5132);
+  box-shadow: 0 8px 24px -3px rgba(21, 128, 61, 0.55);
+}
+
+.omyu-confirm-modal.theme-danger .omyu-confirm-icon-circle {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #ffffff;
+}
+.omyu-confirm-modal.theme-danger .omyu-confirm-icon-glow {
+  background: #ef4444;
+}
+.omyu-confirm-modal.theme-danger .omyu-confirm-btn-submit {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #ffffff;
+  box-shadow: 0 6px 20px -3px rgba(220, 38, 38, 0.45);
+}
+.omyu-confirm-modal.theme-danger .omyu-confirm-btn-submit:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  box-shadow: 0 8px 24px -3px rgba(220, 38, 38, 0.55);
+}
+
+.omyu-confirm-modal.theme-warning .omyu-confirm-icon-circle {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+}
+.omyu-confirm-modal.theme-warning .omyu-confirm-icon-glow {
+  background: #f59e0b;
+}
+.omyu-confirm-modal.theme-warning .omyu-confirm-btn-submit {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  box-shadow: 0 6px 20px -3px rgba(217, 119, 6, 0.45);
+}
+
+.omyu-confirm-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px;
+  line-height: 1.3;
+}
+.omyu-confirm-code-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin: 4px 0 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+.omyu-confirm-modal.theme-danger .omyu-confirm-code-badge {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+.omyu-confirm-message {
+  font-size: 13.5px;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 0 22px;
+  max-width: 320px;
+  word-break: break-word;
+}
+.omyu-confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 10px;
+  width: 100%;
+}
+.omyu-confirm-btn-cancel {
+  pointer-events: auto;
+  touch-action: manipulation;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.omyu-confirm-btn-cancel:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+.omyu-confirm-btn-cancel:active {
+  transform: scale(0.96);
+}
+.omyu-confirm-btn-submit {
+  pointer-events: auto;
+  touch-action: manipulation;
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: none;
+  font-size: 14px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.omyu-confirm-btn-submit:hover {
+  transform: translateY(-2px);
+}
+.omyu-confirm-btn-submit:active {
+  transform: scale(0.97) translateY(0);
+}
+.omyu-confirm-btn-submit.loading {
+  opacity: 0.8;
+  pointer-events: none;
+}

@@ -27,7 +27,11 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('panel.admin.karyawan.store') }}" class="space-y-5">
+        <form method="POST" action="{{ route('panel.admin.karyawan.store') }}" class="space-y-5"
+              data-confirm="Buat akun staf baru dengan kata sandi yang dimasukkan?"
+              data-confirm-title="Buat Akun Staf?"
+              data-confirm-btn="Ya, Buat Akun"
+              data-confirm-type="success">
             @csrf
 
             <!-- Nama Lengkap -->

@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -64,39 +65,47 @@ class ProdukController extends Controller
         $daftarKategori = Kategori::orderBy('nama')->pluck('nama', 'id');
         $daftarBahan = $this->daftarBahan();
         $resepBahan = [];
+        $daftarVarian = [[
+            'id' => null,
+            'nama' => 'Reguler',
+            'harga' => (int) (old('varians.0.harga', old('harga', 12000))),
+        ]];
 
-        return view('panel.admin.menu.create', compact('daftarKategori', 'daftarBahan', 'resepBahan'));
+        return view('panel.admin.menu.create', compact('daftarKategori', 'daftarBahan', 'resepBahan', 'daftarVarian'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validasi($request);
 
-        $produk = Produk::create([
-            'kategori_id' => $this->kategoriId($data['kategori_nama'] ?? null),
-            'nama' => $data['nama'],
-            'slug' => $this->slugMenu($data['nama']),
-            'deskripsi' => $data['deskripsi'] ?? null,
-            'harga' => $data['harga'],
-            'stok' => 0,
-            'berat_gram' => $data['berat_gram'] ?? null,
-            'gambar' => $request->hasFile('gambar')
-                ? $this->simpanGambarTerkompres($request->file('gambar'), $this->slugMenu($data['nama']))
-                : null,
-            'aktif' => $request->boolean('aktif', true),
-            'dibuat_oleh' => auth()->id(),
-            'diubah_oleh' => auth()->id(),
-        ]);
+        $produk = DB::transaction(function () use ($request, $data) {
+            $slug = $this->slugMenu($data['nama']);
+            $gambar = $request->hasFile('gambar')
+                ? $this->simpanGambarTerkompres($request->file('gambar'), $slug)
+                : null;
 
-        VarianProduk::create([
-            'produk_id' => $produk->id,
-            'nama' => 'Reguler',
-            'harga' => $produk->harga,
-            'aktif' => 1,
-        ]);
+            $produk = Produk::create([
+                'kategori_id' => $this->kategoriId($data['kategori_nama'] ?? null),
+                'nama' => $data['nama'],
+                'slug' => $slug,
+                'deskripsi' => $data['deskripsi'] ?? null,
+                'harga' => 0,
+                'stok' => 0,
+                'berat_gram' => $data['berat_gram'] ?? null,
+                'gambar' => $gambar,
+                'aktif' => $request->boolean('aktif', true),
+                'dibuat_oleh' => auth()->id(),
+                'diubah_oleh' => auth()->id(),
+            ]);
 
-        $this->simpanResep($produk, $data);
-        $this->kapasitasMenu->sinkronkan();
+            $daftarVarian = $this->simpanVarian($produk, $data['varians']);
+            $produk->update(['harga' => $daftarVarian->first()->harga]);
+
+            $this->simpanResep($produk, $data, $daftarVarian);
+            $this->kapasitasMenu->sinkronkan();
+
+            return $produk;
+        });
 
         return redirect()->route('panel.admin.menu.index')
             ->with('sukses', "Menu {$produk->nama} berhasil ditambahkan. Stok otomatis dihitung dari resep dan bahan yang tersedia!");
@@ -108,12 +117,29 @@ class ProdukController extends Controller
         $daftarKategori = Kategori::orderBy('nama')->pluck('nama', 'id');
         $daftarBahan = $this->daftarBahan();
         $resepBahan = $this->resepBahan($produk);
+        $daftarVarian = old('varians', $produk->varian
+            ->map(fn (VarianProduk $varian): array => [
+                'id' => $varian->id,
+                'nama' => $varian->nama,
+                'harga' => $varian->harga,
+            ])
+            ->values()
+            ->all());
+
+        if ($daftarVarian === []) {
+            $daftarVarian = [[
+                'id' => null,
+                'nama' => 'Reguler',
+                'harga' => $produk->harga,
+            ]];
+        }
 
         return view('panel.admin.menu.edit', compact(
             'produk',
             'daftarKategori',
             'daftarBahan',
-            'resepBahan'
+            'resepBahan',
+            'daftarVarian'
         ));
     }
 
@@ -122,31 +148,34 @@ class ProdukController extends Controller
         $produk = Produk::findOrFail($id);
         $data = $this->validasi($request, $produk->id);
 
-        $gambar = $produk->gambar;
-        if ($request->hasFile('gambar')) {
-            $gambar = $this->simpanGambarTerkompres($request->file('gambar'), $this->slugMenu($data['nama']));
-            if ($produk->gambar && ! str_starts_with($produk->gambar, 'http')) {
-                Storage::disk('public')->delete($produk->gambar);
+        $produk = DB::transaction(function () use ($request, $data, $produk) {
+            $gambar = $produk->gambar;
+
+            if ($request->hasFile('gambar')) {
+                $gambar = $this->simpanGambarTerkompres($request->file('gambar'), $this->slugMenu($data['nama']));
+                if ($produk->gambar && ! str_starts_with($produk->gambar, 'http')) {
+                    Storage::disk('public')->delete($produk->gambar);
+                }
             }
-        }
 
-        $produk->update([
-            'kategori_id' => $this->kategoriId($data['kategori_nama'] ?? null),
-            'nama' => $data['nama'],
-            'deskripsi' => $data['deskripsi'] ?? null,
-            'harga' => $data['harga'],
-            'berat_gram' => $data['berat_gram'] ?? null,
-            'gambar' => $gambar,
-            'aktif' => $request->boolean('aktif'),
-            'diubah_oleh' => auth()->id(),
-        ]);
+            $daftarVarian = $this->simpanVarian($produk, $data['varians']);
 
-        VarianProduk::where('produk_id', $produk->id)
-            ->where('nama', 'Reguler')
-            ->update(['harga' => $produk->harga]);
+            $produk->update([
+                'kategori_id' => $this->kategoriId($data['kategori_nama'] ?? null),
+                'nama' => $data['nama'],
+                'deskripsi' => $data['deskripsi'] ?? null,
+                'harga' => $daftarVarian->first()->harga,
+                'berat_gram' => $data['berat_gram'] ?? null,
+                'gambar' => $gambar,
+                'aktif' => $request->boolean('aktif'),
+                'diubah_oleh' => auth()->id(),
+            ]);
 
-        $this->simpanResep($produk, $data);
-        $this->kapasitasMenu->sinkronkan();
+            $this->simpanResep($produk, $data, $daftarVarian);
+            $this->kapasitasMenu->sinkronkan();
+
+            return $produk;
+        });
 
         return redirect()->route('panel.admin.menu.index')
             ->with('sukses', "Menu {$produk->nama} berhasil diperbarui. Stok otomatis disesuaikan dengan resep terbaru!");
@@ -182,6 +211,10 @@ class ProdukController extends Controller
             'kategori_nama' => ['nullable', 'string', 'max:100'],
             'deskripsi' => ['nullable', 'string', 'max:2000'],
             'harga' => ['required', 'integer', 'min:0'],
+            'varians' => ['required', 'array', 'min:1'],
+            'varians.*.id' => ['nullable', 'integer'],
+            'varians.*.nama' => ['required', 'string', 'max:50'],
+            'varians.*.harga' => ['required', 'integer', 'min:0'],
             'berat_gram' => ['nullable', 'integer', 'min:0'],
             'gambar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'aktif' => ['nullable', 'boolean'],
@@ -195,7 +228,21 @@ class ProdukController extends Controller
             'resep_bahan.*.bahan_id.exists' => 'Bahan yang dipilih tidak ditemukan.',
             'resep_bahan.*.takaran.required' => 'Isi takaran bahan per 1 cup.',
             'resep_bahan.*.takaran.min' => 'Takaran harus lebih besar dari nol.',
+            'varians.required' => 'Minimal satu varian harus ditambahkan.',
+            'varians.min' => 'Minimal satu varian harus ditambahkan.',
+            'varians.*.nama.required' => 'Isi nama untuk setiap varian.',
+            'varians.*.harga.required' => 'Isi harga untuk setiap varian.',
         ]);
+
+        $namaVarian = collect($data['varians'])
+            ->map(fn (array $varian): string => Str::lower(trim($varian['nama'])))
+            ->all();
+
+        if (count($namaVarian) !== count(array_unique($namaVarian))) {
+            throw ValidationException::withMessages([
+                'varians' => 'Nama varian tidak boleh sama. Gunakan nama yang berbeda, misalnya Reguler, Hot, dan Ice.',
+            ]);
+        }
 
         $bahanId = collect($data['resep_bahan'])->pluck('bahan_id')->all();
 
@@ -241,40 +288,85 @@ class ProdukController extends Controller
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array<int, array{id?: int|string|null, nama: string, harga: int}>  $dataVarian
+     * @return Collection<int, VarianProduk>
      */
-    private function simpanResep(Produk $produk, array $data): void
+    private function simpanVarian(Produk $produk, array $dataVarian): Collection
     {
-        $varian = $produk->varian()->where('nama', 'Reguler')->first()
-            ?? $produk->varian()->first();
+        $idDikirim = collect($dataVarian)
+            ->pluck('id')
+            ->filter(fn ($id) => $id !== null && $id !== '')
+            ->map(fn ($id) => (int) $id)
+            ->all();
 
-        if (! $varian) {
-            $varian = VarianProduk::create([
-                'produk_id' => $produk->id,
-                'nama' => 'Reguler',
-                'harga' => $produk->harga,
+        $tersimpan = $produk->varian()->whereIn('id', $idDikirim)->get()->keyBy('id');
+        $daftarVarian = collect();
+
+        foreach ($dataVarian as $data) {
+            $id = ! empty($data['id']) ? (int) $data['id'] : null;
+            $varian = $id ? $tersimpan->get($id) : null;
+
+            if ($id && ! $varian) {
+                throw ValidationException::withMessages([
+                    'varians' => 'Salah satu varian tidak ditemukan pada menu ini.',
+                ]);
+            }
+
+            if ($varian && $daftarVarian->contains(fn (VarianProduk $item) => $item->id === $varian->id)) {
+                throw ValidationException::withMessages([
+                    'varians' => 'Varian yang sama tidak boleh ditambahkan dua kali.',
+                ]);
+            }
+
+            $varian?->update([
+                'nama' => trim($data['nama']),
+                'harga' => (int) $data['harga'],
                 'aktif' => 1,
             ]);
+
+            if (! $varian) {
+                $varian = $produk->varian()->create([
+                    'nama' => trim($data['nama']),
+                    'harga' => (int) $data['harga'],
+                    'aktif' => 1,
+                ]);
+            }
+
+            $daftarVarian->push($varian);
         }
 
-        Resep::where('varian_id', $varian->id)->where('aktif', 1)->update(['aktif' => 0]);
+        $produk->varian()->whereNotIn('id', $daftarVarian->pluck('id')->all())->delete();
 
-        $resep = Resep::create([
-            'varian_id' => $varian->id,
-            'versi' => (int) Resep::where('varian_id', $varian->id)->max('versi') + 1,
-            'berlaku_mulai' => now(),
-            'aktif' => 1,
-            'alasan_perubahan' => 'Resep diperbarui dari panel admin',
-            'dibuat_oleh' => auth()->id(),
-        ]);
+        return $daftarVarian;
+    }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @param  Collection<int, VarianProduk>  $daftarVarian
+     */
+    private function simpanResep(Produk $produk, array $data, Collection $daftarVarian): void
+    {
         $takaran = [];
 
         foreach ($data['resep_bahan'] as $bahan) {
             $takaran[(int) $bahan['bahan_id']] = ['takaran' => (float) $bahan['takaran']];
         }
 
-        $resep->bahanList()->sync($takaran);
+        // Resep yang sama dipakai semua varian; Hot/Ice dibedakan dari harga, bukan takaran.
+        foreach ($daftarVarian as $varian) {
+            Resep::where('varian_id', $varian->id)->where('aktif', 1)->update(['aktif' => 0]);
+
+            $resep = Resep::create([
+                'varian_id' => $varian->id,
+                'versi' => (int) Resep::where('varian_id', $varian->id)->max('versi') + 1,
+                'berlaku_mulai' => now(),
+                'aktif' => 1,
+                'alasan_perubahan' => 'Resep diperbarui dari panel admin',
+                'dibuat_oleh' => auth()->id(),
+            ]);
+
+            $resep->bahanList()->sync($takaran);
+        }
     }
 
     private function slugMenu(string $nama): string

@@ -98,18 +98,33 @@ class StokController extends Controller
             'bahan_id' => 'required|exists:bahan,id',
             'jumlah_masuk' => 'required|numeric|min:0.001',
             'satuan_input' => 'required|in:'.implode(',', self::SATUAN_INPUT),
+            'total_harga' => 'nullable|numeric|min:0',
             'catatan' => 'nullable|string|max:255',
         ]);
 
         $bahan = Bahan::findOrFail($request->bahan_id);
         $jumlahInput = (float) $request->jumlah_masuk;
         $jumlahDasar = $bahan->konversiKeDasar($request->satuan_input, $jumlahInput);
-        $nilai = $jumlahDasar * (float) $bahan->biaya_rata_rata;
+        $nilai = $request->filled('total_harga')
+            ? (float) $request->total_harga
+            : $jumlahDasar * (float) $bahan->biaya_rata_rata;
 
         DB::transaction(function () use ($bahan, $jumlahDasar, $jumlahInput, $request, $nilai) {
             $bahanLock = Bahan::whereKey($bahan->id)->lockForUpdate()->firstOrFail();
-            $stokSesudah = (float) $bahanLock->stok + $jumlahDasar;
-            $bahanLock->update(['stok' => $stokSesudah, 'aktif' => 1]);
+            $stokSebelum = (float) $bahanLock->stok;
+            $stokSesudah = $stokSebelum + $jumlahDasar;
+
+            // Biaya rata-rata bergerak: nilai stok lama + nilai pasokan baru dibagi total stok.
+            $biayaRataRataBaru = round(
+                ((($stokSebelum * (float) $bahanLock->biaya_rata_rata) + $nilai) / $stokSesudah),
+                4
+            );
+
+            $bahanLock->update([
+                'stok' => $stokSesudah,
+                'biaya_rata_rata' => $biayaRataRataBaru,
+                'aktif' => 1,
+            ]);
             $bahanLock->catatPergerakan(
                 'pembelian',
                 $jumlahDasar,
@@ -134,7 +149,7 @@ class StokController extends Controller
 
         $this->kapasitasMenu->sinkronkan();
 
-        return back()->with('sukses', "Pasokan {$bahan->nama} sebanyak {$jumlahInput} {$request->satuan_input} berhasil ditambahkan ke stok.");
+        return back()->with('sukses', "Pasokan {$bahan->nama} sebanyak {$jumlahInput} {$request->satuan_input} berhasil ditambahkan. Kas keluar Rp ".number_format($nilai, 0, ',', '.').' dicatat atas nama '.auth()->user()->nama.'. Biaya rata-rata bahan dan HPP per cup ikut disesuaikan.');
     }
 
     public function catatPembuangan(Request $request)

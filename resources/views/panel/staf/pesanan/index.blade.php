@@ -242,29 +242,54 @@
                         <form method="POST" action="{{ route('panel.staf.pesanan.batal', $pesanan->id) }}">
                             @csrf
                             <input type="hidden" name="alasan_batal" value="Nominal pembayaran tidak sesuai, mohon verifikasi ulang">
-                            <button type="submit" class="btn btn-danger" onclick="return confirm('Tolak pembayaran pesanan #{{ $pesanan->kode_pesanan }}?')">Tolak</button>
+                            <button type="submit" class="btn btn-danger"
+                                    data-confirm="Apakah Anda yakin ingin menutup pesanan #{{ $pesanan->kode_pesanan }} karena pembayarannya ditolak?"
+                                    data-confirm-title="Tolak Pembayaran?"
+                                    data-confirm-code="#{{ $pesanan->kode_pesanan }}"
+                                    data-confirm-btn="Ya, Tolak"
+                                    data-confirm-type="danger">Tolak</button>
                         </form>
                         <form method="POST" action="{{ route('panel.staf.pesanan.verifikasi-bayar', $pesanan->id) }}">
                             @csrf
-                            <button type="submit" class="btn btn-primary">Konfirmasi Bayar</button>
+                            <button type="submit" class="btn btn-primary"
+                                    data-confirm="Apakah Anda yakin ingin mengaktifkan pesanan #{{ $pesanan->kode_pesanan }} setelah pembayarannya dikonfirmasi?"
+                                    data-confirm-title="Konfirmasi Pembayaran?"
+                                    data-confirm-code="#{{ $pesanan->kode_pesanan }}"
+                                    data-confirm-btn="Ya, Konfirmasi"
+                                    data-confirm-type="success">Konfirmasi Bayar</button>
                         </form>
                     @elseif($statusPesanan === 'dikonfirmasi')
                         <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
                             @csrf
                             <input type="hidden" name="status_pesanan" value="diproses">
-                            <button type="submit" class="btn btn-warning">Mulai Proses</button>
+                            <button type="submit" class="btn btn-warning"
+                                    data-confirm="Apakah Anda yakin ingin mengaktifkan dan mulai memproses pesanan #{{ $pesanan->kode_pesanan }}?"
+                                    data-confirm-title="Mulai Proses Pesanan?"
+                                    data-confirm-code="#{{ $pesanan->kode_pesanan }}"
+                                    data-confirm-btn="Ya, Mulai Proses"
+                                    data-confirm-type="success">Mulai Proses</button>
                         </form>
                     @elseif($statusPesanan === 'diproses')
                         <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
                             @csrf
                             <input type="hidden" name="status_pesanan" value="siap_diambil">
-                            <button type="submit" class="btn btn-primary">Siap Diambil</button>
+                            <button type="submit" class="btn btn-primary"
+                                    data-confirm="Apakah Anda yakin ingin menandai pesanan #{{ $pesanan->kode_pesanan }} siap diambil?"
+                                    data-confirm-title="Siap Diambil?"
+                                    data-confirm-code="#{{ $pesanan->kode_pesanan }}"
+                                    data-confirm-btn="Ya, Lanjutkan"
+                                    data-confirm-type="success">Siap Diambil</button>
                         </form>
                     @elseif($statusPesanan === 'siap_diambil')
                         <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
                             @csrf
                             <input type="hidden" name="status_pesanan" value="selesai">
-                            <button type="submit" class="btn btn-primary" onclick="return confirm('Serahkan pesanan #{{ $pesanan->kode_pesanan }} dan selesaikan?')">Serahkan Pesanan</button>
+                            <button type="submit" class="btn btn-primary"
+                                    data-confirm="Apakah Anda yakin ingin menutup pesanan #{{ $pesanan->kode_pesanan }} dan menyerahkannya ke pembeli?"
+                                    data-confirm-title="Serahkan Pesanan?"
+                                    data-confirm-code="#{{ $pesanan->kode_pesanan }}"
+                                    data-confirm-btn="Ya, Serahkan"
+                                    data-confirm-type="success">Serahkan Pesanan</button>
                         </form>
                     @endif
                 </div>

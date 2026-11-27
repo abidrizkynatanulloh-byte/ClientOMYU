@@ -119,24 +119,25 @@
         <div class="products-grid">
             @forelse($daftarProduk as $p)
                 @php
-                    $namaLower = strtolower($p->nama);
-                    $imgUrl = 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=600&auto=format&fit=crop&q=80';
-                    if (str_contains($namaLower, 'mangga')) {
-                        $imgUrl = 'https://images.unsplash.com/photo-1546173159-315724a31696?w=600&auto=format&fit=crop&q=80';
-                    } elseif (str_contains($namaLower, 'alpukat')) {
-                        $imgUrl = 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=600&auto=format&fit=crop&q=80';
-                    } elseif (str_contains($namaLower, 'tomat')) {
-                        $imgUrl = 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80';
-                    } elseif (str_contains($namaLower, 'seledri') || str_contains($namaLower, 'green')) {
-                        $imgUrl = 'https://images.unsplash.com/photo-1610970881699-44a5587cabec?w=600&auto=format&fit=crop&q=80';
-                    } elseif (str_contains($namaLower, 'kopi') || str_contains($namaLower, 'coffe') || str_contains($namaLower, 'nescafe')) {
-                        $imgUrl = 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=600&auto=format&fit=crop&q=80';
+                    $imgUrl = $p->gambarUrl(600);
+                    $firstVarian = $p->varian->first();
+                    $initialPrice = $firstVarian && $firstVarian->harga > 0 ? $firstVarian->harga : $p->harga;
+
+                    // Variasi potongan harga promo yang dinamis dan proporsional per produk
+                    $pilihanPotongan = [2000, 3000, 4000, 5000];
+                    $potongan = $pilihanPotongan[$p->id % count($pilihanPotongan)];
+                    if ($initialPrice <= 12000 && $potongan > 3000) {
+                        $potongan = 2000;
                     }
-                    if ($p->gambar) {
-                        $imgUrl = str_starts_with($p->gambar, 'http')
-                            ? $p->gambar
-                            : asset('storage/'.$p->gambar);
-                    }
+                    $strikethroughPrice = $initialPrice + $potongan;
+                    $hematRibuan = round($potongan / 1000);
+
+                    // Rating asli dari ulasan pelanggan. Menu baru mulai dari 0 bintang.
+                    $ratingScore = $p->bintangRataRata();
+                    $jumlahUlasan = $p->jumlahUlasan();
+                    $bintangPenuh = (int) round($ratingScore);
+                    $bintangTampil = str_repeat('★', $bintangPenuh).str_repeat('☆', 5 - $bintangPenuh);
+
                     $detailProduk = [
                         'id' => $p->id,
                         'nama' => $p->nama,
@@ -146,38 +147,104 @@
                         'stok' => $p->stok,
                         'kategori' => $p->kategori?->nama ?? 'Menu OMYU',
                         'img' => $imgUrl,
+                        'rating' => $ratingScore,
+                        'jumlah_ulasan' => $jumlahUlasan,
+                        'bintang' => $bintangTampil,
+                        'varians' => $p->varian->map(fn ($varian): array => [
+                            'id' => $varian->id,
+                            'nama' => $varian->nama,
+                            'harga_format' => 'Rp '.number_format($varian->harga > 0 ? $varian->harga : $p->harga, 0, ',', '.'),
+                        ])->values()->all(),
                     ];
                 @endphp
                 <div class="product-card product-open-detail"
                      role="button"
                      tabindex="0"
+                     data-potongan="{{ $potongan }}"
                      data-produk='@json($detailProduk)'>
+
+                    <!-- Product Hero Image Box -->
                     <div class="product-img-box">
-                        <img src="{{ $imgUrl }}" alt="{{ $p->nama }}">
+                        <span class="product-card-badge">{{ $p->kategori?->nama ?? '100% Buah Murni' }}</span>
+                        <img src="{{ $imgUrl }}" alt="{{ $p->nama }}" loading="lazy">
+                        @if($p->stok > 0)
+                            <div class="product-img-overlay-btn" onclick="event.stopPropagation();">
+                                <button type="button" class="btn-add-cart-enhanced btn-img-add-cart" onclick="window.tambahKeranjangAnimasi(this, event)">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="9" cy="21" r="1"></circle>
+                                        <circle cx="20" cy="21" r="1"></circle>
+                                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                    </svg>
+                                    <span>Tambah ke Keranjang</span>
+                                </button>
+                            </div>
+                        @endif
                     </div>
 
+                    <!-- Product Title -->
                     <div class="product-title">{{ $p->nama }}</div>
-                    <span class="product-price">Rp {{ number_format($p->harga, 0, ',', '.') }}</span>
 
-                    <div class="product-footer">
+                    <!-- Rating dari rata-rata ulasan pelanggan -->
+                    <div class="product-rating-row">
+                        <span class="product-stars">{{ $bintangTampil }}</span>
+                        <span class="product-rating-score">{{ number_format($ratingScore, 1, ',', '.') }}</span>
+                        <span class="product-rating-reviews">({{ $jumlahUlasan }} ulasan)</span>
+                    </div>
+
+                    <!-- Price & Discount Tag -->
+                    <div class="product-price-row">
+                        <span class="product-price-main">Rp {{ number_format($initialPrice, 0, ',', '.') }}</span>
+                        <span class="product-price-strike">Rp {{ number_format($strikethroughPrice, 0, ',', '.') }}</span>
+                        <span class="product-discount-tag">Hemat {{ $hematRibuan }}rb</span>
+                    </div>
+
+                    <!-- Variant Chips (Interactive Pills) -->
+                    @if($p->varian->isNotEmpty())
+                        <div class="variant-chips-container" onclick="event.stopPropagation();">
+                            @foreach($p->varian as $varian)
+                                @php
+                                    $varPrice = $varian->harga > 0 ? $varian->harga : $p->harga;
+                                @endphp
+                                <button type="button"
+                                        class="variant-chip {{ $loop->first ? 'active' : '' }}"
+                                        data-id="{{ $varian->id }}"
+                                        data-harga="{{ $varPrice }}"
+                                        data-harga-format="Rp {{ number_format($varPrice, 0, ',', '.') }}"
+                                        onclick="window.pilihVarianKartu(this, event)">
+                                    {{ $varian->nama }}
+                                </button>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <!-- Card Action Area -->
+                    <div class="card-action-container" onclick="event.stopPropagation();">
                         @if($p->stok > 0)
-                            <div class="product-actions" onclick="event.stopPropagation();">
-                                <form method="POST" action="{{ route('pelanggan.keranjang.tambah') }}">
-                                    @csrf
-                                    <input type="hidden" name="produk_id" value="{{ $p->id }}">
-                                    <input type="hidden" name="qty" value="1">
-                                    <button type="submit" class="btn-add-cart">Keranjang</button>
-                                </form>
-                                <form method="POST" action="{{ route('pelanggan.keranjang.tambah') }}">
-                                    @csrf
-                                    <input type="hidden" name="produk_id" value="{{ $p->id }}">
-                                    <input type="hidden" name="qty" value="1">
-                                    <input type="hidden" name="langsung" value="1">
-                                    <button type="submit" class="btn-order-now">Pesan</button>
-                                </form>
-                            </div>
+                            <form method="POST" action="{{ route('pelanggan.keranjang.tambah') }}" class="card-cart-form" onsubmit="event.preventDefault();">
+                                @csrf
+                                <input type="hidden" name="produk_id" value="{{ $p->id }}">
+                                <input type="hidden" name="varian_id" class="input-varian-id" value="{{ $firstVarian?->id ?? '' }}">
+                                <input type="hidden" name="langsung" class="input-langsung" value="0">
+                                <input type="hidden" name="qty" class="input-qty" value="1">
+
+                                <div class="card-qty-row">
+                                    <span class="card-stok-text">Stok: <strong>{{ $p->stok }} cup</strong></span>
+                                    <div class="card-qty-pill">
+                                        <button type="button" class="card-qty-btn" onclick="window.ubahQtyKartu(this, -1, {{ $p->stok }}, event)">−</button>
+                                        <input type="text" class="card-qty-input" value="1" readonly>
+                                        <button type="button" class="card-qty-btn" onclick="window.ubahQtyKartu(this, 1, {{ $p->stok }}, event)">+</button>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn-order-direct" onclick="this.form.querySelector('.input-langsung').value='1'; this.form.submit();">
+                                    <span>Pesan Langsung</span>
+                                    <span>&rarr;</span>
+                                </button>
+                            </form>
                         @else
-                            <span style="font-size: 12px; color: #dc2626; font-weight: 800;">Stok Habis</span>
+                            <div style="text-align: center; padding: 10px; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 999px; color: #dc2626; font-size: 12px; font-weight: 800;">
+                                Stok Habis
+                            </div>
                         @endif
                     </div>
                 </div>
@@ -242,26 +309,28 @@
                     <span class="product-modal-badge" id="modalKategoriProduk">Menu OMYU</span>
                     <h3 class="product-modal-title" id="modalNamaProduk"></h3>
                     <p class="product-modal-desc" id="modalDeskripsiProduk"></p>
+                    <div class="product-modal-rating" id="modalRatingProduk">☆☆☆☆☆ 0,0 (0 ulasan)</div>
                     <div class="product-modal-price" id="modalHargaProduk"></div>
                     <div class="product-modal-meta">
                         <div class="product-modal-meta-item"><strong>Stok tersedia:</strong> <span id="modalStokProduk"></span></div>
                         <div class="product-modal-meta-item"><strong>Catatan:</strong> Dibuat segar saat pesanan diproses.</div>
                     </div>
-                    <div class="product-modal-actions">
-                        <form method="POST" action="{{ route('pelanggan.keranjang.tambah') }}">
-                            @csrf
-                            <input type="hidden" name="produk_id" id="modalProdukIdCart">
-                            <input type="hidden" name="qty" value="1">
-                            <button type="submit" class="btn-add-cart">+ Keranjang</button>
-                        </form>
-                        <form method="POST" action="{{ route('pelanggan.keranjang.tambah') }}">
-                            @csrf
-                            <input type="hidden" name="produk_id" id="modalProdukIdOrder">
-                            <input type="hidden" name="qty" value="1">
-                            <input type="hidden" name="langsung" value="1">
-                            <button type="submit" class="btn-order-now">Pesan Langsung</button>
-                        </form>
-                    </div>
+                    <form method="POST" action="{{ route('pelanggan.keranjang.tambah') }}" class="product-modal-form">
+                        @csrf
+                        <input type="hidden" name="produk_id" id="modalProdukId">
+                        <label class="qty-control">
+                            <span>Varian</span>
+                            <select name="varian_id" id="modalVarianId" aria-label="Varian produk"></select>
+                        </label>
+                        <label class="qty-control">
+                            <span>Jumlah</span>
+                            <input type="number" name="qty" id="modalQty" value="1" min="1" max="1" inputmode="numeric">
+                        </label>
+                        <div class="product-modal-actions">
+                            <button type="button" class="btn-add-cart btn-add-cart-enhanced" onclick="window.tambahKeranjangAnimasi(this, event)">+ Keranjang</button>
+                            <button type="submit" name="langsung" value="1" class="btn-order-now">Pesan Langsung</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -276,10 +345,40 @@
             const kategori = document.getElementById('modalKategoriProduk');
             const nama = document.getElementById('modalNamaProduk');
             const desk = document.getElementById('modalDeskripsiProduk');
+            const rating = document.getElementById('modalRatingProduk');
             const harga = document.getElementById('modalHargaProduk');
             const stok = document.getElementById('modalStokProduk');
-            const idCart = document.getElementById('modalProdukIdCart');
-            const idOrder = document.getElementById('modalProdukIdOrder');
+            const idProduk = document.getElementById('modalProdukId');
+            const varianSelect = document.getElementById('modalVarianId');
+            const qty = document.getElementById('modalQty');
+
+            function isiVarian(data) {
+                varianSelect.innerHTML = '';
+
+                const daftarVarian = data.varians || [];
+                if (daftarVarian.length === 0) {
+                    const opsi = document.createElement('option');
+                    opsi.value = '';
+                    opsi.textContent = 'Reguler';
+                    varianSelect.appendChild(opsi);
+                    return;
+                }
+
+                daftarVarian.forEach(function (varian) {
+                    const opsi = document.createElement('option');
+                    opsi.value = varian.id;
+                    opsi.textContent = varian.nama + ' — ' + (varian.harga_format || '');
+                    opsi.dataset.hargaFormat = varian.harga_format || '';
+                    varianSelect.appendChild(opsi);
+                });
+            }
+
+            varianSelect.addEventListener('change', function () {
+                const opsi = varianSelect.selectedOptions[0];
+                if (opsi?.dataset.hargaFormat) {
+                    harga.textContent = opsi.dataset.hargaFormat;
+                }
+            });
 
             function openModal(data) {
                 img.src = data.img || '';
@@ -287,10 +386,16 @@
                 kategori.textContent = data.kategori || 'Menu OMYU';
                 nama.textContent = data.nama || '';
                 desk.textContent = data.deskripsi || '';
+                rating.textContent = (data.bintang || '☆☆☆☆☆') + ' '
+                    + Number(data.rating ?? 0).toFixed(1).replace('.', ',') + ' ('
+                    + (data.jumlah_ulasan ?? 0) + ' ulasan)';
                 harga.textContent = data.harga_format || '';
                 stok.textContent = (data.stok ?? 0) + ' cup';
-                idCart.value = data.id || '';
-                idOrder.value = data.id || '';
+                idProduk.value = data.id || '';
+                isiVarian(data);
+                qty.max = String(data.stok ?? 0);
+                qty.value = '1';
+                qty.setAttribute('aria-label', 'Jumlah ' + (data.nama || 'produk'));
                 modal.classList.add('show');
                 modal.setAttribute('aria-hidden', 'false');
                 document.body.style.overflow = 'hidden';
@@ -331,5 +436,6 @@
         })();
     </script>
     <script src="{{ asset('js/pelanggan-anim.js') }}?v={{ filemtime(public_path('js/pelanggan-anim.js')) }}"></script>
+    <script src="{{ asset('js/soft-refresh.js') }}?v={{ filemtime(public_path('js/soft-refresh.js')) }}"></script>
 </body>
 </html>

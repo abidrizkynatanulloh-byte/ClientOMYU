@@ -31,6 +31,29 @@ class PelangganPesananController extends Controller
         return $pelanggan instanceof Pelanggan ? $pelanggan : null;
     }
 
+    /**
+     * Lampirkan foto produk terkini ke tiap item keranjang agar tampilan pesanan
+     * memakai gambar yang sama dengan katalog (termasuk sesi lama).
+     *
+     * @param  array<string, array<string, mixed>>  $keranjang
+     * @return array<string, array<string, mixed>>
+     */
+    private function lampirkanGambarProduk(array $keranjang): array
+    {
+        $produkIds = collect($keranjang)->pluck('produk_id')->filter()->unique()->all();
+
+        $daftarGambar = Produk::whereIn('id', $produkIds)
+            ->get()
+            ->mapWithKeys(fn (Produk $produk): array => [$produk->id => $produk->gambarUrl(200)]);
+
+        foreach ($keranjang as $kunci => $item) {
+            $keranjang[$kunci]['gambar_url'] = $daftarGambar[$item['produk_id'] ?? null]
+                ?? asset('images/logo_omyu.png');
+        }
+
+        return $keranjang;
+    }
+
     private function deviceToken(Request $request): string
     {
         $token = (string) $request->cookie('omyu_device_token', '');
@@ -58,7 +81,10 @@ class PelangganPesananController extends Controller
     public function katalog(Request $request)
     {
         $kategoriList = Kategori::where('aktif', 1)->get();
-        $query = Produk::with(['kategori', 'varian'])->where('aktif', 1);
+        $query = Produk::with(['kategori', 'varian'])
+            ->withCount('ulasan')
+            ->withAvg('ulasan', 'bintang')
+            ->where('aktif', 1);
 
         if ($request->filled('kategori_id')) {
             $query->where('kategori_id', $request->kategori_id);
@@ -80,12 +106,22 @@ class PelangganPesananController extends Controller
     {
         $request->validate([
             'produk_id' => 'required|exists:produk,id',
+            'varian_id' => 'nullable|integer|exists:varian_produk,id',
             'qty' => 'required|integer|min:1',
             'catatan' => 'nullable|string|max:150',
         ]);
 
         $produk = Produk::with('varian')->findOrFail($request->produk_id);
-        $varian = $produk->varian()->first(); // Ambil varian reguler/default
+
+        if ($request->filled('varian_id')) {
+            $varian = $produk->varian()->whereKey((int) $request->varian_id)->where('aktif', 1)->first();
+
+            if (! $varian) {
+                return back()->with('galat', 'Varian yang dipilih tidak tersedia untuk menu ini.');
+            }
+        } else {
+            $varian = $produk->varian()->where('aktif', 1)->first();
+        }
 
         if ($produk->stok < $request->qty) {
             return back()->with('galat', "Stok {$produk->nama} tidak mencukupi (sisa {$produk->stok} cup).");
@@ -131,7 +167,7 @@ class PelangganPesananController extends Controller
      */
     public function lihatKeranjang()
     {
-        $keranjang = session()->get('keranjang', []);
+        $keranjang = $this->lampirkanGambarProduk(session()->get('keranjang', []));
         $totalHarga = 0;
 
         foreach ($keranjang as $item) {
@@ -190,9 +226,9 @@ class PelangganPesananController extends Controller
     public function checkout(Request $request)
     {
         $modeLangsung = $request->query('mode') === 'langsung';
-        $keranjang = $modeLangsung
+        $keranjang = $this->lampirkanGambarProduk($modeLangsung
             ? session()->get('checkout_langsung', [])
-            : session()->get('keranjang', []);
+            : session()->get('keranjang', []));
 
         if (empty($keranjang)) {
             if ($modeLangsung) {
@@ -476,7 +512,7 @@ class PelangganPesananController extends Controller
         $deviceToken = $this->deviceToken($request);
         $daftarPesanan = collect();
 
-        $query = Pesanan::with(['itemPesanan.produk', 'pembayaran']);
+        $query = Pesanan::with(['itemPesanan.produk', 'pembayaran', 'ulasan']);
 
         if ($pelanggan) {
             $query->where(function ($q) use ($pelanggan, $deviceToken) {

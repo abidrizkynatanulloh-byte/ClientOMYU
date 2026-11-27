@@ -10,6 +10,7 @@ use App\Http\Controllers\Owner\ProdukController;
 use App\Http\Controllers\Owner\ResepHppController;
 use App\Http\Controllers\PelangganAuthController;
 use App\Http\Controllers\PelangganPesananController;
+use App\Http\Controllers\PelangganUlasanController;
 use App\Http\Controllers\Staf\AktivitasController as StafAktivitasController;
 use App\Http\Controllers\Staf\BantuanController as StafBantuanController;
 use App\Http\Controllers\Staf\DashboardController as StafDashboardController;
@@ -24,6 +25,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     // Menu favorit dihitung dari total cup pada pesanan yang sudah selesai.
     $menuFavorit = Produk::where('aktif', 1)
+        ->withCount('ulasan')
+        ->withAvg('ulasan', 'bintang')
         ->withSum(['itemPesanan as jumlah_terjual' => function ($query) {
             $query->whereHas('pesanan', function ($pesanan) {
                 $pesanan->where('status_pesanan', 'selesai');
@@ -65,6 +68,10 @@ Route::middleware(['auth', 'peran:admin,karyawan'])
         // K-03, K-04, K-05, K-06, K-12: Manajemen Pesanan Masuk & Verifikasi
         Route::prefix('pesanan')->name('staf.pesanan.')->group(function () {
             Route::get('/', [StafPesananController::class, 'index'])->name('index');
+            Route::get('/scan', [StafPesananController::class, 'scan'])->name('scan');
+            Route::post('/scan/validasi', [StafPesananController::class, 'validasiQr'])->name('scan.validasi');
+            Route::post('/{id}/terima-qr', [StafPesananController::class, 'terimaQr'])->name('terima-qr');
+            Route::get('/struk/{id}', [StafPesananController::class, 'struk'])->name('struk');
             Route::get('/{id}', [StafPesananController::class, 'detail'])->name('detail');
             Route::post('/{id}/verifikasi-bayar', [StafPesananController::class, 'verifikasiPembayaran'])->name('verifikasi-bayar');
             Route::post('/{id}/status', [StafPesananController::class, 'updateStatus'])->name('update-status');
@@ -173,4 +180,7 @@ Route::prefix('order')->name('pelanggan.')->group(function () {
 
     // P-08: Cek Status Pesanan Real-time (guest by device token, login by akun)
     Route::get('/lacak', [PelangganPesananController::class, 'lacakStatus'])->name('lacak');
+
+    // Penilaian bintang untuk menu dari pesanan yang sudah selesai
+    Route::post('/ulasan', [PelangganUlasanController::class, 'simpan'])->name('ulasan.simpan');
 });

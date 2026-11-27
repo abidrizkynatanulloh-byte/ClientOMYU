@@ -27,7 +27,11 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('panel.admin.bahan.update', $bahan->id) }}" class="space-y-5">
+        <form method="POST" action="{{ route('panel.admin.bahan.update', $bahan->id) }}" class="space-y-5"
+              data-confirm="Simpan perubahan data bahan {{ $bahan->nama }}?"
+              data-confirm-title="Perbarui Data Bahan?"
+              data-confirm-btn="Ya, Simpan"
+              data-confirm-type="success">
             @csrf
             @method('PUT')
 

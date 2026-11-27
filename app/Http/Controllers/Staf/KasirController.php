@@ -12,6 +12,7 @@ use App\Models\Pesanan;
 use App\Models\Produk;
 use App\Models\Resep;
 use App\Models\RiwayatStok;
+use App\Models\VarianProduk;
 use App\Support\KapasitasMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +28,7 @@ class KasirController extends Controller
     {
         $kategoriList = Kategori::where('aktif', 1)->get();
 
-        $query = Produk::where('aktif', 1);
+        $query = Produk::with('varian')->where('aktif', 1);
 
         if ($request->filled('kategori_id')) {
             $query->where('kategori_id', $request->kategori_id);
@@ -54,6 +55,7 @@ class KasirController extends Controller
             'bukti_bayar' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:2048',
             'items' => 'required|array|min:1',
             'items.*.id' => 'required|exists:produk,id',
+            'items.*.varian_id' => 'nullable|integer|exists:varian_produk,id',
             'items.*.qty' => 'required|integer|min:1',
         ], [
             'items.required' => 'Pilih minimal satu menu untuk transaksi kasir.',
@@ -62,9 +64,15 @@ class KasirController extends Controller
         ]);
 
         $itemsDiminta = collect($request->items)
-            ->groupBy('id')
-            ->map(function ($group, $id) {
-                return ['id' => (int) $id, 'qty' => (int) $group->sum('qty')];
+            ->groupBy(fn (array $item): string => $item['id'].'_'.($item['varian_id'] ?? '0'))
+            ->map(function ($group): array {
+                $pertama = $group->first();
+
+                return [
+                    'id' => (int) $pertama['id'],
+                    'varian_id' => ! empty($pertama['varian_id']) ? (int) $pertama['varian_id'] : null,
+                    'qty' => (int) $group->sum('qty'),
+                ];
             })
             ->values()
             ->all();
@@ -93,6 +101,14 @@ class KasirController extends Controller
                     ->get()
                     ->keyBy('id');
 
+                $varianList = VarianProduk::whereIn('id', collect($itemsDiminta)->pluck('varian_id')->filter())
+                    ->get()
+                    ->keyBy('id');
+
+                $sisaStokProduk = $produkList->mapWithKeys(fn (Produk $produk): array => [
+                    $produk->id => (int) $produk->stok,
+                ]);
+
                 $itemsData = [];
                 $subtotal = 0;
 
@@ -104,16 +120,28 @@ class KasirController extends Controller
                         throw new RuntimeException('Produk tidak ditemukan atau sedang tidak aktif.');
                     }
 
-                    if ($produk->stok < $qty) {
-                        throw new RuntimeException("Stok untuk {$produk->nama} tidak mencukupi (Tersedia: {$produk->stok}, Diminta: {$qty}).");
+                    $varian = $varianList->get($item['varian_id']);
+
+                    if ($varian && ($varian->produk_id !== $produk->id || ! $varian->aktif)) {
+                        throw new RuntimeException('Varian yang dipilih tidak tersedia untuk menu ini.');
                     }
 
-                    $lineTotal = $produk->harga * $qty;
+                    if (! $varian) {
+                        $varian = $produk->varian()->where('aktif', 1)->first();
+                    }
+
+                    if ($sisaStokProduk->get($produk->id) < $qty) {
+                        throw new RuntimeException("Stok untuk {$produk->nama} tidak mencukupi (Tersedia: {$sisaStokProduk->get($produk->id)}, Diminta: {$qty}).");
+                    }
+
+                    $hargaSatuan = $varian && $varian->harga > 0 ? (int) $varian->harga : (int) $produk->harga;
+                    $lineTotal = $hargaSatuan * $qty;
                     $subtotal += $lineTotal;
                     $itemsData[] = [
                         'produk' => $produk,
+                        'varian' => $varian,
                         'jumlah' => $qty,
-                        'harga' => $produk->harga,
+                        'harga' => $hargaSatuan,
                         'subtotal' => $lineTotal,
                     ];
                 }
@@ -164,7 +192,7 @@ class KasirController extends Controller
                     $produk = $data['produk'];
                     $qty = $data['jumlah'];
 
-                    $varian = $produk->varian()->where('aktif', 1)->first();
+                    $varian = $data['varian'];
                     $resep = $varian
                         ? Resep::with('bahanList')->where('varian_id', $varian->id)->where('aktif', 1)->first()
                         : null;
@@ -228,8 +256,9 @@ class KasirController extends Controller
                         'hpp_kemasan' => round($hppKemasanPerCup, 2),
                     ]);
 
-                    $stokSebelum = $produk->stok;
+                    $stokSebelum = $sisaStokProduk->get($produk->id);
                     $stokSesudah = $stokSebelum - $qty;
+                    $sisaStokProduk->put($produk->id, $stokSesudah);
                     $produk->update(['stok' => $stokSesudah]);
 
                     RiwayatStok::create([

@@ -32,9 +32,7 @@ class BahanController extends Controller
         // Hitung Ringkasan Aset Persediaan (Bab 6 Buku Panduan)
         $semuaBahan = Bahan::where('aktif', 1)->get();
         $totalJenisBahan = $semuaBahan->count();
-        $totalNilaiPersediaan = $semuaBahan->sum(function ($b) {
-            return (float) $b->stok * (float) $b->biaya_rata_rata;
-        });
+        $totalNilaiPersediaan = Bahan::totalNilaiPersediaan();
         $jumlahBahanKritis = $semuaBahan->filter(fn ($b) => $b->is_kritis)->count();
 
         $daftarBahan = $query->orderBy('nama')->paginate(15)->withQueryString();

@@ -54,6 +54,20 @@
     </div>
 
     <main class="ticket-wrapper">
+        @if(session('galat'))
+            <div style="background:#fef2f2;color:#991b1b;border:1px solid #fecaca;padding:12px 16px;border-radius:14px;font-size:13px;font-weight:700;margin-bottom:14px;">
+                {{ session('galat') }}
+            </div>
+        @endif
+        @if(session('sukses'))
+            <div class="alert-sukses" style="margin-bottom:14px;">{{ session('sukses') }}</div>
+        @endif
+        @if($errors->any())
+            <div style="background:#fef2f2;color:#991b1b;border:1px solid #fecaca;padding:12px 16px;border-radius:14px;font-size:13px;font-weight:700;margin-bottom:14px;">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
         <div class="search-card">
             <form method="GET" action="{{ route('pelanggan.lacak') }}" class="lacak-search-form">
                 <input type="text" name="kode" value="{{ $kode ?? request('kode') }}" placeholder="Cari kode pesanan / nama / no. WA...">
@@ -115,6 +129,7 @@
     </nav>
 
     <script src="{{ asset('js/pelanggan-anim.js') }}?v={{ filemtime(public_path('js/pelanggan-anim.js')) }}"></script>
+    <script src="{{ asset('js/soft-refresh.js') }}?v={{ filemtime(public_path('js/soft-refresh.js')) }}"></script>
     @php
         $adaPesananAktif = ($daftarPesanan ?? collect())->contains(function ($p) {
             return !in_array($p->status_pesanan, ['selesai', 'dibatalkan'], true);
@@ -127,9 +142,18 @@
                 if (!liveRegion) return;
                 var url = @json(route('pelanggan.lacak', ['kode' => $kode ?: null, 'partial' => 1]));
                 var busy = false;
+                var sedangMenilai = false;
+
+                // Jangan timpa form penilaian yang sedang diisi pelanggan.
+                liveRegion.addEventListener('focusin', function (event) {
+                    if (event.target.closest('.ulasan-form')) sedangMenilai = true;
+                });
+                liveRegion.addEventListener('submit', function () {
+                    sedangMenilai = false;
+                });
 
                 async function refreshLacak() {
-                    if (busy || document.visibilityState !== 'visible') return;
+                    if (busy || sedangMenilai || document.visibilityState !== 'visible') return;
                     busy = true;
                     try {
                         var res = await fetch(url, {

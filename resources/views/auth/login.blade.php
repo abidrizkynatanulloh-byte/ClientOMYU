@@ -176,5 +176,6 @@
             kolomPassword.type = kolomPassword.type === 'password' ? 'text' : 'password';
         });
     </script>
+    <script src="{{ asset('js/soft-refresh.js') }}?v={{ filemtime(public_path('js/soft-refresh.js')) }}"></script>
 </body>
 </html>

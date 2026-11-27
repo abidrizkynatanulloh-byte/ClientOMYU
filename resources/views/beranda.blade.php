@@ -774,6 +774,12 @@
             font-weight: 900;
             color: #4d8822;
         }
+        .favorit-rating {
+            margin-top: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            color: #f59e0b;
+        }
         .favorit-meta {
             margin-top: 9px;
             display: flex;
@@ -790,6 +796,53 @@
             background: #dff2c8;
             color: #183d12;
             white-space: nowrap;
+        }
+        .favorit-order-form {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .favorit-order-form .favorit-pesan {
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 10px;
+            font-weight: 800;
+        }
+        .favorit-order-form .favorit-pesan:hover { background: #c9e9a6; }
+        .favorit-order-form .favorit-pesan:disabled { opacity: 0.5; cursor: not-allowed; }
+        .qty-control {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            color: #64748b;
+            white-space: nowrap;
+        }
+        .qty-control input {
+            width: 62px;
+            height: 30px;
+            padding: 4px 6px;
+            border: 1px solid #d7e8c4;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #183d12;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 900;
+            text-align: center;
+        }
+        .favorit-stok {
+            color: #4d8822;
+        }
+        .favorit-habis {
+            margin-top: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #dc2626;
         }
         .favorit-kosong {
             grid-column: 1 / -1;
@@ -1571,39 +1624,65 @@
             <div class="favorit-grid">
                 @forelse($menuFavorit as $menu)
                     @php
-                        $namaLower = strtolower($menu->nama);
-                        $gambarUrl = 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=600&auto=format&fit=crop&q=80';
-                        if ($menu->gambar) {
-                            $gambarUrl = str_starts_with($menu->gambar, 'http')
-                                ? $menu->gambar
-                                : asset('storage/'.$menu->gambar);
-                        } elseif (str_contains($namaLower, 'mangga')) {
-                            $gambarUrl = 'https://images.unsplash.com/photo-1546173159-315724a31696?w=600&auto=format&fit=crop&q=80';
-                        } elseif (str_contains($namaLower, 'alpukat')) {
-                            $gambarUrl = 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=600&auto=format&fit=crop&q=80';
-                        } elseif (str_contains($namaLower, 'tomat')) {
-                            $gambarUrl = 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80';
-                        } elseif (str_contains($namaLower, 'seledri') || str_contains($namaLower, 'green')) {
-                            $gambarUrl = 'https://images.unsplash.com/photo-1610970881699-44a5587cabec?w=600&auto=format&fit=crop&q=80';
-                        } elseif (str_contains($namaLower, 'kopi') || str_contains($namaLower, 'coffe')) {
-                            $gambarUrl = 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=600&auto=format&fit=crop&q=80';
-                        }
+                        $gambarUrl = $menu->gambarUrl(600);
                         $terjual = (int) ($menu->jumlah_terjual ?? 0);
+                        $pilihanPotongan = [2000, 3000, 4000, 5000];
+                        $potongan = $pilihanPotongan[$menu->id % count($pilihanPotongan)];
+                        if ($menu->harga <= 12000 && $potongan > 3000) {
+                            $potongan = 2000;
+                        }
+                        $strikethroughPrice = $menu->harga + $potongan;
+                        $hematRibuan = round($potongan / 1000);
+
+                        $ratingScore = $menu->bintangRataRata();
+                        $bintangPenuh = (int) round($ratingScore);
+                        $bintangTampil = str_repeat('★', $bintangPenuh).str_repeat('☆', 5 - $bintangPenuh);
                     @endphp
-                    <a href="{{ route('pelanggan.katalog') }}" class="favorit-card">
+                    <div class="favorit-card">
                         @if($loop->first && $terjual > 0)
                             <span class="favorit-rank">#1 TERLARIS</span>
                         @endif
                         <div class="favorit-img-box">
                             <img src="{{ $gambarUrl }}" alt="{{ $menu->nama }}" loading="lazy">
+                            @if($menu->stok > 0)
+                                <div class="product-img-overlay-btn" onclick="event.stopPropagation();">
+                                    <button type="button" class="btn-add-cart-enhanced btn-img-add-cart" onclick="window.tambahKeranjangAnimasi(this, event)">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="9" cy="21" r="1"></circle>
+                                            <circle cx="20" cy="21" r="1"></circle>
+                                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                        </svg>
+                                        <span>+ Keranjang</span>
+                                    </button>
+                                </div>
+                            @endif
                         </div>
                         <div class="favorit-nama">{{ $menu->nama }}</div>
-                        <div class="favorit-harga">Rp {{ number_format($menu->harga, 0, ',', '.') }}</div>
+                        <div class="product-price-row" style="margin-bottom:4px;">
+                            <span class="product-price-main">Rp {{ number_format($menu->harga, 0, ',', '.') }}</span>
+                            <span class="product-price-strike">Rp {{ number_format($strikethroughPrice, 0, ',', '.') }}</span>
+                            <span class="product-discount-tag">Hemat {{ $hematRibuan }}rb</span>
+                        </div>
+                        <div class="favorit-rating">{{ $bintangTampil }} {{ number_format($ratingScore, 1, ',', '.') }} ({{ $menu->jumlahUlasan() }} ulasan)</div>
                         <div class="favorit-meta">
                             <span>{{ $terjual > 0 ? $terjual.'x dipesan' : 'Menu pilihan' }}</span>
-                            <span class="favorit-pesan">Pesan</span>
+                            <span class="favorit-stok">Stok: {{ $menu->stok }} cup</span>
                         </div>
-                    </a>
+                        @if($menu->stok > 0)
+                            <form method="POST" action="{{ route('pelanggan.keranjang.tambah') }}" class="favorit-order-form">
+                                @csrf
+                                <input type="hidden" name="produk_id" value="{{ $menu->id }}">
+                                <input type="hidden" name="langsung" value="1">
+                                <label class="qty-control">
+                                    <span>Jumlah</span>
+                                    <input type="number" name="qty" value="1" min="1" max="{{ $menu->stok }}" inputmode="numeric" aria-label="Jumlah {{ $menu->nama }}">
+                                </label>
+                                <button type="submit" class="favorit-pesan">Pesan Langsung</button>
+                            </form>
+                        @else
+                            <div class="favorit-habis">Stok Habis</div>
+                        @endif
+                    </div>
                 @empty
                     <div class="favorit-kosong">Belum ada menu favorit untuk ditampilkan.</div>
                 @endforelse
@@ -1747,6 +1826,7 @@
     </nav>
 
     <script src="{{ asset('js/pelanggan-anim.js') }}?v={{ filemtime(public_path('js/pelanggan-anim.js')) }}"></script>
+    <script src="{{ asset('js/soft-refresh.js') }}?v={{ filemtime(public_path('js/soft-refresh.js')) }}"></script>
     <script>
         (function () {
             const track = document.getElementById('promoTrack');

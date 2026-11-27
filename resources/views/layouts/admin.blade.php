@@ -136,7 +136,6 @@
                                 <i class="fa-solid fa-chart-pie text-sm"></i>
                             </div>
                             <span>Dashboard Utama</span>
-                            <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded-md font-bold {{ request()->routeIs('panel.admin.beranda') ? 'bg-brand-950/20 text-brand-950' : 'bg-white/10 text-white/70' }}">O-01</span>
                         </a>
                     </div>
                 </div>
@@ -153,7 +152,6 @@
                                 <i class="fa-solid fa-receipt text-sm"></i>
                             </div>
                             <span>Penjualan & Pesanan</span>
-                            <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded-md font-bold {{ request()->routeIs('panel.admin.penjualan.*') ? 'bg-brand-950/20 text-brand-950' : 'bg-white/10 text-white/70' }}">O-02</span>
                         </a>
 
                         <a href="{{ route('panel.admin.menu.index') }}"
@@ -162,8 +160,7 @@
                                 <i class="fa-solid fa-glass-water text-sm"></i>
                             </div>
                             <span>Daftar Menu</span>
-                            <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded-md font-bold {{ request()->routeIs('panel.admin.menu.*') ? 'bg-brand-950/20 text-brand-950' : 'bg-white/10 text-white/70' }}">O-03A</span>
-                        </a>
+                            </a>
 
                         <a href="{{ route('panel.admin.resep.index') }}"
                            class="admin-sidebar-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-all {{ request()->routeIs('panel.admin.resep.*') ? 'active-pill bg-brand-400 text-brand-950 shadow-md font-bold' : 'text-slate-200 hover:bg-white/10 hover:text-white' }}">
@@ -171,7 +168,6 @@
                                 <i class="fa-solid fa-blender text-sm"></i>
                             </div>
                             <span>Resep, HPP & Margin</span>
-                            <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded-md font-bold {{ request()->routeIs('panel.admin.resep.*') ? 'bg-brand-950/20 text-brand-950' : 'bg-white/10 text-white/70' }}">O-03</span>
                         </a>
 
                         <a href="{{ route('panel.admin.bahan.index') }}"
@@ -180,7 +176,6 @@
                                 <i class="fa-solid fa-boxes-stacked text-sm"></i>
                             </div>
                             <span>Persediaan Bahan</span>
-                            <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded-md font-bold {{ request()->routeIs('panel.admin.bahan.*') ? 'bg-brand-950/20 text-brand-950' : 'bg-white/10 text-white/70' }}">O-04</span>
                         </a>
                     </div>
                 </div>
@@ -197,7 +192,6 @@
                                 <i class="fa-solid fa-file-invoice-dollar text-sm"></i>
                             </div>
                             <span>Laporan Laba Rugi</span>
-                            <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded-md font-bold {{ request()->routeIs('panel.admin.keuangan.laba_rugi') ? 'bg-brand-950/20 text-brand-950' : 'bg-white/10 text-white/70' }}">O-05</span>
                         </a>
 
                         <a href="{{ route('panel.admin.keuangan.buku_kas') }}"
@@ -214,7 +208,6 @@
                                 <i class="fa-solid fa-users-gear text-sm"></i>
                             </div>
                             <span>Manajemen Karyawan</span>
-                            <span class="ml-auto text-[10px] px-1.5 py-0.5 rounded-md font-bold {{ request()->routeIs('panel.admin.karyawan.*') ? 'bg-brand-950/20 text-brand-950' : 'bg-white/10 text-white/70' }}">O-09</span>
                         </a>
                     </div>
                 </div>
@@ -549,8 +542,44 @@
         </div>
     </div>
 
+    <!-- OMYU Modern Interactive Confirmation Modal -->
+    <div id="omyuConfirmModal" class="omyu-confirm-modal" aria-hidden="true" role="dialog" aria-modal="true" data-soft-refresh-skip>
+        <div class="omyu-confirm-backdrop" onclick="window.tutupKonfirmasiModal()"></div>
+        <div class="omyu-confirm-box" role="document">
+            <button type="button" class="omyu-confirm-close" onclick="window.tutupKonfirmasiModal()" aria-label="Tutup popup">&times;</button>
+
+            <div class="omyu-confirm-icon-wrapper" id="omyuConfirmIconWrapper">
+                <div class="omyu-confirm-icon-glow"></div>
+                <div class="omyu-confirm-icon-circle" id="omyuConfirmIconCircle">
+                    <svg id="omyuConfirmIconSvg" class="omyu-confirm-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                </div>
+            </div>
+
+            <h3 class="omyu-confirm-title" id="omyuConfirmTitle">Konfirmasi</h3>
+
+            <div class="omyu-confirm-code-badge" id="omyuConfirmCodeBadge" style="display:none;">
+                <span class="badge-icon">🧾</span>
+                <span class="badge-text" id="omyuConfirmCodeText"></span>
+            </div>
+
+            <p class="omyu-confirm-message" id="omyuConfirmMessage"></p>
+
+            <div class="omyu-confirm-actions">
+                <button type="button" class="omyu-confirm-btn-cancel" id="omyuConfirmBtnCancel" onclick="window.tutupKonfirmasiModal()">
+                    Batal
+                </button>
+                <button type="button" class="omyu-confirm-btn-submit" id="omyuConfirmBtnSubmit">
+                    <span id="omyuConfirmBtnSubmitText">Ya, Lanjutkan</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- OMYU Admin V35 Interactive Scripts -->
     <script src="{{ asset('js/admin.js') }}?v={{ filemtime(public_path('js/admin.js')) }}"></script>
     @stack('scripts')
+    <script src="{{ asset('js/soft-refresh.js') }}?v={{ filemtime(public_path('js/soft-refresh.js')) }}"></script>
 </body>
 </html>

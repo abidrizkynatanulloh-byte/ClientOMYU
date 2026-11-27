@@ -49,6 +49,14 @@ class Bahan extends Model
         return $this->stok_tersedia <= (float) $this->batas_minimum;
     }
 
+    // Nilai modal yang tertanam pada persediaan aktif (stok × biaya rata-rata).
+    public static function totalNilaiPersediaan(): float
+    {
+        return (float) static::where('aktif', 1)->get()->sum(function (Bahan $bahan) {
+            return (float) $bahan->stok * (float) $bahan->biaya_rata_rata;
+        });
+    }
+
     // Harga beli per satuan beli (kg, pack, dll.) untuk ditampilkan kembali di form.
     public function getHargaBeliAttribute(): float
     {
@@ -109,6 +117,7 @@ class Bahan extends Model
             'rujukan_id' => $rujukanId,
             'pengguna_id' => $stafId ?? auth()->id(),
             'alasan' => $alasan,
+            'created_at' => now(),
         ]);
     }
 }

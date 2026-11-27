@@ -6,7 +6,11 @@
 @section('page_subtitle', 'Kelola menu jualan: resep per cup, upload gambar, harga, dan stok yang dihitung otomatis dari ketersediaan bahan.')
 
 @section('header_actions')
-    <form method="POST" action="{{ route('panel.admin.menu.hitung-ulang') }}">
+    <form method="POST" action="{{ route('panel.admin.menu.hitung-ulang') }}"
+          data-confirm="Hitung ulang stok semua menu dari resep dan bahan saat ini?"
+          data-confirm-title="Hitung Ulang Stok?"
+          data-confirm-btn="Ya, Hitung Ulang"
+          data-confirm-type="warning">
         @csrf
         <button type="submit" class="btn-press inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200">
             <i class="fa-solid fa-rotate"></i>

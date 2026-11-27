@@ -115,12 +115,22 @@
                     @if(in_array($sedangDibuat->status_pesanan, ['diproses', 'dikonfirmasi'], true))
                         <form method="POST" action="{{ route('panel.staf.produksi.selesai-racik', $sedangDibuat->id) }}">
                             @csrf
-                            <button type="submit" class="btn btn-selesai">Selesai Racik &middot; Siap Diambil</button>
+                            <button type="submit" class="btn btn-selesai"
+                                    data-confirm="Apakah Anda yakin ingin menutup racikan pesanan #{{ $sedangDibuat->kode_pesanan }} dan menandainya siap diambil?"
+                                    data-confirm-title="Selesaikan Racikan?"
+                                    data-confirm-code="#{{ $sedangDibuat->kode_pesanan }}"
+                                    data-confirm-btn="Ya, Selesai"
+                                    data-confirm-type="success">Selesai Racik &middot; Siap Diambil</button>
                         </form>
                     @else
                         <form method="POST" action="{{ route('panel.staf.produksi.mulai-racik', $sedangDibuat->id) }}">
                             @csrf
-                            <button type="submit" class="btn btn-mulai">Mulai Racik Sekarang</button>
+                            <button type="submit" class="btn btn-mulai"
+                                    data-confirm="Apakah Anda yakin ingin mengaktifkan pesanan #{{ $sedangDibuat->kode_pesanan }} dan mulai meraciknya sekarang?"
+                                    data-confirm-title="Mulai Racik?"
+                                    data-confirm-code="#{{ $sedangDibuat->kode_pesanan }}"
+                                    data-confirm-btn="Ya, Mulai Racik"
+                                    data-confirm-type="success">Mulai Racik Sekarang</button>
                         </form>
                     @endif
                 </div>
@@ -152,7 +162,12 @@
                     @endif
                     <form method="POST" action="{{ route('panel.staf.produksi.mulai-racik', $berikutnya->id) }}">
                         @csrf
-                        <button type="submit" class="btn btn-mulai">Mulai Racik Sekarang</button>
+                        <button type="submit" class="btn btn-mulai"
+                                data-confirm="Apakah Anda yakin ingin mengaktifkan pesanan #{{ $berikutnya->kode_pesanan }} dan mulai meraciknya sekarang?"
+                                data-confirm-title="Mulai Racik?"
+                                data-confirm-code="#{{ $berikutnya->kode_pesanan }}"
+                                data-confirm-btn="Ya, Mulai Racik"
+                                data-confirm-type="success">Mulai Racik Sekarang</button>
                     </form>
                 </div>
             </article>
@@ -183,7 +198,12 @@
                     @endif
                     <form method="POST" action="{{ route('panel.staf.produksi.mulai-racik', $menunggu->id) }}">
                         @csrf
-                        <button type="submit" class="btn btn-ringan">Ambil ke Blender</button>
+                        <button type="submit" class="btn btn-ringan"
+                                data-confirm="Apakah Anda yakin ingin mengaktifkan pesanan #{{ $menunggu->kode_pesanan }} dan memindahkannya ke blender?"
+                                data-confirm-title="Ambil ke Blender?"
+                                data-confirm-code="#{{ $menunggu->kode_pesanan }}"
+                                data-confirm-btn="Ya, Ambil"
+                                data-confirm-type="success">Ambil ke Blender</button>
                     </form>
                 </div>
             </article>
@@ -239,12 +259,22 @@
                         @if($order->status_pesanan === 'diproses')
                             <form method="POST" action="{{ route('panel.staf.produksi.selesai-racik', $order->id) }}">
                                 @csrf
-                                <button type="submit" class="btn btn-selesai">Selesai Racik</button>
+                                <button type="submit" class="btn btn-selesai"
+                                        data-confirm="Apakah Anda yakin ingin menutup racikan pesanan #{{ $order->kode_pesanan }}?"
+                                        data-confirm-title="Selesaikan Racikan?"
+                                        data-confirm-code="#{{ $order->kode_pesanan }}"
+                                        data-confirm-btn="Ya, Selesai"
+                                        data-confirm-type="success">Selesai Racik</button>
                             </form>
                         @else
                             <form method="POST" action="{{ route('panel.staf.produksi.mulai-racik', $order->id) }}">
                                 @csrf
-                                <button type="submit" class="btn btn-mulai">Mulai Racik</button>
+                                <button type="submit" class="btn btn-mulai"
+                                        data-confirm="Apakah Anda yakin ingin mengaktifkan pesanan #{{ $order->kode_pesanan }} dan mulai meraciknya sekarang?"
+                                        data-confirm-title="Mulai Racik?"
+                                        data-confirm-code="#{{ $order->kode_pesanan }}"
+                                        data-confirm-btn="Ya, Mulai Racik"
+                                        data-confirm-type="success">Mulai Racik</button>
                             </form>
                         @endif
                     </div>
@@ -265,7 +295,11 @@
             <p>Catat Bahan Tumpah / Gagal / gagal racik, dll</p>
             <button type="button" id="tutupWaste" aria-label="Tutup">&times;</button>
         </div>
-        <form method="POST" action="{{ route('panel.staf.produksi.catat-gagal') }}">
+        <form method="POST" action="{{ route('panel.staf.produksi.catat-gagal') }}"
+              data-confirm="Catat gagal racik / bahan tumpah ini sebagai waste dan kurangi stok?"
+              data-confirm-title="Catat Waste?"
+              data-confirm-btn="Ya, Catat Waste"
+              data-confirm-type="danger">
             @csrf
             <label class="form-label" for="wasteTipe">Tipe Item</label>
             <select class="form-select" id="wasteTipe" name="tipe_item" required>

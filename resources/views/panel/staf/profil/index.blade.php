@@ -102,12 +102,20 @@
                         <div class="catatan kiri">JPG, PNG, atau WebP &middot; maksimal 2 MB</div>
                     </div>
                 </div>
-                <button type="submit" class="btn">Simpan Foto Profil</button>
+                <button type="submit" class="btn"
+                        data-confirm="Simpan foto profil baru ini?"
+                        data-confirm-title="Simpan Foto Profil?"
+                        data-confirm-btn="Ya, Simpan"
+                        data-confirm-type="success">Simpan Foto Profil</button>
             </form>
             @if($pengguna->foto)
                 <form method="POST" action="{{ route('panel.staf.profil.foto') }}">
                     @csrf
-                    <button type="submit" name="hapus_foto" value="1" class="btn btn-ghost">Hapus Foto</button>
+                    <button type="submit" name="hapus_foto" value="1" class="btn btn-ghost"
+                            data-confirm="Hapus foto profil saat ini?"
+                            data-confirm-title="Hapus Foto Profil?"
+                            data-confirm-btn="Ya, Hapus"
+                            data-confirm-type="danger">Hapus Foto</button>
                 </form>
             @endif
         </section>
@@ -141,7 +149,11 @@
                     <label for="password_confirmation">Konfirmasi Kata Sandi Baru</label>
                     <input type="password" id="password_confirmation" name="password_confirmation" autocomplete="new-password" placeholder="Ulangi kata sandi baru" minlength="8" required>
                 </div>
-                <button type="submit" class="btn">Perbarui Kata Sandi</button>
+                <button type="submit" class="btn"
+                        data-confirm="Perbarui kata sandi akun ini sekarang?"
+                        data-confirm-title="Perbarui Kata Sandi?"
+                        data-confirm-btn="Ya, Perbarui"
+                        data-confirm-type="warning">Perbarui Kata Sandi</button>
                 <div class="catatan">Anda tetap masuk setelah kata sandi diperbarui.</div>
             </form>
         </section>

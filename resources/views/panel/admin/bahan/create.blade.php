@@ -27,7 +27,11 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('panel.admin.bahan.store') }}" class="space-y-5">
+        <form method="POST" action="{{ route('panel.admin.bahan.store') }}" class="space-y-5"
+              data-confirm="Simpan bahan baku baru ke gudang?"
+              data-confirm-title="Simpan Bahan Baru?"
+              data-confirm-btn="Ya, Simpan"
+              data-confirm-type="success">
             @csrf
 
             <!-- Nama Bahan -->

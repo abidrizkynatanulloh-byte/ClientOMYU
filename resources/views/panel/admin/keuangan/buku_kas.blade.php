@@ -3,7 +3,7 @@
 @section('title', 'Buku Mutasi Kas Harian')
 @section('page_title', 'Buku Mutasi Kas')
 @section('badge', 'Kas Harian')
-@section('page_subtitle', 'Pencatatan arus kas masuk operasional dan arus kas keluar harian outlet OMYU.')
+@section('page_subtitle', 'Kas masuk dari pembayaran lunas dan kas keluar dari pasokan bahan yang dicatat staf — jelas pihak, nominal, dan keperluannya.')
 
 @section('header_actions')
     <a href="{{ route('panel.admin.keuangan.laba_rugi') }}" class="btn-press inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
@@ -54,21 +54,21 @@
     </div>
 
     <!-- 3 KPI Cards Kas Mutasi -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
         
         <div class="glass-card hover-lift rounded-3xl p-5 flex items-center gap-4 anim-fade-up delay-2">
             <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-arrow-trend-down"></i>
             </div>
-            <div>
+            <div class="min-w-0 flex-1">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Total Kas Masuk</span>
-                <h3 class="text-2xl font-extrabold text-emerald-700 tracking-tight mt-0.5 counter-value"
+                <h3 class="text-xl xl:text-2xl font-extrabold text-emerald-700 tracking-tight mt-0.5 counter-value leading-tight break-words"
                     data-counter
                     data-counter-target="{{ $totalKasMasuk }}"
                     data-counter-prefix="Rp ">
                     Rp {{ number_format($totalKasMasuk, 0, ',', '.') }}
                 </h3>
-                <span class="text-[11px] text-slate-400">Penerimaan kas outlet</span>
+                <span class="text-[11px] text-slate-400 block">Penerimaan kas outlet</span>
             </div>
         </div>
 
@@ -76,15 +76,15 @@
             <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-arrow-trend-up"></i>
             </div>
-            <div>
+            <div class="min-w-0 flex-1">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Total Kas Keluar</span>
-                <h3 class="text-2xl font-extrabold text-rose-600 tracking-tight mt-0.5 counter-value"
+                <h3 class="text-xl xl:text-2xl font-extrabold text-rose-600 tracking-tight mt-0.5 counter-value leading-tight break-words"
                     data-counter
                     data-counter-target="{{ $totalKasKeluar }}"
                     data-counter-prefix="Rp ">
                     Rp {{ number_format($totalKasKeluar, 0, ',', '.') }}
                 </h3>
-                <span class="text-[11px] text-slate-400">Beban & belanja operasional</span>
+                <span class="text-[11px] text-slate-400 block">Beban & belanja operasional</span>
             </div>
         </div>
 
@@ -92,15 +92,15 @@
             <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-800 flex items-center justify-center font-bold text-lg shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-scale-balanced"></i>
             </div>
-            <div>
+            <div class="min-w-0 flex-1">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Saldo Kas Bersih</span>
-                <h3 class="text-2xl font-extrabold {{ $saldoKasBersih >= 0 ? 'text-brand-900' : 'text-rose-600' }} tracking-tight mt-0.5 counter-value"
+                <h3 class="text-xl xl:text-2xl font-extrabold {{ $saldoKasBersih >= 0 ? 'text-brand-900' : 'text-rose-600' }} tracking-tight mt-0.5 counter-value leading-tight break-words"
                     data-counter
                     data-counter-target="{{ $saldoKasBersih }}"
                     data-counter-prefix="Rp ">
                     Rp {{ number_format($saldoKasBersih, 0, ',', '.') }}
                 </h3>
-                <span class="text-[11px] text-slate-400">Kas Masuk dikurangi Keluar</span>
+                <span class="text-[11px] text-slate-400 block">Kas Masuk dikurangi Keluar</span>
             </div>
         </div>
 
@@ -111,14 +111,15 @@
          x-data="{ detailOpen: false, selected: null, openDetail(data) { this.selected = data; this.detailOpen = true; }, closeDetail() { this.detailOpen = false; } }"
          @keydown.escape.window="closeDetail()">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs sm:text-sm admin-table">
+            <table class="w-full min-w-[640px] md:min-w-full text-left text-xs sm:text-sm admin-table">
                 <thead>
                     <tr class="bg-slate-50/80 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200/80">
-                        <th class="py-3.5 px-5 font-bold">Waktu Transaksi</th>
-                        <th class="py-3.5 px-4 font-bold">Jenis Aliran</th>
+                        <th class="py-3.5 px-5 font-bold whitespace-nowrap">Waktu Transaksi</th>
+                        <th class="py-3.5 px-4 font-bold whitespace-nowrap">Jenis Aliran</th>
+                        <th class="py-3.5 px-4 font-bold hidden md:table-cell">Dari / Untuk</th>
                         <th class="py-3.5 px-4 font-bold hidden md:table-cell">Keterangan Mutasi</th>
-                        <th class="py-3.5 px-4 font-bold text-right">Nominal (Rp)</th>
-                        <th class="py-3.5 px-5 font-bold text-right hidden md:table-cell">Dicatat Oleh</th>
+                        <th class="py-3.5 px-4 font-bold text-right whitespace-nowrap">Nominal (Rp)</th>
+                        <th class="py-3.5 px-5 font-bold text-right hidden md:table-cell whitespace-nowrap">Dicatat Oleh</th>
                         <th class="py-3.5 px-5 font-bold text-center md:hidden">Detail</th>
                     </tr>
                 </thead>
@@ -141,13 +142,16 @@
                                     <i class="fa-solid {{ $jenisIcon }} text-[10px]"></i> {{ $jenisLabel }}
                                 </span>
                             </td>
-                            <td class="py-4 px-4 font-semibold text-slate-800 hidden md:table-cell">
+                            <td class="py-4 px-4 font-semibold text-brand-800 hidden md:table-cell max-w-[180px] break-words">
+                                {{ $k->sumber ?? '-' }}
+                            </td>
+                            <td class="py-4 px-4 font-semibold text-slate-800 hidden md:table-cell max-w-[280px] break-words">
                                 {{ $k->keterangan }}
                             </td>
-                            <td class="py-4 px-4 text-right font-black {{ $isMasuk ? 'text-emerald-700' : 'text-rose-600' }}">
+                            <td class="py-4 px-4 text-right font-black whitespace-nowrap {{ $isMasuk ? 'text-emerald-700' : 'text-rose-600' }}">
                                 {{ $nominalText }}
                             </td>
-                            <td class="py-4 px-5 text-right text-slate-600 font-medium hidden md:table-cell">
+                            <td class="py-4 px-5 text-right text-slate-600 font-medium hidden md:table-cell whitespace-nowrap">
                                 {{ $k->pencatat?->nama ?? 'Sistem' }}
                             </td>
                             <td class="py-4 px-5 text-center md:hidden">
@@ -158,6 +162,7 @@
                                             'jenis' => $jenisLabel,
                                             'jenis_class' => $jenisClass,
                                             'jenis_icon' => $jenisIcon,
+                                            'sumber' => $k->sumber ?? '-',
                                             'keterangan' => $k->keterangan,
                                             'nominal' => $nominalText,
                                             'nominal_class' => $isMasuk ? 'text-emerald-700' : 'text-rose-600',
@@ -171,7 +176,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-16 text-center text-slate-400">
+                            <td colspan="7" class="py-16 text-center text-slate-400">
                                 <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-300 text-2xl mx-auto mb-3">
                                     <i class="fa-solid fa-book-open"></i>
                                 </div>
@@ -239,6 +244,10 @@
                                     <span x-text="selected?.jenis"></span>
                                 </span>
                             </div>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-brand-50 border border-brand-100 col-span-2">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-brand-600">Dari / Untuk</p>
+                            <p class="font-semibold text-brand-900 mt-1" x-text="selected?.sumber"></p>
                         </div>
                         <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 col-span-2">
                             <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Keterangan Mutasi</p>

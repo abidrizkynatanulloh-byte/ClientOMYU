@@ -28,11 +28,13 @@
 
     .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
     .menu-card { text-align: left; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 13px; padding: 10px; cursor: pointer; font-family: inherit; transition: .15s; }
-    .menu-card:hover:not(:disabled) { border-color: #198754; box-shadow: 0 4px 12px rgba(15, 81, 50, .08); }
-    .menu-card:disabled { opacity: .55; cursor: not-allowed; }
+    .menu-card:hover:not(.menu-card-habis) { border-color: #198754; box-shadow: 0 4px 12px rgba(15, 81, 50, .08); }
+    .menu-card-habis { opacity: .55; cursor: not-allowed; }
     .menu-img { width: 100%; height: 88px; object-fit: cover; border-radius: 9px; margin-bottom: 8px; background: #f1f5f9; }
     .menu-nama { font-size: 13px; font-weight: 800; color: #0f172a; line-height: 1.3; }
     .menu-harga { font-size: 14px; font-weight: 900; color: #15803d; margin-top: 6px; }
+    .varian-select { width: 100%; margin-top: 7px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 5px 7px; font-size: 11px; font-weight: 700; color: #334155; background: #f8fafc; font-family: inherit; outline: none; }
+    .varian-select:focus { border-color: #198754; }
     .menu-stok { font-size: 10px; font-weight: 800; margin-top: 4px; }
     .stok-tersedia { color: #16a34a; }
     .stok-menipis { color: #d97706; }
@@ -110,12 +112,23 @@
                     $stokHabis = $produk->stok <= 0;
                     $kelasStok = $stokHabis ? 'stok-habis' : ($produk->stok <= 5 ? 'stok-menipis' : 'stok-tersedia');
                 @endphp
-                <button type="button" class="menu-card" data-id="{{ $produk->id }}" data-nama="{{ $produk->nama }}" data-harga="{{ $produk->harga }}" data-stok="{{ $produk->stok }}" {{ $stokHabis ? 'disabled' : '' }}>
+                <div class="menu-card {{ $stokHabis ? 'menu-card-habis' : '' }}" role="button"
+                     tabindex="{{ $stokHabis ? -1 : 0 }}" aria-disabled="{{ $stokHabis ? 'true' : 'false' }}"
+                     data-id="{{ $produk->id }}" data-nama="{{ $produk->nama }}" data-harga="{{ $produk->harga }}" data-stok="{{ $produk->stok }}">
                     @if($produk->gambar)
                         <img class="menu-img" src="{{ Storage::url($produk->gambar) }}" alt="{{ $produk->nama }}">
                     @endif
                     <div class="menu-nama">{{ $produk->nama }}</div>
-                    <div class="menu-harga">Rp {{ number_format($produk->harga, 0, ',', '.') }}</div>
+                    @if($produk->varian->isNotEmpty())
+                        <select class="varian-select" aria-label="Varian {{ $produk->nama }}" {{ $stokHabis ? 'disabled' : '' }}>
+                            @foreach($produk->varian as $varian)
+                                <option value="{{ $varian->id }}" data-nama="{{ $varian->nama }}" data-harga="{{ $varian->harga }}">
+                                    {{ $varian->nama }} — Rp {{ number_format($varian->harga, 0, ',', '.') }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
+                    <div class="menu-harga">Rp {{ number_format($produk->varian->first()?->harga ?: $produk->harga, 0, ',', '.') }}</div>
                     <div class="menu-stok {{ $kelasStok }}">
                         @if($stokHabis)
                             Stok habis
@@ -123,7 +136,7 @@
                             Sisa {{ $produk->stok }} cup
                         @endif
                     </div>
-                </button>
+                </div>
             @empty
                 <div class="cart-empty" style="grid-column: 1 / -1;">Tidak ada menu yang sesuai dengan pencarian atau kategori ini.</div>
             @endforelse
@@ -200,7 +213,11 @@
             </div>
 
             <div class="form-error" id="formError" role="alert"></div>
-            <button type="submit" class="btn-simpan" id="btnSimpan" disabled>Simpan & selesaikan transaksi</button>
+            <button type="submit" class="btn-simpan" id="btnSimpan" disabled
+                    data-confirm="Simpan transaksi kasir ini dan selesaikan pembayaran?"
+                    data-confirm-title="Simpan Transaksi Kasir?"
+                    data-confirm-btn="Ya, Simpan Transaksi"
+                    data-confirm-type="success">Simpan & selesaikan transaksi</button>
         </form>
     </section>
 </div>
@@ -254,6 +271,8 @@
 
     function tambahKeKeranjang(produk) {
         const id = Number(produk.id);
+        const varianId = produk.varianId ? Number(produk.varianId) : null;
+        const kunci = id + '_' + (varianId || '0');
         const harga = Number(produk.harga);
         const stok = Number(produk.stok);
 
@@ -262,13 +281,30 @@
             return;
         }
 
-        if (!keranjang[id]) {
-            keranjang[id] = { id: id, nama: produk.nama, harga: harga, stok: stok, qty: 1 };
-        } else if (keranjang[id].qty >= keranjang[id].stok) {
-            tampilPesan('Stok ' + keranjang[id].nama + ' hanya tersedia ' + keranjang[id].stok + ' cup.', 'error');
+        const sudahDipakai = Object.values(keranjang)
+            .filter(function (item) { return item.id === id; })
+            .reduce(function (total, item) { return total + item.qty; }, 0);
+
+        if (sudahDipakai >= stok) {
+            tampilPesan('Stok ' + produk.nama + ' hanya tersedia ' + stok + ' cup untuk semua varian.', 'error');
+            return;
+        }
+
+        if (!keranjang[kunci]) {
+            keranjang[kunci] = {
+                id: id,
+                varianId: varianId,
+                varianNama: produk.varianNama || 'Reguler',
+                nama: produk.nama,
+                harga: harga,
+                stok: stok,
+                qty: 1
+            };
+        } else if (keranjang[kunci].qty >= keranjang[kunci].stok) {
+            tampilPesan('Stok ' + keranjang[kunci].nama + ' hanya tersedia ' + keranjang[kunci].stok + ' cup.', 'error');
             return;
         } else {
-            keranjang[id].qty += 1;
+            keranjang[kunci].qty += 1;
         }
 
         renderKeranjang();
@@ -284,20 +320,22 @@
             cartItemsList.innerHTML = '<div class="cart-empty">Pilih menu untuk mulai transaksi.</div>';
             hiddenInputs.innerHTML = '';
         } else {
-            ids.forEach(function (id) {
-                const item = keranjang[id];
+            ids.forEach(function (kunci) {
+                const item = keranjang[kunci];
                 const subtotal = item.harga * item.qty;
+                const namaTampil = item.nama + (item.varianNama && item.varianNama !== 'Reguler' ? ' · ' + item.varianNama : '');
 
                 html += '<div class="cart-item">' +
-                    '<div><div class="cart-item-name">' + escapeHtml(item.nama) + '</div>' +
+                    '<div><div class="cart-item-name">' + escapeHtml(namaTampil) + '</div>' +
                     '<div class="cart-item-price">Rp ' + rupaUang.format(item.harga) + ' × ' + item.qty + ' = <strong>Rp ' + rupaUang.format(subtotal) + '</strong></div></div>' +
                     '<div class="cart-qty">' +
-                    '<button type="button" class="btn-qty" data-id="' + item.id + '" data-delta="-1">−</button>' +
+                    '<button type="button" class="btn-qty" data-key="' + kunci + '" data-delta="-1">−</button>' +
                     '<span>' + item.qty + '</span>' +
-                    '<button type="button" class="btn-qty" data-id="' + item.id + '" data-delta="1">+</button>' +
+                    '<button type="button" class="btn-qty" data-key="' + kunci + '" data-delta="1">+</button>' +
                     '</div></div>';
 
                 hidden += '<input type="hidden" name="items[' + index + '][id]" value="' + item.id + '">' +
+                    '<input type="hidden" name="items[' + index + '][varian_id]" value="' + (item.varianId || '') + '">' +
                     '<input type="hidden" name="items[' + index + '][qty]" value="' + item.qty + '">';
                 index += 1;
             });
@@ -313,19 +351,57 @@
         hitungKembalian();
     }
 
-    menuGrid.addEventListener('click', function (event) {
-        const kartu = event.target.closest('.menu-card');
-        if (!kartu || kartu.disabled) {
+    menuGrid.addEventListener('change', function (event) {
+        const pilihan = event.target.closest('.varian-select');
+        if (!pilihan) {
             return;
         }
+
+        const kartu = pilihan.closest('.menu-card');
+        const opsi = pilihan.selectedOptions[0];
+        const labelHarga = kartu?.querySelector('.menu-harga');
+
+        if (labelHarga && opsi) {
+            labelHarga.textContent = 'Rp ' + rupaUang.format(Number(opsi.dataset.harga || kartu.dataset.harga));
+        }
+    });
+
+    menuGrid.addEventListener('click', function (event) {
+        if (event.target.closest('.varian-select')) {
+            return;
+        }
+
+        const kartu = event.target.closest('.menu-card');
+        if (!kartu || kartu.classList.contains('menu-card-habis') || kartu.getAttribute('aria-disabled') === 'true') {
+            return;
+        }
+
+        const pilihan = kartu.querySelector('.varian-select');
+        const opsi = pilihan?.selectedOptions[0];
 
         tambahKeKeranjang({
             id: kartu.dataset.id,
             nama: kartu.dataset.nama,
-            harga: kartu.dataset.harga,
+            varianId: pilihan?.value || null,
+            varianNama: opsi?.dataset.nama || 'Reguler',
+            harga: opsi?.dataset.harga || kartu.dataset.harga,
             stok: kartu.dataset.stok
         });
-        tampilPesan(kartu.dataset.nama + ' ditambahkan ke keranjang.', 'sukses');
+        tampilPesan(kartu.dataset.nama + ' (' + (opsi?.dataset.nama || 'Reguler') + ') ditambahkan ke keranjang.', 'sukses');
+    });
+
+    menuGrid.addEventListener('keydown', function (event) {
+        if (event.key !== 'Enter' && event.key !== ' ') {
+            return;
+        }
+
+        const kartu = event.target.closest('.menu-card');
+        if (!kartu || event.target.closest('.varian-select')) {
+            return;
+        }
+
+        event.preventDefault();
+        kartu.click();
     });
 
     cartItemsList.addEventListener('click', function (event) {
@@ -334,22 +410,28 @@
             return;
         }
 
-        const id = tombol.dataset.id;
-        if (!keranjang[id]) {
+        const kunci = tombol.dataset.key;
+        if (!keranjang[kunci]) {
             return;
         }
 
         const delta = Number(tombol.dataset.delta);
         if (delta < 0) {
-            keranjang[id].qty -= 1;
-            if (keranjang[id].qty < 1) {
-                delete keranjang[id];
+            keranjang[kunci].qty -= 1;
+            if (keranjang[kunci].qty < 1) {
+                delete keranjang[kunci];
             }
-        } else if (keranjang[id].qty < keranjang[id].stok) {
-            keranjang[id].qty += 1;
         } else {
-            tampilPesan('Stok ' + keranjang[id].nama + ' hanya tersedia ' + keranjang[id].stok + ' cup.', 'error');
-            return;
+            const sudahDipakai = Object.values(keranjang)
+                .filter(function (item) { return item.id === keranjang[kunci].id; })
+                .reduce(function (total, item) { return total + item.qty; }, 0);
+
+            if (sudahDipakai >= keranjang[kunci].stok) {
+                tampilPesan('Stok ' + keranjang[kunci].nama + ' hanya tersedia ' + keranjang[kunci].stok + ' cup untuk semua varian.', 'error');
+                return;
+            }
+
+            keranjang[kunci].qty += 1;
         }
 
         renderKeranjang();

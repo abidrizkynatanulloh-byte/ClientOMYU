@@ -175,7 +175,12 @@
                             @endif
                             <label>Catatan verifikasi (opsional)</label>
                             <textarea name="catatan_verifikasi" rows="2" maxlength="255" placeholder="Contoh: Cocok dengan mutasi BCA 17/11 10:24"></textarea>
-                            <button type="submit" class="btn-action btn-primary" style="margin-top:12px;">Konfirmasi Pembayaran &amp; Pesanan</button>
+                            <button type="submit" class="btn-action btn-primary" style="margin-top:12px;"
+                                    data-confirm="Apakah Anda yakin ingin mengaktifkan pesanan #{{ $pesanan->kode_pesanan }} setelah pembayarannya diverifikasi?"
+                                    data-confirm-title="Verifikasi Pembayaran?"
+                                    data-confirm-code="#{{ $pesanan->kode_pesanan }}"
+                                    data-confirm-btn="Ya, Verifikasi"
+                                    data-confirm-type="success">Konfirmasi Pembayaran &amp; Pesanan</button>
                         @endif
                     </form>
                 @endif
@@ -193,19 +198,34 @@
                             <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
                                 @csrf
                                 <input type="hidden" name="status_pesanan" value="diproses">
-                                <button type="submit" class="btn-action btn-primary">Mulai Proses Pembuatan</button>
+                                <button type="submit" class="btn-action btn-primary"
+                                        data-confirm="Apakah Anda yakin ingin mengaktifkan dan mulai memproses pesanan #{{ $pesanan->kode_pesanan }}?"
+                                        data-confirm-title="Mulai Proses Pesanan?"
+                                        data-confirm-code="#{{ $pesanan->kode_pesanan }}"
+                                        data-confirm-btn="Ya, Mulai Proses"
+                                        data-confirm-type="success">Mulai Proses Pembuatan</button>
                             </form>
                         @elseif($pesanan->status_pesanan === 'diproses')
                             <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
                                 @csrf
                                 <input type="hidden" name="status_pesanan" value="siap_diambil">
-                                <button type="submit" class="btn-action btn-indigo">Selesai Dibuat & Siap Diambil</button>
+                                <button type="submit" class="btn-action btn-indigo"
+                                        data-confirm="Apakah Anda yakin ingin menandai pesanan #{{ $pesanan->kode_pesanan }} selesai dibuat dan siap diambil?"
+                                        data-confirm-title="Selesaikan Pembuatan?"
+                                        data-confirm-code="#{{ $pesanan->kode_pesanan }}"
+                                        data-confirm-btn="Ya, Lanjutkan"
+                                        data-confirm-type="success">Selesai Dibuat & Siap Diambil</button>
                             </form>
                         @elseif($pesanan->status_pesanan === 'siap_diambil')
                             <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
                                 @csrf
                                 <input type="hidden" name="status_pesanan" value="selesai">
-                                <button type="submit" class="btn-action btn-green" onclick="return confirm('Serahkan pesanan dan selesaikan transaksi?')">Serahkan & Selesaikan Pesanan</button>
+                                <button type="submit" class="btn-action btn-green"
+                                        data-confirm="Apakah Anda yakin ingin menutup pesanan #{{ $pesanan->kode_pesanan }} dan menyelesaikan transaksinya?"
+                                        data-confirm-title="Serahkan Pesanan?"
+                                        data-confirm-code="#{{ $pesanan->kode_pesanan }}"
+                                        data-confirm-btn="Ya, Serahkan"
+                                        data-confirm-type="success">Serahkan & Selesaikan Pesanan</button>
                             </form>
                         @else
                             <div style="font-size:12px;color:#64748b;">Selesaikan verifikasi pembayaran untuk melanjutkan pesanan ke produksi.</div>
@@ -217,10 +237,22 @@
                                 @csrf
                                 <label>Alasan pembatalan (wajib)</label>
                                 <textarea name="alasan_batal" rows="2" minlength="5" maxlength="255" required placeholder="Contoh: Stok bahan habis mendadak"></textarea>
-                                <button type="submit" class="btn-action btn-danger" style="margin-top:8px;" onclick="return confirm('Yakin membatalkan pesanan ini?')">Konfirmasi Pembatalan</button>
+                                <button type="submit" class="btn-action btn-danger" style="margin-top:8px;"
+                                        data-confirm="Apakah Anda yakin ingin menutup pesanan #{{ $pesanan->kode_pesanan }} ini tanpa menyelesaikannya?"
+                                        data-confirm-title="Batalkan Pesanan?"
+                                        data-confirm-code="#{{ $pesanan->kode_pesanan }}"
+                                        data-confirm-btn="Ya, Batalkan"
+                                        data-confirm-type="danger">Konfirmasi Pembatalan</button>
                             </form>
                         </details>
                     </div>
+                @endif
+
+                @if(in_array($pesanan->status_pesanan, ['siap_diambil', 'selesai'], true))
+                    <a href="{{ route('panel.staf.pesanan.struk', $pesanan->id) }}" class="btn-action"
+                       style="display:block;margin-top:10px;background:#eaf8ef;color:#166534;text-decoration:none;">
+                        Cetak Struk Penyerahan
+                    </a>
                 @endif
             </section>
         </div>

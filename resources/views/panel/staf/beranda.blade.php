@@ -287,25 +287,45 @@
                                 <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
                                     @csrf
                                     <input type="hidden" name="status_pesanan" value="dikonfirmasi">
-                                    <button type="submit" class="btn btn-primary">Konfirmasi</button>
+                                    <button type="submit" class="btn btn-primary"
+                                            data-confirm="Apakah Anda yakin ingin mengaktifkan pesanan #{{ $pesanan->kode_pesanan }} dan melanjutkan ke produksi?"
+                                            data-confirm-title="Konfirmasi Pesanan?"
+                                            data-confirm-code="#{{ $pesanan->kode_pesanan }}"
+                                            data-confirm-btn="Ya, Konfirmasi"
+                                            data-confirm-type="success">Konfirmasi</button>
                                 </form>
                             @elseif($pesanan->status_pesanan === 'dikonfirmasi')
                                 <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
                                     @csrf
                                     <input type="hidden" name="status_pesanan" value="diproses">
-                                    <button type="submit" class="btn btn-primary">Mulai Racik</button>
+                                    <button type="submit" class="btn btn-primary"
+                                            data-confirm="Apakah Anda yakin ingin mengaktifkan pesanan #{{ $pesanan->kode_pesanan }} dan mulai meraciknya sekarang?"
+                                            data-confirm-title="Mulai Racik?"
+                                            data-confirm-code="#{{ $pesanan->kode_pesanan }}"
+                                            data-confirm-btn="Ya, Mulai Racik"
+                                            data-confirm-type="success">Mulai Racik</button>
                                 </form>
                             @elseif($pesanan->status_pesanan === 'diproses')
                                 <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
                                     @csrf
                                     <input type="hidden" name="status_pesanan" value="siap_diambil">
-                                    <button type="submit" class="btn btn-primary">Siap Diambil</button>
+                                    <button type="submit" class="btn btn-primary"
+                                            data-confirm="Apakah Anda yakin ingin menandai pesanan #{{ $pesanan->kode_pesanan }} siap diambil?"
+                                            data-confirm-title="Siap Diambil?"
+                                            data-confirm-code="#{{ $pesanan->kode_pesanan }}"
+                                            data-confirm-btn="Ya, Lanjutkan"
+                                            data-confirm-type="success">Siap Diambil</button>
                                 </form>
                             @elseif($pesanan->status_pesanan === 'siap_diambil')
                                 <form method="POST" action="{{ route('panel.staf.pesanan.update-status', $pesanan->id) }}">
                                     @csrf
                                     <input type="hidden" name="status_pesanan" value="selesai">
-                                    <button type="submit" class="btn btn-primary" onclick="return confirm('Serahkan pesanan ini ke pembeli?')">Serahkan</button>
+                                    <button type="submit" class="btn btn-primary"
+                                            data-confirm="Apakah Anda yakin ingin menutup pesanan #{{ $pesanan->kode_pesanan }} dan menyerahkannya ke pembeli?"
+                                            data-confirm-title="Serahkan Pesanan?"
+                                            data-confirm-code="#{{ $pesanan->kode_pesanan }}"
+                                            data-confirm-btn="Ya, Serahkan"
+                                            data-confirm-type="success">Serahkan</button>
                                 </form>
                             @endif
                             <a href="{{ route('panel.staf.pesanan.detail', $pesanan->id) }}" class="btn btn-ghost">Detail</a>

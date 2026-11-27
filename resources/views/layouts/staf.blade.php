@@ -47,7 +47,8 @@
             overflow-x: hidden;
             max-width: 100%;
             width: 100%;
-            /* space for mobile bottom nav */
+            /* space for fixed topbar + mobile bottom nav */
+            padding-top: var(--th);
             padding-bottom: 72px;
         }
         a { text-decoration: none; color: inherit; }
@@ -58,7 +59,7 @@
 
         /* ===== TOPBAR ===== */
         .topbar {
-            position: sticky; top: 0; z-index: 50;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 50;
             height: var(--th);
             background: var(--w);
             border-bottom: 1px solid var(--br);
@@ -196,6 +197,28 @@
         }
         .bnav-tab.active { color: var(--g); }
         .bnav-tab svg { width: 22px; height: 22px; stroke-width: 2; }
+
+        /* Center scan tab */
+        .bnav-scan {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 2px;
+            padding: 4px 2px;
+            font-size: 9.5px; font-weight: 700; color: var(--s);
+            border: 0; background: none; cursor: pointer;
+            transition: color .15s ease;
+        }
+        .bnav-scan.active { color: var(--g); }
+        .bnav-scan-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 46px; height: 46px; margin-top: -20px;
+            border-radius: 50%;
+            background: var(--g); color: #fff;
+            border: 3px solid var(--w);
+            box-shadow: 0 6px 16px -4px rgba(25,135,84,.6);
+            transition: transform .15s ease, box-shadow .2s ease;
+        }
+        .bnav-scan:active .bnav-scan-icon { transform: scale(.9); }
+        .bnav-scan svg { width: 23px; height: 23px; stroke-width: 2; }
 
         /* Menu Lainnya sheet */
         .more-backdrop {
@@ -475,9 +498,11 @@
 
             /* Topbar offset */
             .topbar {
+                left: var(--sw);
+                right: 0;
                 margin-left: 0;
-                width: 100%;
-                max-width: 100%;
+                width: auto;
+                max-width: none;
                 padding: 0 24px;
                 box-sizing: border-box;
             }
@@ -744,6 +769,18 @@
                 Pesanan Masuk
             </a>
 
+            <a href="{{ route('panel.staf.pesanan.scan') }}"
+               class="snav-link {{ request()->routeIs('panel.staf.pesanan.scan') ? 'active' : '' }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M4 8V6a2 2 0 0 1 2-2h2"></path>
+                    <path d="M16 4h2a2 2 0 0 1 2 2v2"></path>
+                    <path d="M20 16v2a2 2 0 0 1-2 2h-2"></path>
+                    <path d="M8 20H6a2 2 0 0 1-2-2v-2"></path>
+                    <path d="M8 8h8v8H8z"></path>
+                </svg>
+                Scan QR Pengambilan
+            </a>
+
             <a href="{{ route('panel.staf.produksi.index') }}"
                class="snav-link {{ request()->routeIs('panel.staf.produksi.*') ? 'active' : '' }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -880,7 +917,11 @@
             </a>
             <form method="POST" action="{{ route('keluar') }}">
                 @csrf
-                <button type="submit" class="dd-logout">
+                <button type="submit" class="dd-logout"
+                        data-confirm="Apakah Anda yakin ingin keluar dari panel staf?"
+                        data-confirm-title="Keluar dari Panel Staf?"
+                        data-confirm-btn="Ya, Keluar"
+                        data-confirm-type="danger">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                     Keluar (Logout)
                 </button>
@@ -1016,6 +1057,18 @@
             </svg>
             <span>Pesanan</span>
         </a>
+        <button type="button" class="bnav-scan {{ request()->routeIs('panel.staf.pesanan.scan') ? 'active' : '' }}" onclick="bukaScanQrCepat()" aria-label="Scan QR">
+            <span class="bnav-scan-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M4 8V6a2 2 0 0 1 2-2h2"></path>
+                    <path d="M16 4h2a2 2 0 0 1 2 2v2"></path>
+                    <path d="M20 16v2a2 2 0 0 1-2 2h-2"></path>
+                    <path d="M8 20H6a2 2 0 0 1-2-2v-2"></path>
+                    <path d="M8 8h8v8H8z"></path>
+                </svg>
+            </span>
+            <span>Scan</span>
+        </button>
         <a href="{{ route('panel.staf.produksi.index') }}" class="bnav-tab {{ request()->routeIs('panel.staf.produksi.*') ? 'active' : '' }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M7 2h10l-2 11a4 4 0 0 1-4 3h0a4 4 0 0 1-4-3L5 2z"></path>
@@ -1048,6 +1101,7 @@
         <div class="help-section-label">Panduan cepat</div>
         <div class="help-links">
             <a href="{{ route('panel.staf.kasir.index') }}" class="help-link" onclick="tutupHelp()">Kasir &amp; transaksi baru</a>
+            <a href="{{ route('panel.staf.pesanan.scan') }}" class="help-link" onclick="tutupHelp()">Scan QR pengambilan</a>
             <a href="{{ route('panel.staf.produksi.index') }}" class="help-link" onclick="tutupHelp()">Antrean produksi</a>
             <a href="{{ route('panel.staf.stok.index') }}" class="help-link" onclick="tutupHelp()">Cek &amp; catat stok</a>
             <a href="{{ route('panel.staf.profil.index') }}" class="help-link" onclick="tutupHelp()">Foto &amp; kata sandi akun</a>
@@ -1105,6 +1159,22 @@
         function toggleNotif() {
             document.getElementById('profileDd').classList.remove('show');
             document.getElementById('notifDd').classList.toggle('show');
+        }
+        function bukaScanQrCepat() {
+            const tujuan = '{{ route('panel.staf.pesanan.scan') }}';
+
+            if (!window.StafScanner || typeof window.StafScanner.bukaQr !== 'function') {
+                window.location.href = tujuan;
+                return;
+            }
+
+            window.StafScanner.bukaQr({
+                judul: 'Scan QR Pengambilan',
+                pesanAwal: 'Arahkan kamera ke QR pengambilan pesanan...',
+                onResult: function (token) {
+                    window.location.href = tujuan + '?token=' + encodeURIComponent(token);
+                }
+            });
         }
         function markAllRead() {
             document.querySelectorAll('#notifDd .notif-row').forEach(r => {
@@ -1229,9 +1299,47 @@
             <img id="omyuLightboxImg" src="" alt="Pratinjau" class="lightbox-img">
         </div>
     </div>
+
+    <!-- OMYU Modern Interactive Confirmation Modal -->
+    <div id="omyuConfirmModal" class="omyu-confirm-modal" aria-hidden="true" role="dialog" aria-modal="true" data-soft-refresh-skip>
+        <div class="omyu-confirm-backdrop" onclick="window.tutupKonfirmasiModal()"></div>
+        <div class="omyu-confirm-box" role="document">
+            <button type="button" class="omyu-confirm-close" onclick="window.tutupKonfirmasiModal()" aria-label="Tutup popup">&times;</button>
+
+            <div class="omyu-confirm-icon-wrapper" id="omyuConfirmIconWrapper">
+                <div class="omyu-confirm-icon-glow"></div>
+                <div class="omyu-confirm-icon-circle" id="omyuConfirmIconCircle">
+                    <svg id="omyuConfirmIconSvg" class="omyu-confirm-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                </div>
+            </div>
+
+            <h3 class="omyu-confirm-title" id="omyuConfirmTitle">Konfirmasi</h3>
+
+            <div class="omyu-confirm-code-badge" id="omyuConfirmCodeBadge" style="display:none;">
+                <span class="badge-icon">🧾</span>
+                <span class="badge-text" id="omyuConfirmCodeText"></span>
+            </div>
+
+            <p class="omyu-confirm-message" id="omyuConfirmMessage"></p>
+
+            <div class="omyu-confirm-actions">
+                <button type="button" class="omyu-confirm-btn-cancel" id="omyuConfirmBtnCancel" onclick="window.tutupKonfirmasiModal()">
+                    Batal
+                </button>
+                <button type="button" class="omyu-confirm-btn-submit" id="omyuConfirmBtnSubmit">
+                    <span id="omyuConfirmBtnSubmitText">Ya, Lanjutkan</span>
+                </button>
+            </div>
+        </div>
+    </div>
     <!-- OMYU Staf V35 Interactive Scripts -->
     <script src="{{ asset('js/staf-anim.js') }}?v={{ filemtime(public_path('js/staf-anim.js')) }}"></script>
     @yield('scripts')
     @stack('scripts')
+    @unless(request()->routeIs('panel.staf.pesanan.scan'))
+        <script src="{{ asset('js/soft-refresh.js') }}?v={{ filemtime(public_path('js/soft-refresh.js')) }}"></script>
+    @endunless
 </body>
 </html>

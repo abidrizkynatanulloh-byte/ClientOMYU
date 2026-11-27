@@ -3,7 +3,7 @@
 @section('title', 'Edit Menu: '.$produk->nama)
 @section('page_title', 'Edit Menu')
 @section('badge', 'O-03A')
-@section('page_subtitle', 'Perbarui data menu, harga, stok, dan gambar. Gambar baru otomatis dikompres menjadi WebP maksimal 100 KB.')
+@section('page_subtitle', 'Perbarui data menu, varian & harga (misalnya Hot/Ice), resep, dan gambar. Gambar baru otomatis dikompres menjadi WebP maksimal 100 KB.')
 
 @section('header_actions')
     <a href="{{ route('panel.admin.menu.index') }}" class="btn-press inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
@@ -23,11 +23,15 @@
             </div>
             <div>
                 <h3 class="text-lg font-extrabold text-slate-900">Edit {{ $produk->nama }}</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Perubahan harga juga mengikuti varian <strong>Reguler</strong>.</p>
+                <p class="text-xs text-slate-500 mt-0.5">Atur nama dan harga tiap varian. Harga utama menu mengikuti varian pertama.</p>
             </div>
         </div>
 
-        <form method="POST" action="{{ route('panel.admin.menu.update', $produk->id) }}" enctype="multipart/form-data" class="space-y-5">
+        <form method="POST" action="{{ route('panel.admin.menu.update', $produk->id) }}" enctype="multipart/form-data" class="space-y-5"
+              data-confirm="Simpan perubahan pada menu {{ $produk->nama }}?"
+              data-confirm-title="Simpan Perubahan Menu?"
+              data-confirm-btn="Ya, Simpan"
+              data-confirm-type="success">
             @csrf
             @method('PUT')
 
@@ -59,9 +63,10 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Harga (Rp) <span class="text-rose-500">*</span></label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Harga Dasar (Rp) <span class="text-rose-500">*</span></label>
                     <input type="number" name="harga" value="{{ old('harga', $produk->harga) }}" min="0" required
                            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/40 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+                    <span class="text-[11px] text-slate-400 mt-1 block">Menjadi harga varian pertama. Harga tiap varian bisa diisi berbeda.</span>
                     @error('harga') <p class="text-xs text-rose-600 mt-1 font-semibold">{{ $message }}</p> @enderror
                 </div>
                 <div class="rounded-xl bg-brand-50 border border-brand-200 p-3">
@@ -80,8 +85,46 @@
             </div>
 
             @php
+                $barisVarian = old('varians', $daftarVarian);
                 $barisResep = old('resep_bahan', $resepBahan ?: [['bahan_id' => '', 'takaran' => '']]);
             @endphp
+
+            <div class="rounded-2xl bg-white border border-slate-200 p-4">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
+                    <div>
+                        <h4 class="text-xs font-extrabold text-slate-900">
+                            <i class="fa-solid fa-layer-group mr-1 text-brand-600"></i> Varian &amp; Harga <span class="text-rose-500">*</span>
+                        </h4>
+                        <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                            Bisa lebih dari satu, misalnya <strong>Reguler</strong>, <strong>Hot</strong>, dan <strong>Ice</strong> dengan harga berbeda.
+                            Varian pertama menjadi harga utama menu.
+                        </p>
+                    </div>
+                    <button type="button" id="tambah-varian"
+                            class="btn-press shrink-0 px-3 py-2 rounded-xl bg-brand-100 hover:bg-brand-200 text-brand-900 font-bold text-xs">
+                        <i class="fa-solid fa-plus mr-1"></i> Tambah Varian
+                    </button>
+                </div>
+
+                <div id="baris-varian" class="space-y-2">
+                    @foreach($barisVarian as $indeks => $varian)
+                        <div class="baris-varian grid grid-cols-1 sm:grid-cols-[1fr_10rem_auto] gap-2 items-start">
+                            <input type="hidden" name="varians[{{ $indeks }}][id]" value="{{ $varian['id'] ?? '' }}">
+                            <input type="text" name="varians[{{ $indeks }}][nama]" value="{{ $varian['nama'] ?? '' }}" placeholder="Contoh: Hot" maxlength="50" required
+                                   class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/40 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+                            <input type="number" name="varians[{{ $indeks }}][harga]" value="{{ $varian['harga'] ?? '' }}" min="0" placeholder="Harga (Rp)" required
+                                   class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/40 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-400">
+                            <button type="button" class="hapus-varian w-10 h-10 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center" title="Hapus varian">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                    @endforeach
+                </div>
+
+                @error('varians') <p class="text-xs text-rose-600 mt-2 font-semibold">{{ $message }}</p> @enderror
+                @error('varians.*.nama') <p class="text-xs text-rose-600 mt-2 font-semibold">{{ $message }}</p> @enderror
+                @error('varians.*.harga') <p class="text-xs text-rose-600 mt-2 font-semibold">{{ $message }}</p> @enderror
+            </div>
 
             <div class="rounded-2xl bg-white border border-slate-200 p-4">
                 <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
@@ -183,6 +226,47 @@
         }
         pratinjau.src = URL.createObjectURL(berkas);
         pratinjau.classList.remove('hidden');
+    });
+
+    const wadahVarian = document.getElementById('baris-varian');
+    let indeksVarian = wadahVarian.querySelectorAll('.baris-varian').length;
+    const hargaDasar = document.querySelector('[name="harga"]');
+    const hargaVarianPertama = wadahVarian.querySelector('[name$="[harga]"]');
+    let hargaVarianDiubah = false;
+
+    hargaVarianPertama?.addEventListener('input', function () {
+        hargaVarianDiubah = true;
+    });
+
+    hargaDasar?.addEventListener('input', function () {
+        if (!hargaVarianDiubah && hargaVarianPertama) {
+            hargaVarianPertama.value = hargaDasar.value;
+        }
+    });
+
+    document.getElementById('tambah-varian')?.addEventListener('click', function () {
+        const contoh = wadahVarian.querySelector('.baris-varian');
+        const barisBaru = contoh.cloneNode(true);
+
+        barisBaru.querySelectorAll('[name]').forEach(function (elemen) {
+            elemen.name = elemen.name.replace(/\[\d+\]/, '[' + indeksVarian + ']');
+        });
+        barisBaru.querySelector('[name$="[id]"]').value = '';
+        barisBaru.querySelector('[name$="[nama]"]').value = '';
+        barisBaru.querySelector('[name$="[harga]"]').value = '';
+
+        wadahVarian.appendChild(barisBaru);
+        indeksVarian++;
+    });
+
+    wadahVarian.addEventListener('click', function (event) {
+        const tombolHapus = event.target.closest('.hapus-varian');
+        if (!tombolHapus) {
+            return;
+        }
+        if (wadahVarian.querySelectorAll('.baris-varian').length > 1) {
+            tombolHapus.closest('.baris-varian').remove();
+        }
     });
 
     const wadahResep = document.getElementById('baris-resep');

@@ -110,6 +110,90 @@ class PesananController extends Controller
         return view('panel.staf.pesanan.detail', compact('pesanan', 'pembayaranAktif', 'buktiPembayaranTersedia'));
     }
 
+    public function scan()
+    {
+        $siapDiambil = Pesanan::with(['itemPesanan.produk'])
+            ->where('status_pesanan', 'siap_diambil')
+            ->latest('updated_at')
+            ->take(8)
+            ->get();
+
+        return view('panel.staf.pesanan.scan', compact('siapDiambil'));
+    }
+
+    public function validasiQr(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string|max:128',
+        ]);
+
+        $hasil = (new Pesanan)->validasiQrPickup($request->token);
+
+        if (! $hasil['valid']) {
+            return response()->json($hasil, 422);
+        }
+
+        $pesanan = $hasil['pesanan'];
+
+        return response()->json([
+            'valid' => true,
+            'pesanan' => [
+                'id' => $pesanan->id,
+                'kode_pesanan' => $pesanan->kode_pesanan,
+                'nama_pembeli' => $pesanan->nama_pembeli,
+                'telepon_pembeli' => $pesanan->telepon_pembeli,
+                'total' => $pesanan->total,
+                'status_pembayaran' => $pesanan->status_pembayaran,
+                'status_pesanan' => $pesanan->status_pesanan,
+                'status_produksi' => 'Selesai diracik',
+                'status_pengambilan' => 'Belum diambil',
+                'items' => $pesanan->itemPesanan->map(function ($item) {
+                    return [
+                        'nama' => $item->nama_produk.($item->nama_varian ? ' ('.$item->nama_varian.')' : ''),
+                        'jumlah' => $item->jumlah,
+                    ];
+                })->values(),
+            ],
+        ]);
+    }
+
+    public function terimaQr(Request $request, $id)
+    {
+        $request->validate([
+            'token' => 'required|string|max:128',
+        ]);
+
+        $pesanan = Pesanan::findOrFail($id);
+        $hasil = $pesanan->konfirmasiPengambilan(auth()->id(), $request->token);
+
+        if (! $hasil['valid']) {
+            return response()->json($hasil, 422);
+        }
+
+        LogAktivitas::create([
+            'pengguna_id' => auth()->id(),
+            'aksi' => 'konfirmasi_pengambilan',
+            'tipe_objek' => 'pesanan',
+            'id_objek' => $pesanan->id,
+            'deskripsi' => 'Staf '.auth()->user()->nama.' mengonfirmasi pengambilan pesanan '.$pesanan->kode_pesanan.' melalui QR.',
+            'alasan' => 'Scan QR pengambilan',
+            'ip_address' => $request->ip(),
+            'nilai_sesudah' => ['status_pesanan' => 'selesai'],
+        ]);
+
+        $pesananSelesai = $hasil['pesanan'];
+
+        return response()->json([
+            'valid' => true,
+            'struk_url' => route('panel.staf.pesanan.struk', $pesananSelesai->id),
+            'pesanan' => [
+                'kode_pesanan' => $pesananSelesai->kode_pesanan,
+                'status_pesanan' => $pesananSelesai->status_pesanan,
+                'diselesaikan_pada' => optional($pesananSelesai->diselesaikan_pada)->format('d/m/Y H:i'),
+            ],
+        ]);
+    }
+
     private function pembayaranAktif(Pesanan $pesanan): ?Pembayaran
     {
         return $pesanan->pembayaran()
@@ -266,7 +350,19 @@ class PesananController extends Controller
             $this->kapasitasMenu->sinkronkan();
         }
 
+        if ($statusBaru === 'selesai') {
+            return redirect()->route('panel.staf.pesanan.struk', $pesanan->id)
+                ->with('sukses', 'Pesanan '.$pesanan->kode_pesanan.' selesai diserahkan. Silakan cetak struknya.');
+        }
+
         return back()->with('sukses', 'Status pesanan '.$pesanan->kode_pesanan.' berhasil diubah menjadi '.$statusBaru.'.');
+    }
+
+    public function struk($id)
+    {
+        $pesanan = Pesanan::with(['itemPesanan', 'pembayaran', 'penangan'])->findOrFail($id);
+
+        return view('panel.staf.pesanan.struk', compact('pesanan'));
     }
 
     public function batalkan(Request $request, $id)

@@ -66,6 +66,48 @@
                             <div class="lacak-note">
                                 <strong>Catatan/Jadwal:</strong> {{ $pesanan->catatan ?: 'Segera dalam 15-20 menit' }}
                             </div>
+
+                            @if($pesanan->status_pesanan === 'selesai')
+                                @php
+                                    $ulasanPesanan = $pesanan->ulasan->keyBy('produk_id');
+                                    $menuDinilai = $pesanan->itemPesanan
+                                        ->filter(fn ($item) => $item->produk_id)
+                                        ->groupBy('produk_id');
+                                @endphp
+                                <div class="ulasan-box">
+                                    <div class="ulasan-judul">Beri Bintang untuk Menu Kamu</div>
+                                    <p class="ulasan-petunjuk">Bintang 1 = kurang suka, bintang 5 = paling suka. Penilaianmu dirata-rata dan ditampilkan di katalog.</p>
+                                    @forelse($menuDinilai as $produkId => $itemMenu)
+                                        @php
+                                            $namaMenu = $itemMenu->first()->nama_produk;
+                                            $ulasanMenu = $ulasanPesanan->get($produkId);
+                                        @endphp
+                                        <form method="POST" action="{{ route('pelanggan.ulasan.simpan') }}" class="ulasan-form">
+                                            @csrf
+                                            <input type="hidden" name="pesanan_id" value="{{ $pesanan->id }}">
+                                            <input type="hidden" name="produk_id" value="{{ $produkId }}">
+                                            <div class="ulasan-item-head">
+                                                <strong>{{ $namaMenu }}</strong>
+                                                @if($ulasanMenu)
+                                                    <span class="ulasan-tersimpan">Tersimpan: {{ $ulasanMenu->bintang }} bintang</span>
+                                                @endif
+                                            </div>
+                                            <div class="ulasan-bintang" role="radiogroup" aria-label="Pilih bintang untuk {{ $namaMenu }}">
+                                                @for($bintang = 1; $bintang <= 5; $bintang++)
+                                                    <label class="ulasan-bintang-pilih">
+                                                        <input type="radio" name="bintang" value="{{ $bintang }}" aria-label="{{ $bintang }} bintang" @checked($ulasanMenu?->bintang === $bintang) required>
+                                                        <span>&#9733;</span>
+                                                    </label>
+                                                @endfor
+                                            </div>
+                                            <textarea name="komentar" maxlength="500" placeholder="Komentar (opsional)">{{ old('komentar', $ulasanMenu?->komentar ?? '') }}</textarea>
+                                            <button type="submit" class="ulasan-kirim">{{ $ulasanMenu ? 'Perbarui Penilaian' : 'Kirim Penilaian' }}</button>
+                                        </form>
+                                    @empty
+                                        <div class="ulasan-kosong">Tidak ada menu untuk dinilai pada pesanan ini.</div>
+                                    @endforelse
+                                </div>
+                            @endif
                         </div>
 
                         <div class="lacak-detail-qr">
